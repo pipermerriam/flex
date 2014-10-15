@@ -1,0 +1,1361 @@
+swagger: 2.0
+info:
+  version: 3.0.0
+  title: Engagement API
+basePath: /v3
+schemes:
+  - http
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+paths:
+  /feeds/:
+    get:
+      summary: List resource for feed entries.
+      parameters:
+        - Page
+        - PageSize
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: FeedList
+    post:
+      summary: Create resource for feed entries.
+      parameters:
+        - name: body
+          in: body
+          schema: 
+            $ref: Feed
+      responses:
+        200:
+          schema:
+            $ref: Feed
+  /feeds/{feed_id}/:
+    parameters:
+      - name: tag_id
+        in: path
+        description: The database primary key identifying the feed
+        type: integer
+    get:
+      summary: Detail resource for a feed entry.
+      responses:
+        200:
+          schema:
+            $ref: Feed
+        400:
+        403:
+        404:
+    put:
+      summary: Update Resource for a feed entry.
+      parameters:
+        - name: body
+          in: body
+          schema: 
+            $ref: Feed
+      responses:
+        200:
+          schema:
+            $ref: Feed
+        400:
+        403:
+        404:
+    patch:
+      summary: Partial update resource for a feed entry.
+      responses:
+        200:
+          schema:
+            $ref: Feed
+        400:
+        403:
+        404:
+    delete:
+      summary: Delete resource for a feed entry.
+      responses:
+        201:
+        403:
+        404:
+  /tags/:
+    get:
+      summary: List resource for tags.
+      parameters:
+        - Page
+        - PageSize
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: TagList
+    post:
+      summary: Create a new tag.
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: Tag
+
+  /tags/{tag_id}/:
+    parameters:
+      - name: tag_id
+        in: path
+        description: The database primary key identifying the tag
+        type: integer
+
+    get:
+      summary: Detail resource for the specified tag.
+      responses:
+        200:
+          schema:
+            $ref: Tag
+    put:
+      summary: Update resource for the specified tag.
+      responses:
+        200:
+
+  # Marketplace Endpoints
+  /marketplace-links/:
+    get:
+      responses:
+        200:
+          schema:
+            $ref: MarketplaceLinkList
+        403:
+    post:
+      parameters:
+        - name: body
+          in: body
+          schema: 
+            $ref: MarketplaceLinkCreate
+      responses:
+        201:
+          schema:
+            $ref: Tip
+        400:
+        403:
+  /marketplace-links/{id}/:
+    parameters:
+      - name: id
+        in: path
+        description: The primary key of the MarketplaceLink
+        type: integer
+        format: int64
+    put:
+      responses:
+        200:
+          schema:
+            $ref: Tip
+        400:
+        403:
+        404:
+    patch:
+      responses:
+        200:
+          schema:
+            $ref: Tip
+        400:
+        403:
+        404:
+    delete:
+      responses:
+        204:
+        403:
+        404:
+  /marketplace-links/{marketplace_link_id}/tips/:
+    parameters:
+      - name: marketplace_link_id
+        in: path
+        description: The primary key of the MarketplaceLink
+        type: integer
+        format: int64
+    get:
+      responses:
+        200:
+          schema:
+            $ref: TipList
+        403:
+  /marketplace-links/{marketplace_link_id}/tips/{id}/:
+    parameters:
+      - name: marketplace_link_id
+        in: path
+        description: The primary key of the MarketplaceLink
+        type: integer
+        format: int64
+      - name: id
+        in: path
+        description: The primary of the Tip
+        type: integer
+        format: int64
+    get:
+      responses:
+        200:
+          schema:
+            $ref: Tip
+        403:
+        404:
+  /tips/{tip_id}/marketplace-links/:
+    parameters:
+      - name: tip_id
+        in: path
+        description: The primary key of the Tip
+        type: integer
+        format: int64
+    get:
+      responses:
+        200:
+          schema:
+            $ref: MarketplaceLinkList
+        403:
+  /tips/{tip_id}/marketplace-links/{id}/:
+    parameters:
+      - name: tip_id
+        in: path
+        description: The primary key of the Tip
+        type: integer
+        format: int64
+      - name: id
+        in: path
+        description: The primary of the MarketplaceLink
+        type: integer
+        format: int64
+    get:
+      responses:
+        200:
+          schema:
+            $ref: MarketplaceLink
+        403:
+        404:
+  /utility-programs/{utility_program_id}/marketplace-links/:
+    parameters:
+      - name: utility_program_id
+        in: path
+        description: The primary key of the UtilityProgram
+        type: integer
+        format: int64
+    get:
+      responses:
+        200:
+          schema:
+            $ref: MarketplaceLinkList
+        403:
+  /utility-programs/{utility_program_id}/marketplace-links/{id}/:
+    parameters:
+      - name: utility_program_id
+        in: path
+        description: The primary key of the UtilityProgram
+        type: integer
+        format: int64
+      - name: id
+        in: path
+        description: The primary of the MarketplaceLink
+        type: integer
+        format: int64
+    get:
+      responses:
+        200:
+          schema:
+            $ref: MarketplaceLink
+        403:
+        404:
+  # Customer Endpoints
+  /customers/:
+    get:
+      responses:
+        200:
+          schema:
+            $ref: CustomerList
+        403:
+  /customers/{cust_unique_id}/:
+    parameters:
+      - name: cust_unique_id
+        in: path
+        description: The opaque string identifier for the customer
+        type: string
+        maxLength: 255
+    patch:
+      summary: Update zero or more fields of the customer resource.
+      parameters:
+        - name: body
+          in: body
+          schema: 
+            $ref: CustomerPatch
+      responses:
+        200:
+          schema:
+            $ref: Customer
+        400:
+        404:
+        403:
+  # Account Endpoints
+  /accounts/:
+    get:
+      responses:
+        200:
+          schema:
+            $ref: AccountList
+        403:
+  /accounts/{account_unique_id}/:
+    parameters:
+      - name: account_unique_id
+        in: path
+        description: The opaque string identifier for the account
+        type: string
+        maxLength: 255
+    patch:
+      summary: Update zero or more fields of the account resource.
+      parameters:
+        - name: body
+          in: body
+          schema: 
+            $ref: AccountPatch
+      responses:
+        200:
+          schema:
+            $ref: Account
+        400:
+        404:
+        403:
+  # Premise Endpoints
+  /premises/:
+    get:
+      responses:
+        200:
+          schema:
+            $ref: PremiseList
+        403:
+  /premises/{premise_unique_id}/:
+    parameters:
+      - name: premise_unique_id
+        in: path
+        description: The opaque string identifier for the premise
+        type: string
+        maxLength: 255
+    patch:
+      summary: Update zero or more fields of the premise resource.
+      parameters:
+        - name: body
+          in: body
+          schema: 
+            $ref: PremisePatch
+      responses:
+        200:
+          schema:
+            $ref: Premise
+        400:
+        404:
+        403:
+  # Service Point Endpoints
+  /service-points/:
+    get:
+      responses:
+        200:
+          schema:
+            $ref: ServicePointList
+        403:
+  /service-points/{spt_unique_id}/:
+    parameters:
+      - name: spt_unique_id
+        in: path
+        description: The opaque string identifier for the service point.
+        type: string
+        maxLength: 255
+    get:
+      summary: Account and premise information for the specified service point identifier.
+      responses:
+        200:
+          schema:
+            $ref: ServicePoint
+        404: 
+          summary: Service point identifier does not correspond to a known service point
+    put:
+    patch:
+      summary: Partial update resource for a service point.
+      responses:
+        200:
+          parameters:
+            - name: body
+              in: body
+              schema:
+                $ref: ServicePointPatch
+          schema:
+            $ref: ServicePoint
+        400:
+        403:
+        404:
+    delete:
+        201:
+        403:
+        404:
+definitions:
+  # Start Tag
+  Tag:
+    required:
+      - id
+      - tag
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      tag:
+        type: string
+        maxLength: 255
+  # End Tag
+  # Start TagList
+  TagList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: Tag
+  # End TagList
+
+  # Start Feed
+  Feed:
+    required:
+      - id
+      - user
+      - template_name
+      - template_data
+      - created
+      - status
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      user:
+        type: integer
+        format: int64
+      template_name:
+        enum:
+          - "badge"
+          - "reward"
+      template_data:
+        type: string
+        description: JSON for rendering the feed entry on the front end.
+      created:
+        type: string
+        format: date-time
+      status:
+        type: integer
+        enum:
+          - 0
+          - 1
+        description: Integer representing a boolean for whether this entry should be displayed or not.
+  # End Feed
+  # Start FeedList
+  FeedList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: Feed
+  # End FeedList
+  # Start ServicePoint
+  ServicePoint:
+    required:
+      - id
+      - usage_id
+      - account
+      - premise
+      - meters
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      usage_id:
+        type: string
+        maxLength: 255
+      account:
+        type:
+          - string
+          - null
+        maxLength: 255
+      premise:
+        type: string
+        maxLength: 255
+      meters:
+        type: array
+        items: 
+          type: string
+          maxLength: 255
+          uniqueItems: True
+  # End ServicePoint
+  # Start ServicePointList
+  ServicePointList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: ServicePoint
+  # End ServicePointList
+  # Start ServicePointPatch
+  ServicePointPatch:
+      usage_id:
+        type: string
+        maxLength: 255
+      account:
+        type:
+          - string
+          - null
+        maxLength: 255
+      premise:
+        type: string
+        maxLength: 255
+  # End ServicePointPatch
+  # Start Customer
+  Customer:
+    required:
+      - id
+      - unique_id
+      - login_id
+      - name
+      - contact_email
+      - phone_number
+      - timezone
+      - is_employee
+      - billing_address
+      - accounts
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      unique_id:
+        type: string
+        maxLength: 255
+        readOnly: True
+      login_id:
+        type: 
+          - string
+          - null
+        maxLength: 255
+      contact_email:
+        type:
+          - string
+          - null
+        maxLength: 320  
+        format: email #TODO: API should enforce this
+      name: 
+        type: string
+      phone_number:
+        description: This phone number is validated with respect to international country code / number pattern conventions.
+        externalDocs: "https://github.com/daviddrysdale/python-phonenumbers"
+        type: string
+        maxLength: 50
+      timezone:
+        type: string
+        description: A timezone string such as "US/Denver"
+        externalDocs: "http://pythonhosted.org/pytz/"
+      is_employess:
+        type: boolean
+      can_contact:
+        type: boolean
+      billing_address:
+        $ref: Address
+      accounts:
+        type: array
+        items:
+          type: string
+          maxLength: 255
+          description: unique_id of the accounts related to this Customer
+  # End Customer
+  # Start CustomerList
+  CustomerList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: Customer
+  # End CustomerList
+  # Start CustomerPatch
+  CustomerPatch:
+    properties:
+      login_id:
+        type: 
+          - string
+          - null
+        maxLength: 255
+      contact_email:
+        type:
+          - string
+          - null
+        maxLength: 320  
+        format: email #TODO: API should enforce this
+      name: 
+        type: string
+      phone_number:
+        description: This phone number is validated with respect to international country code / number pattern conventions.
+        externalDocs: "https://github.com/daviddrysdale/python-phonenumbers"
+        type: string
+        maxLength: 50
+      timezone:
+        type: string
+        description: A timezone string such as "US/Denver"
+        externalDocs: "http://pythonhosted.org/pytz/"
+      is_employess:
+        type: boolean
+      can_contact:
+        type: boolean
+      billing_address:
+        $ref: AddressPatch
+  # End CustomerPatch
+  # Start Address
+  Address:
+    required: 
+      - id
+      - line_1
+      - line_2
+      - postal_code
+      - city
+      - region
+      - country
+      - latitude
+      - longitude
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      line_1:
+        type: string
+        maxLength: 255
+      line_2:
+        type: string
+        maxLength: 255
+      postal_code:
+        type: string
+        maxLength: 50
+      city:
+        type: string
+        maxLength: 50
+      region:
+        type: string
+        maxLength: 50
+      country:
+        description: ISO Country Code
+        type: string
+        maxLength: 2
+      latitude:
+        type: number
+        minimum: -90
+        maximum: 90
+      longitude:
+        type: number
+        minimum: -180
+        maximum: 180
+  # End Address
+  # Start AddressPatch
+  AddressPatch:
+    properties:
+      line_1:
+        type: string
+        maxLength: 255
+      line_2:
+        type: string
+        maxLength: 255
+      postal_code:
+        type: string
+        maxLength: 50
+      city:
+        type: string
+        maxLength: 50
+      region:
+        type: string
+        maxLength: 50
+      country:
+        description: ISO Country Code
+        type: string
+        maxLength: 2
+      latitude:
+        type: number
+        minimum: -90
+        maximum: 90
+      longitude:
+        type: number
+        minimum: -180
+        maximum: 180
+  # End AddressPatch
+  # Start Premise
+  Premise:
+    required:
+      - id
+      - unique_id
+      - address
+      - service_points
+      - structure_type
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      unique_id:
+        type: string
+        maxLength: 255
+        readOnly: True
+      address:
+        $ref: Address
+      service_points:
+        type: array
+        items: ServicePoint
+      structure_type:
+        type: string
+        enum:
+          - "Unknown"
+          - "Single Family"
+          - "Apartment"
+          - "Multi-dwelling"
+          - "Commercial"
+  # End Premise
+  # Start PremiseList
+  PremiseList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: Premise
+  # End PremiseList
+  # Start PremisePatch
+  PremisePatch:
+    properties:
+      address:
+        $ref: AddressPatch
+      service_points:
+        type: array
+        items: ServicePoint
+      structure_type:
+        type: string
+        enum:
+          - "Unknown"
+          - "Single Family"
+          - "Apartment"
+          - "Multi-dwelling"
+          - "Commercial"
+  # End PremisePatch
+  # Start Account
+  Account:
+    required:
+      - id
+      - unique_id
+      - account_type
+      - consumption_key
+      - disabled_at
+      - is_disabled
+      - account_state
+      - is_demand_response_eligible
+      - is_net_metered
+      - is_homeowner
+      - opened_at
+      - closed_at
+      - heating_type
+      - climate_zone
+      - number_of_medical_devices
+      - rate_plan
+      - assistance_program
+      - bill_cycle
+      - customer
+      - active_service_points
+      - properties
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      unique_id:
+        type: string
+        maxLength: 255
+        readOnly: True
+      account_type:
+        type: string
+        enum:
+          - "residential"
+          - "commercial"
+          - "unknown"
+      consumption_key:
+        type: string
+        maxLength: 255
+      disabled_at:
+        oneOf:
+          - type: string
+            format: date-time
+          - type: null
+        readOnly: True
+      is_disabled:
+        type: boolean
+        readOnly: True
+      account_state:
+        type: string
+        enum:
+          - "initial"
+          - "enrolled"
+          - "activated"
+          - "disabled"
+          - "not_eligible"
+      is_demand_response_eligible:
+        type:
+          - boolean
+          - null
+      is_net_metered:
+        type:
+          - boolean
+          - null
+      is_homeowner:
+        type:
+          - boolean
+          - null
+      opened_at:
+        oneOf:
+          - type: string
+            format: date-time
+          - type: null
+      closed_at:
+        oneOf:
+          - type: string
+            format: date-time
+          - type: null
+      heating_type:
+        oneOf:
+          - type: string
+            enum:
+              - "basic"
+              - "electric"
+              - "gas"
+              - "other"
+          - type: null
+      climate_zone:
+        oneOf:
+          - type: integer
+            enum:
+              - 1  # Coastal
+              - 2  # Mountain
+              - 3  # Desert
+              - 4  # Inland
+          - type: null
+      number_of_medical_devices:
+        oneOf:
+          - type: integer
+            minimum: 0
+          - type: null
+      assistance_program:
+        type: string
+        enum:
+          - "CARE"
+          - "FERA"
+          - "BOTH"
+      bill_cycle:
+        type:
+          - integer
+          - null
+      customer:
+        type: string
+        maxLength: 255
+        description: The unique_id of this account's customer
+      active_service_points:
+        type: array
+        items: 
+          type: string
+          maxLength: 255
+          uniqueItems: True
+      properties:
+        type: array
+  # End Account
+  # Start AccountList
+  AccountList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: Account
+  # End AccountList
+  # Start AccountPatch
+  AccountPatch:
+    properties:
+      account_type:
+        type: string
+        enum:
+          - "residential"
+          - "commercial"
+          - "unknown"
+      consumption_key:
+        type: string
+        maxLength: 255
+      account_state:
+        type: string
+        enum:
+          - "initial"
+          - "enrolled"
+          - "activated"
+          - "disabled"
+          - "not_eligible"
+      is_demand_response_eligible:
+        type:
+          - boolean
+          - null
+      is_net_metered:
+        type:
+          - boolean
+          - null
+      is_homeowner:
+        type:
+          - boolean
+          - null
+      opened_at:
+        oneOf:
+          - type: string
+            format: date-time
+          - type: null
+      closed_at:
+        oneOf:
+          - type: string
+            format: date-time
+          - type: null
+      heating_type:
+        oneOf:
+          - type: string
+            enum:
+              - "basic"
+              - "electric"
+              - "gas"
+              - "other"
+          - type: null
+      climate_zone:
+        oneOf:
+          - type: integer
+            enum:
+              - 1  # Coastal
+              - 2  # Mountain
+              - 3  # Desert
+              - 4  # Inland
+          - type: null
+      number_of_medical_devices:
+        oneOf:
+          - type: integer
+            minimum: 0
+          - type: null
+      assistance_program:
+        type: string
+        enum:
+          - "CARE"
+          - "FERA"
+          - "BOTH"
+      bill_cycle:
+        type:
+          - integer
+          - null
+      customer:
+        type: string
+        maxLength: 255
+        description: The unique_id of this account's customer
+  # End AccountPatch
+  # Start Tip
+  Tip:
+    required:
+      - id
+      - name
+      - headline
+      - body
+      - impact
+      - impact_body
+      - impact_kwh
+      - cost
+      - difficulty
+      - points
+      - status
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      name:
+        type: string
+        maxLength: 255
+      headline:
+        type: string
+        maxLength: 255
+      body:
+        type: string
+      impact:
+        type: integer
+        format: int64
+      impact_body:
+        type: string
+      impact_kwh:
+        type: integer
+        format: int64
+      cost:
+        type: integer
+        format: int64
+      points:
+        type: integer
+        format: int64
+      status:
+        type: integer
+        format: int64
+      hotspots:
+        description: "The primary keys of the Hotspots associated with this Tip"
+        type: array
+        uniqueItems: True
+        items:
+          type: integer
+          format: int64
+      marketplace_links:
+        description: "The primary keys of the MarketplaceLinks associated with this Tip"
+        type: array
+        uniqueItems: True
+        items:
+          type: integer
+          format: int64
+  # End Tip
+  # Start TipList
+  TipList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: Tip
+  # End TipList
+  # Start UtilityProgram
+  UtilityProgram:
+    required:
+      - id
+      - name
+      - headline
+      - body
+      - image_file
+      - cost
+      - difficulty
+      - impact
+      - points
+      - link
+      - status
+      - verification_required
+      - dependencies
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      name:
+        type: string
+        maxLength: 255
+      headline:
+        type: string
+        maxLength: 255
+      body:
+        type: string
+      image_file:
+        description: "An image"  # TODO: how do you spec a file field?
+      cost:
+        type: integer
+        format: int64
+      difficulty:
+        type: integer
+        format: int64
+      impact:
+        type: integer
+        format: int64
+      points:
+        type: integer
+        format: int64
+      link:
+        type: string
+      status:
+        type: integer
+        format: int64
+      verification_required:
+        type: integer
+        format: int64
+      dependencies:
+        description: "The primary keys of the other UtilityPrograms that this program depends on."
+        type: array
+        uniqueItems: True
+        items:
+          type: integer
+          format: int64
+      hotspots:
+        description: "The primary keys of the Hotspots associated with this UtilityProgram"
+        type: array
+        uniqueItems: True
+        items:
+          type: integer
+          format: int64
+      marketplace_links:
+        description: "The primary keys of the MarketplaceLinks associated with this Tip"
+        type: array
+        uniqueItems: True
+        items:
+          type: integer
+          format: int64
+  # End UtilityProgram
+  # Start UtilityProgramList
+  UtilityProgramList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: UtilityProgram
+  # End UtilityProgramList
+  # Start MarketplaceLink
+  MarketplaceLink:
+    required:
+      - id
+      - link_text
+      - uri
+      - tips
+      - utility_programs
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: True
+      link_text:
+        type: string
+        maxLength: 255
+      uri:
+        type: string
+        maxLength: 2000
+      tips:
+        description: "Primary keys of the Tips associated with this MarketplaceLink"
+        type: array
+        uniqueItems: True
+      utility_programs:
+        description: "Primary keys of the UtilityPrograms associated with this MarketplaceLink"
+        type: array
+        uniqueItems: True
+  # End MarketplaceLink
+  # Start MarketplaceLinkList
+  MarketplaceLinkList:
+    required:
+      - next
+      - prev
+      - count
+      - results
+    properties:
+      next:
+        type:
+          - string
+          - null
+        format: uri
+      prev:
+        type:
+          - string
+          - null
+        format: uri
+      count:
+        type: integer
+        format: int64
+        minimum: 0
+      results:
+        type: array
+        items: 
+          $ref: MarketplaceLink
+  # End MarketplaceLinkList
+  # Start MarketplaceLinkCreate
+  MarketplaceLinkCreate:
+    required:
+      - uri
+    properties:
+      link_text:
+        type: string
+        maxLength: 255
+      uri:
+        type: string
+        maxLength: 2000
+      tips:
+        description: "Primary keys of the Tips associated with this MarketplaceLink"
+        type: array
+        uniqueItems: True
+      utility_programs:
+        description: "Primary keys of the UtilityPrograms associated with this MarketplaceLink"
+        type: array
+        uniqueItems: True
+  # End MarketplaceLinkCreate
+  # Start MarketplaceLinkPatch
+  MarketplaceLinkPatch:
+    properties:
+      link_text:
+        type: string
+        maxLength: 255
+      uri:
+        type: string
+        maxLength: 2000
+      tips:
+        description: "Primary keys of the Tips associated with this MarketplaceLink"
+        type: array
+        uniqueItems: True
+      utility_programs:
+        description: "Primary keys of the UtilityPrograms associated with this MarketplaceLink"
+        type: array
+        uniqueItems: True
+  # End MarketplaceLinkPatch
+parameters:
+  Page: 
+    - name: page
+      in: query
+      description: The page of results to be returned
+      type: integer
+      exclusiveMinimum: 0
+  PageSize:
+    - name: page_size
+      in: query
+      description: The page of results to be returned
+      type: integer
+      exclusiveMinimum: 0
+      maximum: 100
