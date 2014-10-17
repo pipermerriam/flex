@@ -29,6 +29,17 @@ Then in your code.
    schema = flex.load('path/to/schema.yaml')
 
 
+Supported Formats
+-----------------
+
+The ``flex.load`` function supports the following.
+
+- A path to either a ``json`` or ``yaml`` file.
+- A file object whose contents are ``json`` or ``yaml``
+- A string whose contents are ``json`` or ``yaml``
+- A native python object that is a ``Mapping`` (like a dictionary).
+
+
 Contents:
 
 .. toctree::
