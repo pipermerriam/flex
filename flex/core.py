@@ -1,5 +1,10 @@
 from __future__ import unicode_literals
 
+import os
+import collections
+
+import six
+import json
 import yaml
 
 from flex.serializers.core import SwaggerSerializer
@@ -8,11 +13,45 @@ from flex.utils import prettify_errors
 
 
 def load_source(source):
-    # TODO: content negotiation.
-    with open(source) as stream:
-        raw_schema = yaml.load(stream)
+    """
+    Common entry point for loading some form of raw swagger schema.
 
-    return raw_schema
+    Supports:
+        - python object (dictionary-like)
+        - path to yaml file
+        - path to json file
+        - file object (json or yaml).
+        - json string.
+        - yaml string.
+    """
+    # TODO: content negotiation.
+    if isinstance(source, collections.Mapping):
+        return source
+
+    elif hasattr(source, 'read') and callable(source.read):
+        raw_source = source.read()
+    elif os.path.exists(str(source)):
+        with open(source, 'r') as source_file:
+            raw_source = source_file.read()
+    elif isinstance(source, six.string_types):
+        raw_source = source
+
+    try:
+        try:
+            return yaml.load(raw_source)
+        except yaml.scanner.ScannerError:
+            pass
+
+        try:
+            return json.loads(raw_source)
+        except ValueError:
+            pass
+    except NameError:
+        pass
+
+    raise ValueError(
+        "Unable to parse `{0}`.  Tried yaml and json.".format(source),
+    )
 
 
 def parse(raw_schema):
