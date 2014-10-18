@@ -51,7 +51,7 @@ def indent_message(message, indent, prefix='', suffix=''):
 SINGULAR_TYPES = six.string_types + (numbers.Number,)
 
 
-def prettify_errors(errors, indent=0, prefix='', suffix=''):
+def format_errors(errors, indent=0, prefix='', suffix=''):
     """
     string: "example"
 
@@ -75,7 +75,7 @@ def prettify_errors(errors, indent=0, prefix='', suffix=''):
                 yield indent_message(message, indent, prefix=prefix, suffix=suffix)
             else:
                 yield indent_message(repr(key), indent, prefix=prefix, suffix=':')
-                for message in prettify_errors(value, indent + 4, prefix='- '):
+                for message in format_errors(value, indent + 4, prefix='- '):
                     yield message
 
     elif is_non_string_iterable(errors):
@@ -83,7 +83,7 @@ def prettify_errors(errors, indent=0, prefix='', suffix=''):
         extra_indent = int(math.ceil(math.log10(len(errors)))) + 2
         for index, value in enumerate(errors):
             list_prefix = "{0}. ".format(index)
-            messages = prettify_errors(
+            messages = format_errors(
                 value,
                 indent=indent + extra_indent - len(list_prefix),
                 prefix=list_prefix,
@@ -92,3 +92,7 @@ def prettify_errors(errors, indent=0, prefix='', suffix=''):
                 yield message
     else:
         assert False, "should not be possible"
+
+
+def prettify_errors(errors):
+    return '\n'.join(format_errors(errors))

@@ -3,7 +3,7 @@ import six
 from flex.utils import (
     is_non_string_iterable,
     is_value_of_type,
-    prettify_errors,
+    format_errors,
 )
 from flex.constants import (
     NULL,
@@ -120,10 +120,10 @@ def test_non_object_types():
 
 
 #
-# prettify_errors tests
+# format_errors tests
 #
 def test_string():
-    messages = list(prettify_errors("error"))
+    messages = list(format_errors("error"))
 
     assert messages == ["'error'"]
 
@@ -134,7 +134,7 @@ def test_short_iterable():
         "0. 'error-a'",
         "1. 'error-b'",
     ]
-    actual = list(prettify_errors(input))
+    actual = list(format_errors(input))
 
     assert set(actual) == set(expected)
 
@@ -148,7 +148,7 @@ def test_mapping_with_string_values():
         "'foo': 'bar'",
         "'bar': 'baz'",
     ]
-    actual = list(prettify_errors(input))
+    actual = list(format_errors(input))
 
     assert set(actual) == set(expected)
 
@@ -166,7 +166,7 @@ def test_mapping_with_iterables():
         "    0. 'baz'",
         "    1. 'foo'",
     ]
-    actual = list(prettify_errors(input))
+    actual = list(format_errors(input))
 
     assert set(actual) == set(expected)
 
@@ -190,7 +190,7 @@ def test_mapping_with_mappings():
         "    - 'baz': 'error-c'",
         "    - 'foo': 'error-d'",
     ]
-    actual = list(prettify_errors(input))
+    actual = list(format_errors(input))
 
     assert set(actual) == set(expected)
 
@@ -206,6 +206,6 @@ def test_iterable_of_mappings():
         "    0. 'baz'",
         "    1. 'foo'",
     ]
-    actual = list(prettify_errors(input))
+    actual = list(format_errors(input))
 
     assert set(actual) == set(expected)

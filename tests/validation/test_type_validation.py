@@ -1,11 +1,9 @@
 import pytest
 
-from rest_framework.serializers import ValidationError
-
-from flex.serializers.core import PropertiesSerializer
-
 
 def test_non_integer_type_raises_error():
+    from flex.serializers.core import PropertiesSerializer
+
     schema = {
         'pk': {
             'type': 'integer',
@@ -16,11 +14,13 @@ def test_non_integer_type_raises_error():
 
     validator = serializer.save()
 
-    with pytest.raises(ValidationError):
-        validator({'pk', '1'})
+    with pytest.raises(ValueError):
+        validator({'pk': '1'})
 
 
 def test_string_type_raises_error():
+    from flex.serializers.core import PropertiesSerializer
+
     schema = {
         'pk': {
             'type': 'integer',
@@ -31,11 +31,12 @@ def test_string_type_raises_error():
 
     validator = serializer.save()
 
-    with pytest.raises(ValidationError):
-        validator({'pk', 'abcd'})
+    with pytest.raises(ValueError):
+        validator({'pk': 'abcd'})
 
 
 def test_integer_type_valid():
+    from flex.serializers.core import PropertiesSerializer
     schema = {
         'pk': {
             'type': 'integer',

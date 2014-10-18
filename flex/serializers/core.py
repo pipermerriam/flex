@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import functools
 import collections
 import six
 
@@ -34,6 +35,10 @@ from flex.serializers.validators import (
 from flex.constants import (
     CSV,
     ARRAY,
+)
+from flex.validation.schema import (
+    validate_schema,
+    generate_type_validator,
 )
 
 
@@ -92,9 +97,7 @@ class HeadersSerializer(HomogenousDictSerializer):
 
 
 class SchemaSerializer(BaseSchemaSerializer):
-    def save_object(self, obj, **kwargs):
-        import ipdb; ipdb.set_trace()
-        return obj
+    pass
 
 
 class ResponseSerializer(BaseResponseSerializer):
@@ -196,8 +199,13 @@ class PropertiesSerializer(HomogenousDictSerializer):
     value_serializer_class = SchemaSerializer
 
     def save_object(self, obj, **kwargs):
-        import ipdb; ipdb.set_trace()
-        return obj
+        validators = {}
+        for key, schema in obj.items():
+            foo = {}
+            if 'type' in schema:
+                foo['type'] = generate_type_validator(schema['type'])
+            validators[key] = foo
+        self.object = functools.partial(validate_schema, validators=validators)
 
 
 # These fields include recursive use of the `SchemaSerializer` so they have to
