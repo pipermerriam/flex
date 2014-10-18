@@ -92,7 +92,9 @@ class HeadersSerializer(HomogenousDictSerializer):
 
 
 class SchemaSerializer(BaseSchemaSerializer):
-    pass
+    def save_object(self, obj, **kwargs):
+        import ipdb; ipdb.set_trace()
+        return obj
 
 
 class ResponseSerializer(BaseResponseSerializer):
@@ -192,6 +194,10 @@ class TagSerializer(serializers.Serializer):
 
 class PropertiesSerializer(HomogenousDictSerializer):
     value_serializer_class = SchemaSerializer
+
+    def save_object(self, obj, **kwargs):
+        import ipdb; ipdb.set_trace()
+        return obj
 
 
 # These fields include recursive use of the `SchemaSerializer` so they have to
