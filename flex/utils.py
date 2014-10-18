@@ -31,6 +31,10 @@ def is_value_of_type(value, type_):
     return isinstance(value, PRIMATIVE_TYPES[type_])
 
 
+def is_value_of_any_type(value, types):
+    return any(is_value_of_type(value, type_) for type_ in types)
+
+
 def is_single_item_iterable(value):
     if is_non_string_iterable(value):
         if isinstance(value, collections.Sequence):

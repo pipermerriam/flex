@@ -37,14 +37,14 @@ ARRAY = 'array'
 OBJECT = 'object'
 
 PRIMATIVE_TYPES = {
-    None: type(None),
-    NULL: type(None),
-    BOOLEAN: bool,
-    INTEGER: int,
-    NUMBER: numbers.Number,
+    None: (type(None),),
+    NULL: (type(None),),
+    BOOLEAN: (bool,),
+    INTEGER: (int,),
+    NUMBER: (numbers.Number,),
     STRING: six.string_types,
-    ARRAY: collections.Sequence,
-    OBJECT: collections.Mapping,
+    ARRAY: (collections.Sequence,),
+    OBJECT: (collections.Mapping,),
 }
 
 HEADER_TYPES = (

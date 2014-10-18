@@ -3,17 +3,22 @@ import functools
 
 from rest_framework import serializers
 
-from flex.constants import PRIMATIVE_TYPES
-from flex.utils import prettify_errors
+from flex.utils import (
+    prettify_errors,
+    is_value_of_any_type,
+    is_non_string_iterable,
+)
 
 
-def isinstance_(obj, classinfo):
-    if not isinstance(obj, classinfo):
-        raise serializers.ValidationError('Must be of type {0}'.format(classinfo))
+def validate_type(value, types):
+    if not is_value_of_any_type(value, types):
+        raise serializers.ValidationError("Invalid Type: {0}".format(value))
 
 
-def generate_type_validator(type):
-    return functools.partial(isinstance_, classinfo=PRIMATIVE_TYPES[type])
+def generate_type_validator(types):
+    if not is_non_string_iterable(types):
+        types = (types,)
+    return functools.partial(validate_type, types=types)
 
 
 def validate_schema(obj, validators):
