@@ -22,6 +22,10 @@ def generate_type_validator(types):
 
 
 def validate_schema(obj, validators):
+    """
+    Given a json-like object to validate, and a dictionary of validators, apply
+    the validators to the object.
+    """
     errors = {}
 
     for key, value in validators.items():

@@ -24,6 +24,8 @@ from flex.constants import (
     FORM_DATA,
     MULTI,
     ARRAY,
+    INTEGER,
+    NUMBER,
 )
 
 
@@ -75,6 +77,11 @@ class HomogenousDictSerializer(serializers.Serializer):
 
 
 class CommonJSONSchemaSerializer(serializers.Serializer):
+    default_error_messages = {
+        'invalid_type_for_minimum': '`minimum` can only be used for json number types',
+        'invalid_type_for_maximum': '`maximum` can only be used for json number types',
+    }
+
     multipleOf = serializers.IntegerField(
         required=False, validators=[MinValueValidator(0)],
     )
@@ -100,6 +107,27 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
     uniqueItems = serializers.BooleanField(required=False)
 
     enum = ListField(required=False)
+
+    def validate(self, attrs):
+        errors = collections.defaultdict(list)
+
+        # Minimum
+        if 'minimum' in attrs and 'type' in attrs:
+            if attrs['type'] not in (INTEGER, NUMBER):
+                errors['minimum'].append(
+                    self.error_messages['invalid_type_for_minimum'],
+                )
+
+        # Maximum
+        if 'maximum' in attrs and 'type' in attrs:
+            if attrs['type'] not in (INTEGER, NUMBER):
+                errors['maximum'].append(
+                    self.error_messages['invalid_type_for_maximum'],
+                )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(CommonJSONSchemaSerializer, self).validate(attrs)
 
 
 class BaseSchemaSerializer(CommonJSONSchemaSerializer):
