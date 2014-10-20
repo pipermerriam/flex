@@ -25,8 +25,8 @@ def assert_error_message_equal(formatted_msg, unformatted_msg):
     # replace any parenthesis
     pattern = re.sub('\(', '\(', pattern)
     pattern = re.sub('\)', '\)', pattern)
+
     if not re.compile(pattern).search(formatted_msg):
-        import ipdb; ipdb.set_trace()
         raise AssertionError(
             "`{0}` not found in `{1}`".format(
                 formatted_msg, unformatted_msg,

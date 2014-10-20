@@ -26,6 +26,7 @@ from flex.constants import (
     ARRAY,
     INTEGER,
     NUMBER,
+    STRING,
 )
 
 
@@ -80,6 +81,15 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
     default_error_messages = {
         'invalid_type_for_minimum': '`minimum` can only be used for json number types',
         'invalid_type_for_maximum': '`maximum` can only be used for json number types',
+        'invalid_type_for_multiple_of': '`multipleOf` can only be used for json number types',
+        'invalid_type_for_min_length': '`minLength` can only be used for string types',
+        'invalid_type_for_max_length': '`maxLength` can only be used for string types',
+        'exclusive_minimum_requires_minimum': (
+            '`exclusiveMinimum` requires `minimum` to be set'
+        ),
+        'exclusive_maximum_requires_maximum': (
+            '`exclusiveMaximum` requires `maximum` to be set'
+        ),
     }
 
     multipleOf = serializers.IntegerField(
@@ -118,11 +128,42 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
                     self.error_messages['invalid_type_for_minimum'],
                 )
 
+        if 'exclusiveMinimum' in attrs and 'minimum' not in attrs:
+            errors['exclusiveMinimum'].append(
+                self.error_messages['exclusive_minimum_requires_minimum'],
+            )
+
         # Maximum
         if 'maximum' in attrs and 'type' in attrs:
             if attrs['type'] not in (INTEGER, NUMBER):
                 errors['maximum'].append(
                     self.error_messages['invalid_type_for_maximum'],
+                )
+
+        if 'exclusiveMaximum' in attrs and 'maximum' not in attrs:
+            errors['exclusiveMaximum'].append(
+                self.error_messages['exclusive_maximum_requires_maximum'],
+            )
+
+        # multipleOf
+        if 'multipleOf' in attrs and 'type' in attrs:
+            if attrs['type'] not in (INTEGER, NUMBER):
+                errors['multipleOf'].append(
+                    self.error_messages['invalid_type_for_multiple_of'],
+                )
+
+        # minLength
+        if 'minLength' in attrs and 'type' in attrs:
+            if attrs['type'] != STRING:
+                errors['minLength'].append(
+                    self.error_messages['invalid_type_for_min_length'],
+                )
+
+        # maxLength
+        if 'maxLength' in attrs and 'type' in attrs:
+            if attrs['type'] != STRING:
+                errors['maxLength'].append(
+                    self.error_messages['invalid_type_for_max_length'],
                 )
 
         if errors:
