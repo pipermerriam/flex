@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+
+import re
 import urlparse
 import operator
 
@@ -7,6 +9,7 @@ import six
 from rest_framework import serializers
 
 from flex.decorators import maybe_iterable
+from flex.utils import is_value_of_type
 from flex.constants import (
     SCHEMES,
     MIMETYPES,
@@ -18,6 +21,7 @@ from flex.constants import (
     SECURITY_TYPES,
     SECURITY_API_KEY_LOCATIONS,
     SECURITY_FLOWS,
+    ARRAY,
 )
 
 
@@ -142,4 +146,20 @@ def security_flow_validator(value):
     if value not in SECURITY_FLOWS:
         raise serializers.ValidationError(
             "Unknown security flow: {0}".format(value),
+        )
+
+
+def regex_validator(value):
+    try:
+        re.compile(value)
+    except re.error as e:
+        raise serializers.ValidationError(
+            "Invalid Regex: {0}".format(e.message)
+        )
+
+
+def is_array_validator(value):
+    if not is_value_of_type(value, ARRAY):
+        raise serializers.ValidationError(
+            "Must be an array",
         )

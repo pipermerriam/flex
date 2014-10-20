@@ -260,3 +260,152 @@ def test_max_length_valid_with_string_type():
         },
     )
     assert 'maxLength' not in serializer.errors
+
+
+#
+# maxItems tests
+@pytest.mark.parametrize(
+    'type_',
+    (
+        NULL,
+        BOOLEAN,
+        INTEGER,
+        NUMBER,
+        STRING,
+        OBJECT,
+    ),
+)
+def test_max_items_invalid_with_non_arraw_type(type_):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': type_,
+            'maxItems': 5,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'maxItems' in serializer.errors
+    assert_error_message_equal(
+        serializer.errors['maxItems'][0],
+        serializer.error_messages['invalid_type_for_max_items'],
+    )
+
+
+def test_max_items_valid_with_array_type():
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': ARRAY,
+            'maxItems': 5,
+        },
+    )
+    assert 'maxItems' not in serializer.errors
+
+
+#
+# minItems tests
+#
+@pytest.mark.parametrize(
+    'type_',
+    (
+        NULL,
+        BOOLEAN,
+        INTEGER,
+        NUMBER,
+        STRING,
+        OBJECT,
+    ),
+)
+def test_min_items_invalid_with_non_arraw_type(type_):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': type_,
+            'minItems': 5,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'minItems' in serializer.errors
+    assert_error_message_equal(
+        serializer.errors['minItems'][0],
+        serializer.error_messages['invalid_type_for_min_items'],
+    )
+
+
+def test_min_items_valid_with_array_type():
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': ARRAY,
+            'minItems': 5,
+        },
+    )
+    assert 'minItems' not in serializer.errors
+
+
+#
+# uniqueItems tests
+#
+@pytest.mark.parametrize(
+    'type_',
+    (
+        NULL,
+        BOOLEAN,
+        INTEGER,
+        NUMBER,
+        STRING,
+        OBJECT,
+    ),
+)
+def test_unique_items_invalid_with_non_arraw_type(type_):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': type_,
+            'uniqueItems': True,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'uniqueItems' in serializer.errors
+    assert_error_message_equal(
+        serializer.errors['uniqueItems'][0],
+        serializer.error_messages['invalid_type_for_unique_items'],
+    )
+
+
+def test_unique_items_valid_with_array_type():
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': ARRAY,
+            'uniqueItems': True,
+        },
+    )
+    assert 'uniqueItems' not in serializer.errors
+
+
+#
+# enum tests
+#
+@pytest.mark.parametrize(
+    'enum',
+    (
+        'abcd',
+        {'a': 'foo', 'b': 'bar'},
+        123,
+        None,
+    ),
+)
+def test_non_array_for_enum_is_invalid(enum):
+
+    serializer = BaseSchemaSerializer(
+        data={
+            'enum': enum,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'enum' in serializer.errors
+
+
+def test_valid_enum_iterable():
+
+    serializer = BaseSchemaSerializer(
+        data={
+            'enum': ['a', 1, True, ['inner', 'array'], {'a': 'b', 'c': 'd'}, 2.0, None],
+        },
+    )
+    assert 'enum' not in serializer.errors

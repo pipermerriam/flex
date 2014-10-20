@@ -15,6 +15,8 @@ from flex.serializers.validators import (
     parameter_in_validator,
     collection_format_validator,
     MinValueValidator,
+    regex_validator,
+    is_array_validator,
 )
 from flex.constants import (
     BODY,
@@ -84,12 +86,16 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
         'invalid_type_for_multiple_of': '`multipleOf` can only be used for json number types',
         'invalid_type_for_min_length': '`minLength` can only be used for string types',
         'invalid_type_for_max_length': '`maxLength` can only be used for string types',
+        'invalid_type_for_min_items': '`minItems` can only be used for array types',
+        'invalid_type_for_max_items': '`maxItems` can only be used for array types',
+        'invalid_type_for_unique_items': '`uniqueItems` can only be used for array types',
         'exclusive_minimum_requires_minimum': (
             '`exclusiveMinimum` requires `minimum` to be set'
         ),
         'exclusive_maximum_requires_maximum': (
             '`exclusiveMaximum` requires `maximum` to be set'
         ),
+        'enum_must_be_of_array_type': 'enum value must be an array',
     }
 
     multipleOf = serializers.IntegerField(
@@ -109,14 +115,13 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
         required=False, validators=[MinValueValidator(0)],
     )
 
-    # TODO: validate regex on `pattern`
-    pattern = serializers.CharField(required=False)
+    pattern = serializers.CharField(required=False, validators=[regex_validator])
 
     maxItems = serializers.IntegerField(required=False)
     minItems = serializers.IntegerField(required=False)
     uniqueItems = serializers.BooleanField(required=False)
 
-    enum = ListField(required=False)
+    enum = serializers.WritableField(required=False, validators=[is_array_validator])
 
     def validate(self, attrs):
         errors = collections.defaultdict(list)
@@ -165,6 +170,33 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
                 errors['maxLength'].append(
                     self.error_messages['invalid_type_for_max_length'],
                 )
+
+        # maxItems
+        if 'maxItems' in attrs and 'type' in attrs:
+            if attrs['type'] != ARRAY:
+                errors['maxItems'].append(
+                    self.error_messages['invalid_type_for_max_items'],
+                )
+
+        # minItems
+        if 'minItems' in attrs and 'type' in attrs:
+            if attrs['type'] != ARRAY:
+                errors['minItems'].append(
+                    self.error_messages['invalid_type_for_min_items'],
+                )
+
+        # uniqueItems
+        if 'uniqueItems' in attrs and 'type' in attrs:
+            if attrs['type'] != ARRAY:
+                errors['uniqueItems'].append(
+                    self.error_messages['invalid_type_for_unique_items'],
+                )
+
+        # enum null value special case.
+        if 'enum' in attrs and attrs['enum'] is None:
+            errors['enum'].append(
+                self.error_messages['enum_must_be_of_array_type'],
+            )
 
         if errors:
             raise serializers.ValidationError(errors)

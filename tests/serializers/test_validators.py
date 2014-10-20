@@ -20,6 +20,7 @@ from flex.serializers.validators import (
     security_type_validator,
     security_api_key_location_validator,
     security_flow_validator,
+    regex_validator,
 )
 from flex.constants import (
     SCHEMES,
@@ -285,3 +286,15 @@ def test_with_unknown_flow():
 
 def test_with_known_flow():
     security_flow_validator(SECURITY_FLOWS[0])
+
+
+#
+# regex_validator
+#
+def test_with_invalid_regex():
+    with pytest.raises(serializers.ValidationError):
+        regex_validator('[abc')
+
+
+def test_with_valid_regex():
+    regex_validator('abc')
