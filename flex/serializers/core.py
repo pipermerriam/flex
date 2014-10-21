@@ -140,7 +140,7 @@ class ParameterSerializer(BaseParameterSerializer):
                 return
             else:
                 return data
-        return super(BaseParameterSerializer, self).from_native(data, files)
+        return super(ParameterSerializer, self).from_native(data, files)
 
     def validate_reference(self, reference):
         if reference not in self.context.get('parameters', {}):

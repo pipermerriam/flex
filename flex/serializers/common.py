@@ -3,8 +3,6 @@ import six
 
 from rest_framework import serializers
 
-from drf_compound_fields.fields import ListField
-
 from flex.serializers.fields import MaybeListCharField
 from flex.serializers.mixins import (
     TypedDefaultMixin,
