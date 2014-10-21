@@ -101,13 +101,21 @@ def generate_maximum_validator(maximum, exclusiveMaximum=False, **kwargs):
     return functools.partial(validate_maximum, maximum=maximum, is_exclusive=exclusiveMaximum)
 
 
+def generate_min_length_validator(minLength, **kwargs):
+    return MinLengthValidator(minLength)
+
+
+def generate_max_length_validator(maxLength, **kwargs):
+    return MaxLengthValidator(maxLength)
+
+
 validator_mapping = {
     'type': generate_type_validator,
     'multipleOf': generate_multiple_of_validator,
     'minimum': generate_minimum_validator,
     'maximum': generate_maximum_validator,
-    # 'minLength': MinLengthValidator,
-    # 'maxLength': MaxLengthValidator,
+    'minLength': generate_min_length_validator,
+    'maxLength': generate_max_length_validator,
 }
 
 
