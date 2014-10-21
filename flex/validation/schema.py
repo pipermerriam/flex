@@ -109,6 +109,81 @@ def generate_max_length_validator(maxLength, **kwargs):
     return MaxLengthValidator(maxLength)
 
 
+def validate_min_items(value, minimum):
+    if len(value) < minimum:
+        raise serializers.ValidationError(
+            "Array must have at least {0} items.  It had {1}".format(
+                minimum, len(value),
+            ),
+        )
+
+
+def generate_min_items_validator(minItems, **kwargs):
+    return functools.partial(validate_min_items, minimum=minItems)
+
+
+def validate_max_items(value, maximum):
+    if len(value) > maximum:
+        raise serializers.ValidationError(
+            "Array must have no more than {0} items.  It had {1}".format(
+                maximum, len(value),
+            ),
+        )
+
+
+def generate_max_items_validator(maxItems, **kwargs):
+    return functools.partial(validate_max_items, maximum=maxItems)
+
+
+def validate_unique_items(value):
+    counter = collections.Counter(value)
+    dupes = [v for v, count in counter.items() if count > 1]
+    if dupes:
+        raise serializers.ValidationError(
+            "Items must be unique.  The following items appeard more than once: {0}".format(
+                repr(dupes),
+            ),
+        )
+
+
+def noop(*args, **kwargs):
+    """
+    No-Op validator that does nothing.
+    """
+    pass
+
+
+def generate_unique_items_generator(uniqueItems, **kwargs):
+    if uniqueItems:
+        return validate_unique_items
+    else:
+        return noop
+
+
+def deep_equal(a, b):
+    """
+    Because of things in python like:
+        >>> 1 == 1.0
+        True
+        >>> 1 == True
+        True
+    """
+    return a == b and isinstance(a, type(b))
+
+
+def validate_enum(value, options):
+    if not any(deep_equal(value, option) for option in options):
+        raise serializers.ValidationError(
+            "Invalid value.  {0} is not one of the available options ({1})".format(
+                value, options,
+            )
+        )
+
+
+def generate_enum_validator(enum, **kwargs):
+    return functools.partial(validate_enum, options=enum)
+
+
 validator_mapping = {
     'type': generate_type_validator,
     'multipleOf': generate_multiple_of_validator,
@@ -116,10 +191,14 @@ validator_mapping = {
     'maximum': generate_maximum_validator,
     'minLength': generate_min_length_validator,
     'maxLength': generate_max_length_validator,
+    'minItems': generate_min_items_validator,
+    'maxItems': generate_max_items_validator,
+    'uniqueItems': generate_unique_items_generator,
+    'enum': generate_enum_validator,
 }
 
 
-def generate_validator_for_schema(schema):
+def construct_schema_validator(schema):
     # TODO: raise an error if there are unknown schema keys.
     validator = {}
     for key in schema:

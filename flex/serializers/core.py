@@ -38,7 +38,7 @@ from flex.constants import (
 )
 from flex.validation.schema import (
     validate_schema,
-    generate_validator_for_schema,
+    construct_schema_validator,
 )
 
 
@@ -201,7 +201,7 @@ class PropertiesSerializer(HomogenousDictSerializer):
     def save_object(self, obj, **kwargs):
         validators = {}
         for key, schema in obj.items():
-            validators[key] = generate_validator_for_schema(schema)
+            validators[key] = construct_schema_validator(schema)
         self.object = functools.partial(validate_schema, validators=validators)
 
 
