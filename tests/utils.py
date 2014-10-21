@@ -32,3 +32,13 @@ def assert_error_message_equal(formatted_msg, unformatted_msg):
                 formatted_msg, unformatted_msg,
             )
         )
+
+
+def generate_validator_from_schema(schema):
+    from flex.serializers.core import PropertiesSerializer
+
+    serializer = PropertiesSerializer(data=schema)
+    assert serializer.is_valid()
+
+    validator = serializer.save()
+    return validator

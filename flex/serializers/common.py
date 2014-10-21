@@ -98,7 +98,7 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
         'enum_must_be_of_array_type': 'enum value must be an array',
     }
 
-    multipleOf = serializers.IntegerField(
+    multipleOf = serializers.FloatField(
         required=False, validators=[MinValueValidator(0)],
     )
 
