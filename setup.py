@@ -31,6 +31,7 @@ setup(
         'djangorestframework==2.4.3',
         'six==1.7.3',
         'PyYAML==3.11',
+        'iso8601==0.1.10',
     ],
     license="BSD",
     zip_safe=False,

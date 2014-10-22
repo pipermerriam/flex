@@ -23,6 +23,7 @@ from flex.utils import (
     is_value_of_any_type,
     is_non_string_iterable,
 )
+from flex.formats import registry
 
 
 def validate_type(value, types):
@@ -217,6 +218,13 @@ def generate_pattern_validator(pattern, **kwargs):
     return functools.partial(validate_pattern, regex=re.compile(pattern))
 
 
+def generate_format_validator(format, **kwargs):
+    if format in registry:
+        return registry[format]
+    else:
+        raise ValueError('Unknown format {0}'.format(format))
+
+
 validator_mapping = {
     'type': generate_type_validator,
     'multipleOf': generate_multiple_of_validator,
@@ -231,6 +239,7 @@ validator_mapping = {
     'minProperties': generate_min_properties_validator,
     'maxProperties': generate_max_properties_validator,
     'pattern': generate_pattern_validator,
+    'format': generate_format_validator,
 }
 
 
