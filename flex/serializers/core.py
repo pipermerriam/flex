@@ -78,6 +78,7 @@ class HeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
 
     def validate(self, attrs):
         errors = collections.defaultdict(list)
+
         if attrs.get('type') == ARRAY and 'items' not in attrs:
             errors['items'].append(
                 self.error_messages['items_required'],
@@ -97,7 +98,25 @@ class HeadersSerializer(HomogenousDictSerializer):
 
 
 class SchemaSerializer(BaseSchemaSerializer):
-    pass
+    default_error_messages = {
+        'unknown_reference': 'Unknown definition reference `{0}`'
+    }
+
+    def validate(self, attrs):
+        errors = collections.defaultdict(list)
+
+        if '$ref' in attrs:
+            definitions = self.context.get('definitions', {})
+            try:
+                attrs['$ref'] = definitions[attrs['$ref']]
+            except KeyError:
+                errors['$ref'].append(
+                    self.error_messages['unknown_reference'].format(attrs['$ref']),
+                )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(SchemaSerializer, self).validate(attrs)
 
 
 class ResponseSerializer(BaseResponseSerializer):

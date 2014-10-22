@@ -214,8 +214,6 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
         'invalid_type_for_max_properties': 'maxProperties can only be used for `object` types',
     }
 
-    # TODO. reference path item objects from definitions.
-    ref_ = serializers.CharField(source='$ref', required=False)
     format = serializers.CharField(validators=[format_validator], required=False)
     title = serializers.CharField(required=False)
     default = serializers.WritableField(required=False)
@@ -257,6 +255,8 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
         if errors:
             raise serializers.ValidationError(errors)
         return super(BaseSchemaSerializer, self).validate(attrs)
+
+BaseSchemaSerializer.base_fields['$ref'] = serializers.CharField(required=False)
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):

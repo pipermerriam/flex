@@ -1,9 +1,11 @@
 import six
+import pytest
 
 from flex.utils import (
     is_non_string_iterable,
     is_value_of_type,
     format_errors,
+    get_type_for_value,
 )
 from flex.constants import (
     NULL,
@@ -209,3 +211,70 @@ def test_iterable_of_mappings():
     actual = list(format_errors(input))
 
     assert set(actual) == set(expected)
+
+
+#
+# get_type_for_value tests
+#
+@pytest.mark.parametrize(
+    'value',
+    (None,),
+)
+def test_get_type_for_null(value):
+    assert get_type_for_value(value) == NULL
+
+
+@pytest.mark.parametrize(
+    'value',
+    (True, False),
+)
+def test_get_type_for_boolean(value):
+    assert get_type_for_value(value) == BOOLEAN
+
+
+@pytest.mark.parametrize(
+    'value',
+    (0, 1, 2, -2),
+)
+def test_get_type_for_interger(value):
+    assert get_type_for_value(value) == INTEGER
+
+
+@pytest.mark.parametrize(
+    'value',
+    (0.0, 1.0, 2.0, -2.0),
+)
+def test_get_type_for_number(value):
+    assert get_type_for_value(value) == NUMBER
+
+
+@pytest.mark.parametrize(
+    'value',
+    ('', 'a', 'abc'),
+)
+def test_get_type_for_string(value):
+    assert get_type_for_value(value) == STRING
+
+
+@pytest.mark.parametrize(
+    'value',
+    (
+        [],
+        [1, 2, 3],
+        [True, None, 'a', 4],
+    ),
+)
+def test_get_type_for_array(value):
+    assert get_type_for_value(value) == ARRAY
+
+
+@pytest.mark.parametrize(
+    'value',
+    (
+        {},
+        {'a': 1},
+        {'b': 2, 'c': 3},
+    ),
+)
+def test_get_type_for_array(value):
+    assert get_type_for_value(value) == OBJECT

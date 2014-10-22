@@ -34,10 +34,10 @@ def assert_error_message_equal(formatted_msg, unformatted_msg):
         )
 
 
-def generate_validator_from_schema(schema):
+def generate_validator_from_schema(schema, **kwargs):
     from flex.serializers.core import PropertiesSerializer
 
-    serializer = PropertiesSerializer(data=schema)
+    serializer = PropertiesSerializer(data=schema, **kwargs)
     assert serializer.is_valid()
 
     validator = serializer.save()

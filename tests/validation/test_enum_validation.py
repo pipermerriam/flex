@@ -1,6 +1,5 @@
 import pytest
 
-
 from tests.utils import generate_validator_from_schema
 
 

@@ -6,11 +6,13 @@ import six
 
 from flex.constants import (
     PRIMATIVE_TYPES,
+    NULL,
     BOOLEAN,
     INTEGER,
     NUMBER,
     STRING,
     ARRAY,
+    OBJECT,
 )
 
 
@@ -33,6 +35,25 @@ def is_value_of_type(value, type_):
 
 def is_value_of_any_type(value, types):
     return any(is_value_of_type(value, type_) for type_ in types)
+
+
+def get_type_for_value(value):
+    if value is None:
+        return NULL
+    if isinstance(value, PRIMATIVE_TYPES[BOOLEAN]):
+        return BOOLEAN
+    elif isinstance(value, PRIMATIVE_TYPES[INTEGER]):
+        return INTEGER
+    elif isinstance(value, PRIMATIVE_TYPES[NUMBER]):
+        return NUMBER
+    elif isinstance(value, PRIMATIVE_TYPES[STRING]):
+        return STRING
+    elif isinstance(value, PRIMATIVE_TYPES[ARRAY]):
+        return ARRAY
+    elif isinstance(value, PRIMATIVE_TYPES[OBJECT]):
+        return OBJECT
+    else:
+        raise ValueError("Unable to identify type of {0}".format(repr(value)))
 
 
 def is_single_item_iterable(value):
