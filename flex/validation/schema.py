@@ -12,9 +12,6 @@ from django.core.validators import (
 from rest_framework import serializers
 
 from flex.constants import (
-    NULL,
-    BOOLEAN,
-    INTEGER,
     NUMBER,
     STRING,
     ARRAY,
