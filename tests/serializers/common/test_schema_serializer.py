@@ -409,3 +409,109 @@ def test_valid_enum_iterable():
         },
     )
     assert 'enum' not in serializer.errors
+
+
+#
+# minProperties tests
+#
+@pytest.mark.parametrize(
+    'type_',
+    (
+        NULL,
+        BOOLEAN,
+        INTEGER,
+        NUMBER,
+        STRING,
+        ARRAY,
+    ),
+)
+def test_min_properties_invalid_for_non_object_types(type_):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': type_,
+            'minProperties': 3,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'minProperties' in serializer.errors
+    assert_error_message_equal(
+        serializer.errors['minProperties'][0],
+        serializer.error_messages['invalid_type_for_min_properties']
+    )
+
+
+def test_min_properties_valid_for_object_type():
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': OBJECT,
+            'minProperties': 3,
+        },
+    )
+    assert 'minProperties' not in serializer.errors
+
+
+def test_min_properties_must_be_strictly_positive():
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': OBJECT,
+            'minProperties': -1,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'minProperties' in serializer.errors
+    assert serializer.errors['minProperties'][0].startswith(
+        "Ensure this value is greater than or equal to",
+    )
+
+
+#
+# maxProperties tests
+#
+@pytest.mark.parametrize(
+    'type_',
+    (
+        NULL,
+        BOOLEAN,
+        INTEGER,
+        NUMBER,
+        STRING,
+        ARRAY,
+    ),
+)
+def test_max_properties_invalid_for_non_object_types(type_):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': type_,
+            'maxProperties': 3,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'maxProperties' in serializer.errors
+    assert_error_message_equal(
+        serializer.errors['maxProperties'][0],
+        serializer.error_messages['invalid_type_for_max_properties']
+    )
+
+
+def test_max_properties_valid_for_object_type():
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': OBJECT,
+            'maxProperties': 3,
+        },
+    )
+    assert 'maxProperties' not in serializer.errors
+
+
+def test_max_properties_must_be_strictly_positive():
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': OBJECT,
+            'maxProperties': -1,
+        },
+    )
+    assert not serializer.is_valid()
+    assert 'maxProperties' in serializer.errors
+    assert serializer.errors['maxProperties'][0].startswith(
+        "Ensure this value is greater than or equal to",
+    )

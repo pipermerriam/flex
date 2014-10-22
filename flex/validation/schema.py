@@ -184,6 +184,32 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
+def validate_min_properties(value, minimum):
+    if len(value.keys()) < minimum:
+        raise serializers.ValidationError(
+            "Object must have more than {0} properties.  It had {1}".format(
+                minimum, len(value.keys()),
+            ),
+        )
+
+
+def generate_min_properties_validator(minProperties, **kwargs):
+    return functools.partial(validate_min_properties, minimum=minProperties)
+
+
+def validate_max_properties(value, maximum):
+    if len(value.keys()) > maximum:
+        raise serializers.ValidationError(
+            "Object must have less than {0} properties.  It had {1}".format(
+                maximum, len(value.keys()),
+            ),
+        )
+
+
+def generate_max_properties_validator(maxProperties, **kwargs):
+    return functools.partial(validate_max_properties, maximum=maxProperties)
+
+
 validator_mapping = {
     'type': generate_type_validator,
     'multipleOf': generate_multiple_of_validator,
@@ -195,6 +221,8 @@ validator_mapping = {
     'maxItems': generate_max_items_validator,
     'uniqueItems': generate_unique_items_generator,
     'enum': generate_enum_validator,
+    'minProperties': generate_min_properties_validator,
+    'maxProperties': generate_max_properties_validator,
 }
 
 

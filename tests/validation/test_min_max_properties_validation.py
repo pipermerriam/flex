@@ -1,0 +1,92 @@
+import pytest
+
+from flex.constants import (
+    OBJECT,
+)
+
+from tests.utils import generate_validator_from_schema
+
+
+#
+# minLength validation tests
+#
+@pytest.mark.parametrize(
+    'element',
+    (
+        {'id': 1},
+        {},
+    ),
+)
+def test_min_properties_with_too_few_properties(element):
+    schema = {
+        'element': {
+            'type': OBJECT,
+            'minProperties': 2,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    with pytest.raises(ValueError):
+        validator({'element': element})
+
+
+@pytest.mark.parametrize(
+    'element',
+    (
+        {'id': 1, 'class': 'foo'},
+        {'id': 2, 'class': 'bar', 'targets': []},
+    ),
+)
+def test_min_properties_with_enough_properties(element):
+    schema = {
+        'element': {
+            'type': OBJECT,
+            'minProperties': 2,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({'element': element})
+
+
+#
+# maxLength validation tests
+#
+@pytest.mark.parametrize(
+    'element',
+    (
+        {'id': 1, 'class': 'foo', 'targets': []},
+        {'id': 2, 'class': 'bar', 'targets': [], 'baz': 3},
+    ),
+)
+def test_max_properties_with_too_many_properties(element):
+    schema = {
+        'element': {
+            'type': OBJECT,
+            'maxProperties': 2,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    with pytest.raises(ValueError):
+        validator({'element': element})
+
+
+@pytest.mark.parametrize(
+    'element',
+    (
+        {},
+        {'id': 1},
+        {'id': 1, 'class': 'foo'},
+    ),
+)
+def test_max_properties_with_enough_properties(element):
+    schema = {
+        'element': {
+            'type': OBJECT,
+            'maxProperties': 2,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({'element': element})

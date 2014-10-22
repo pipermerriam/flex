@@ -1,6 +1,10 @@
 import collections
 import six
 
+from django.core.validators import (
+    MinValueValidator,
+)
+
 from rest_framework import serializers
 
 from flex.serializers.fields import MaybeListCharField
@@ -12,7 +16,6 @@ from flex.serializers.validators import (
     format_validator,
     parameter_in_validator,
     collection_format_validator,
-    MinValueValidator,
     regex_validator,
     is_array_validator,
 )
@@ -27,6 +30,7 @@ from flex.constants import (
     INTEGER,
     NUMBER,
     STRING,
+    OBJECT,
 )
 
 
@@ -205,14 +209,23 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#schemaObject
     """
+    default_error_messages = {
+        'invalid_type_for_min_properties': 'minProperties can only be used for `object` types',
+        'invalid_type_for_max_properties': 'maxProperties can only be used for `object` types',
+    }
+
     # TODO. reference path item objects from definitions.
     ref_ = serializers.CharField(source='$ref', required=False)
     format = serializers.CharField(validators=[format_validator], required=False)
     title = serializers.CharField(required=False)
     default = serializers.WritableField(required=False)
 
-    maxProperties = serializers.IntegerField(required=False)
-    minProperties = serializers.IntegerField(required=False)
+    minProperties = serializers.IntegerField(
+        required=False, validators=[MinValueValidator(0)]
+    )
+    maxProperties = serializers.IntegerField(
+        required=False, validators=[MinValueValidator(0)],
+    )
 
     required = serializers.BooleanField(required=False)
     type = MaybeListCharField(required=False, validators=[type_validator])
@@ -225,6 +238,25 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
     # Not Implemented
     # xml
     # discriminator
+
+    def validate(self, attrs):
+        errors = collections.defaultdict(list)
+
+        # minProperties
+        if 'minProperties' in attrs and attrs.get('type') != OBJECT:
+            errors['minProperties'].append(
+                self.error_messages['invalid_type_for_min_properties'],
+            )
+
+        # maxProperties
+        if 'maxProperties' in attrs and attrs.get('type') != OBJECT:
+            errors['maxProperties'].append(
+                self.error_messages['invalid_type_for_max_properties'],
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(BaseSchemaSerializer, self).validate(attrs)
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):
