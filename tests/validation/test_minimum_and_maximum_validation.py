@@ -78,6 +78,18 @@ def test_exclusive_minimum_validation_with_invalid_numbers(width):
         validator({'width': width})
 
 
+def test_minimum_noop_when_not_required_or_present():
+    schema = {
+        'width': {
+            'type': NUMBER,
+            'minimum': 5,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})
+
+
 #
 # maximum and exclusiveMaximum tests
 #
@@ -147,3 +159,15 @@ def test_exclusive_maximum_validation_with_invalid_numbers(width):
 
     with pytest.raises(ValueError):
         validator({'width': width})
+
+
+def test_maximum_noop_when_not_required_or_present():
+    schema = {
+        'width': {
+            'type': NUMBER,
+            'maximum': 5,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

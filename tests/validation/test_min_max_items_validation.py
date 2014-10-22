@@ -50,6 +50,18 @@ def test_min_items_with_too_short_array(letters):
         validator({'letters': letters})
 
 
+def test_min_items_allows_empty_when_not_required_and_not_present():
+    schema = {
+        'letters': {
+            'type': ARRAY,
+            'minItems': 3,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})
+
+
 #
 # maxLength validation tests
 #
@@ -91,3 +103,15 @@ def test_max_items_with_too_long_array(letters):
 
     with pytest.raises(ValueError):
         validator({'letters': letters})
+
+
+def test_max_items_allows_empty_when_not_required_and_not_present():
+    schema = {
+        'letters': {
+            'type': ARRAY,
+            'maxItems': 3,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

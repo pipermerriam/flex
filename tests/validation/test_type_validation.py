@@ -5,6 +5,8 @@ from flex.constants import (
     STRING,
 )
 
+from tests.utils import generate_validator_from_schema
+
 
 #
 # Integration style tests for PropertiesSerializer type validation.
@@ -93,3 +95,16 @@ def test_invalid_multi_type(value):
     validator = serializer.save()
     with pytest.raises(ValueError):
         validator({'pk': value})
+
+
+def test_type_validation_is_noop_when_not_required_and_not_present():
+    from flex.serializers.core import PropertiesSerializer
+    schema = {
+        'pk': {
+            'type': [INTEGER, STRING],
+        },
+    }
+
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

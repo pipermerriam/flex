@@ -3,6 +3,7 @@ import pytest
 from flex.decorators import enforce_type
 from flex.constants import (
     NUMBER,
+    EMPTY,
 )
 
 
@@ -31,3 +32,13 @@ def test_type_enforcement_detects_invalid_types(v):
 
     with pytest.raises(serializers.ValidationError):
         fn(v)
+
+
+def test_type_enforcement_skips_empty_value():
+    from rest_framework import serializers
+
+    @enforce_type(NUMBER)
+    def fn(value):
+        pass
+
+    fn(EMPTY)

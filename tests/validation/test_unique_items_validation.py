@@ -49,3 +49,15 @@ def test_unique_items_with_dupes_in_array(letters):
 
     with pytest.raises(ValueError):
         validator({'letters': letters})
+
+
+def test_unique_items_is_noop_when_not_required_and_not_present():
+    schema = {
+        'letters': {
+            'type': ARRAY,
+            'uniqueItems': True,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

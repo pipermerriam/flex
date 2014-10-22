@@ -67,3 +67,15 @@ def test_pattern_on_non_matching_strings(zipcode):
 
     with pytest.raises(ValueError):
         validator({'zipcode': zipcode})
+
+
+def test_pattern_is_noop_when_not_required_and_not_present():
+    schema = {
+        'zipcode': {
+            'type': STRING,
+            'pattern': ZIPCODE_REGEX,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

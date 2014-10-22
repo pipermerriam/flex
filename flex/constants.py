@@ -110,3 +110,15 @@ SECURITY_FLOWS = (
     APPLICATION,
     ACCESS_CODE,
 )
+
+
+class Empty(object):
+    def __cmp__(self, other):
+        raise TypeError('Empty cannot be compared to other values')
+
+
+"""
+Sentinal empty value for use with distinguishing `None` from a key not
+being present.
+"""
+EMPTY = Empty()

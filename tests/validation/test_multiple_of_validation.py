@@ -4,6 +4,7 @@ from flex.constants import (
     NUMBER,
 )
 
+from tests.utils import generate_validator_from_schema
 
 #
 # Integration style tests for PropertiesSerializer type validation.
@@ -93,3 +94,15 @@ def test_float_not_multiple_of(count):
 
     with pytest.raises(ValueError):
         validator({'count': count})
+
+
+def test_multiple_of_is_noop_if_not_required_and_not_present():
+    schema = {
+        'count': {
+            'type': INTEGER,
+            'multipleOf': 0.3,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

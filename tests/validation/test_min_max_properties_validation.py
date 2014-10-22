@@ -49,6 +49,18 @@ def test_min_properties_with_enough_properties(element):
     validator({'element': element})
 
 
+def test_min_properties_is_noop_when_not_required_or_present():
+    schema = {
+        'element': {
+            'type': OBJECT,
+            'minProperties': 2,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})
+
+
 #
 # maxLength validation tests
 #
@@ -90,3 +102,15 @@ def test_max_properties_with_enough_properties(element):
     validator = generate_validator_from_schema(schema)
 
     validator({'element': element})
+
+
+def test_max_properties_is_noop_when_not_required_or_present():
+    schema = {
+        'element': {
+            'type': OBJECT,
+            'maxProperties': 2,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

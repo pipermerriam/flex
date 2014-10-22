@@ -46,3 +46,14 @@ def test_date_time_with_invalid_dates_strings(when):
 
     with pytest.raises(ValueError):
         validator({'birthday': when})
+
+
+def test_date_time_is_noop_when_not_present_or_required():
+    schema = {
+        'birthday': {
+            'format': 'date-time',
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

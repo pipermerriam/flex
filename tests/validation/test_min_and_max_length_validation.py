@@ -43,6 +43,18 @@ def test_minimum_length_with_too_short_string(zipcode):
         validator({'zipcode': zipcode})
 
 
+def test_minimum_length_is_noop_when_not_required_and_not_present():
+    schema = {
+        'zipcode': {
+            'type': STRING,
+            'minLength': 5,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})
+
+
 #
 # maxLength validation tests
 #
@@ -77,3 +89,15 @@ def test_maximum_length_with_too_long_string(zipcode):
 
     with pytest.raises(ValueError):
         validator({'zipcode': zipcode})
+
+
+def test_maximum_length_is_noop_when_not_required_and_not_present():
+    schema = {
+        'zipcode': {
+            'type': STRING,
+            'maxLength': 5,
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

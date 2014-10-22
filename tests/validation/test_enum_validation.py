@@ -35,3 +35,14 @@ def test_enum_with_invalid_items(letters):
 
     with pytest.raises(ValueError):
         validator({'letters': letters})
+
+
+def test_enum_noop_when_not_required_and_field_not_present():
+    schema = {
+        'letters': {
+            'enum': [True, False, 1.0, 2.0, 'A'],
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator({})

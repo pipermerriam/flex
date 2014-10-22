@@ -16,6 +16,7 @@ from flex.constants import (
     STRING,
     ARRAY,
     OBJECT,
+    EMPTY,
 )
 from flex.decorators import enforce_type
 from flex.utils import (
@@ -26,6 +27,17 @@ from flex.utils import (
 from flex.formats import registry
 
 
+def skip_if_empty(func):
+    @functools.wraps(func)
+    def inner(value, *args, **kwargs):
+        if value is EMPTY:
+            return
+        else:
+            return func(value, *args, **kwargs)
+    return inner
+
+
+@skip_if_empty
 def validate_type(value, types):
     if not is_value_of_any_type(value, types):
         raise serializers.ValidationError("Invalid Type: {0}".format(value))
@@ -38,6 +50,7 @@ def generate_type_validator(**kwargs):
     return functools.partial(validate_type, types=types)
 
 
+@skip_if_empty
 @enforce_type(NUMBER)
 def validate_multiple_of(value, divisor):
     """
@@ -54,6 +67,7 @@ def generate_multiple_of_validator(multipleOf, **kwargs):
     return functools.partial(validate_multiple_of, divisor=multipleOf)
 
 
+@skip_if_empty
 @enforce_type(NUMBER)
 def validate_minimum(value, minimum, is_exclusive):
     if is_exclusive:
@@ -73,6 +87,7 @@ def generate_minimum_validator(minimum, exclusiveMinimum=False, **kwargs):
     return functools.partial(validate_minimum, minimum=minimum, is_exclusive=exclusiveMinimum)
 
 
+@skip_if_empty
 @enforce_type(NUMBER)
 def validate_maximum(value, maximum, is_exclusive):
     if is_exclusive:
@@ -93,13 +108,14 @@ def generate_maximum_validator(maximum, exclusiveMaximum=False, **kwargs):
 
 
 def generate_min_length_validator(minLength, **kwargs):
-    return enforce_type(STRING)(MinLengthValidator(minLength).__call__)
+    return skip_if_empty(enforce_type(STRING)(MinLengthValidator(minLength).__call__))
 
 
 def generate_max_length_validator(maxLength, **kwargs):
-    return enforce_type(STRING)(MaxLengthValidator(maxLength).__call__)
+    return skip_if_empty(enforce_type(STRING)(MaxLengthValidator(maxLength).__call__))
 
 
+@skip_if_empty
 @enforce_type(ARRAY)
 def validate_min_items(value, minimum):
     if len(value) < minimum:
@@ -114,6 +130,7 @@ def generate_min_items_validator(minItems, **kwargs):
     return functools.partial(validate_min_items, minimum=minItems)
 
 
+@skip_if_empty
 @enforce_type(ARRAY)
 def validate_max_items(value, maximum):
     if len(value) > maximum:
@@ -128,6 +145,7 @@ def generate_max_items_validator(maxItems, **kwargs):
     return functools.partial(validate_max_items, maximum=maxItems)
 
 
+@skip_if_empty
 @enforce_type(ARRAY)
 def validate_unique_items(value):
     counter = collections.Counter(value)
@@ -165,6 +183,7 @@ def deep_equal(a, b):
     return a == b and isinstance(a, type(b))
 
 
+@skip_if_empty
 def validate_enum(value, options):
     if not any(deep_equal(value, option) for option in options):
         raise serializers.ValidationError(
@@ -178,6 +197,7 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
+@skip_if_empty
 @enforce_type(OBJECT)
 def validate_min_properties(value, minimum):
     if len(value.keys()) < minimum:
@@ -192,6 +212,7 @@ def generate_min_properties_validator(minProperties, **kwargs):
     return functools.partial(validate_min_properties, minimum=minProperties)
 
 
+@skip_if_empty
 @enforce_type(OBJECT)
 def validate_max_properties(value, maximum):
     if len(value.keys()) > maximum:
@@ -206,6 +227,7 @@ def generate_max_properties_validator(maxProperties, **kwargs):
     return functools.partial(validate_max_properties, maximum=maxProperties)
 
 
+@skip_if_empty
 @enforce_type(STRING)
 def validate_pattern(value, regex):
     if not regex.match(value):
@@ -225,6 +247,18 @@ def generate_format_validator(format, **kwargs):
         raise ValueError('Unknown format {0}'.format(format))
 
 
+def validate_required(value):
+    if value is EMPTY:
+        raise serializers.ValidationError("This field is required.")
+
+
+def generate_required_validator(required, **kwargs):
+    if required:
+        return validate_required
+    else:
+        return noop
+
+
 validator_mapping = {
     'type': generate_type_validator,
     'multipleOf': generate_multiple_of_validator,
@@ -240,6 +274,7 @@ validator_mapping = {
     'maxProperties': generate_max_properties_validator,
     'pattern': generate_pattern_validator,
     'format': generate_format_validator,
+    'required': generate_required_validator,
 }
 
 
@@ -255,7 +290,7 @@ def validate_schema(obj, validators):
         for attribute, validator in value.items():
 
             try:
-                validator(obj[key])
+                validator(obj.get(key, EMPTY))
             except serializers.ValidationError as err:
                 errors_[attribute].append(err.messages)
         if errors_:
