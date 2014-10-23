@@ -1,5 +1,7 @@
 import collections
 
+import six
+
 from rest_framework import serializers
 
 from flex.serializers.common import (
@@ -40,7 +42,11 @@ class PropertiesSerializer(HomogenousDictSerializer):
 
 
 class ItemsSerializer(BaseItemsSerializer):
-    pass
+    def from_native(self, data, files=None):
+        if isinstance(data, six.string_types):
+            self.context['deferred_references'].add(data)
+            return data
+        return super(ItemsSerializer, self).from_native(data, files)
 
 
 # These fields include recursive use of the `SchemaSerializer` so they have to

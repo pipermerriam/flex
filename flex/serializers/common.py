@@ -269,12 +269,6 @@ class BaseItemsSerializer(BaseSchemaSerializer):
 
         super(BaseItemsSerializer, self).__init__(*args, **kwargs)
 
-    def from_native(self, data, files=None):
-        if isinstance(data, six.string_types):
-            self.context['deferred_references'].add(data)
-            return data
-        return super(BaseItemsSerializer, self).from_native(data, files)
-
 
 class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
     """

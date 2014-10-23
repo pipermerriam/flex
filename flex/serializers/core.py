@@ -55,7 +55,19 @@ class InfoSerializer(serializers.Serializer):
 
 
 class ItemsSerializer(BaseItemsSerializer):
-    pass
+    default_error_messages = {
+        'unknown_reference': 'Unknown definition reference `{0}`',
+    }
+
+    def from_native(self, data, files):
+        if isinstance(data, six.string_types):
+            definitions = self.context.get('definitions', {})
+            if data not in definitions:
+                raise serializers.ValidationError(
+                    self.error_messages['unknown_reference'].format(data),
+                )
+            return data
+        return super(ItemsSerializer, self).from_native(data, files)
 
 
 class HeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
