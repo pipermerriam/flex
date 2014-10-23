@@ -1,5 +1,6 @@
 import pytest
 
+from flex.serializers.definitions import DefinitionsSerializer
 from flex.constants import STRING
 
 from tests.utils import generate_validator_from_schema
@@ -123,3 +124,42 @@ def test_reference_with_additional_validators_and_invalid_value(name):
 
     with pytest.raises(ValueError):
         validator({'name': name})
+
+
+def test_circular_reference():
+    schema = {
+        'parent': {'$ref': 'Node'},
+    }
+    serializer = DefinitionsSerializer(
+        data={
+            'Node': {
+                'properties': {
+                    'parent': {'$ref': 'Node'},
+                    'value': {'type': STRING},
+                },
+            },
+        },
+        context={'deferred_references': set()},
+    )
+    assert serializer.is_valid(), serializer.errors
+    definitions = serializer.object
+
+    validator = generate_validator_from_schema(
+        schema,
+        context={'definitions': definitions},
+    )
+
+    validator({
+        'parent': {
+            'value': 'bar',
+            'parent': {
+                'value': 1234,
+                'parent': {
+                    'value': 'baz',
+                    'parent': {
+                        'value': 54321,
+                    },
+                },
+            },
+        },
+    })

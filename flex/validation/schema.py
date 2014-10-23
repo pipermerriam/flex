@@ -278,33 +278,86 @@ validator_mapping = {
 }
 
 
-def validate_schema(obj, validators):
+def validate_schema(obj, validators, inner=False):
     """
     Given a json-like object to validate, and a dictionary of validators, apply
     the validators to the object.
     """
+    if obj is EMPTY:
+        return
     errors = {}
 
     for key, value in validators.items():
         errors_ = collections.defaultdict(list)
-        for attribute, validator in value.items():
 
+        if isinstance(obj, collections.Mapping):
+            field = obj.get(key, EMPTY)
+        else:
+            field = obj
+
+        if callable(value):
             try:
-                validator(obj.get(key, EMPTY))
+                value(field)
             except serializers.ValidationError as err:
-                errors_[attribute].append(err.messages)
+                if hasattr(err, 'error_list'):
+                    errors_[key].extend(err.messages)
+                else:
+                    errors_[key].append(err.messages)
+        elif isinstance(value, collections.Mapping):
+            try:
+                validate_schema(field, value, inner=True)
+            except serializers.ValidationError as err:
+                if hasattr(err, 'error_list'):
+                    errors_[key].extend(err.messages)
+                else:
+                    errors_[key].append(err.messages)
+        else:
+            raise ValueError('WTF')
+
         if errors_:
-            errors[key] = [errors_]
+            errors[key] = list(serializers.ValidationError(dict(errors_)).messages)
 
     if errors:
-        raise ValueError(prettify_errors(errors))
+        if inner:
+            raise serializers.ValidationError(errors)
+        else:
+            raise ValueError(prettify_errors(errors))
 
 
-def construct_schema_validator(schema):
-    # TODO: raise an error if there are unknown schema keys.
+class LazySchemaValidator(object):
+    def __init__(self, func, args=None, kwargs=None):
+        if args is None:
+            args = tuple()
+        if kwargs is None:
+            kwargs = {}
+
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self, value):
+        validators = self.func(*self.args, **self.kwargs)
+        return validate_schema(value, validators, inner=True)
+
+    def items(self):
+        validators = self.func(*self.args, **self.kwargs)
+        return validators.items()
+
+
+def construct_schema_validator(schema, context):
+    definitions = context.get('definitions', {})
     validator = {}
     if '$ref' in schema:
-        validator.update(construct_schema_validator(schema.pop('$ref')))
+        validator.update(construct_schema_validator(
+            definitions[schema['$ref']],
+            context,
+        ))
+    if 'properties' in schema:
+        for key, value in schema['properties'].items():
+            validator[key] = LazySchemaValidator(
+                construct_schema_validator,
+                (value, context),
+            )
     for key in schema:
         if key not in validator_mapping:
             # TODO: silent failure?

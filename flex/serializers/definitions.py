@@ -34,7 +34,23 @@ class SchemaSerializer(BaseSchemaSerializer):
 
 
 class DefinitionsSerializer(HomogenousDictSerializer):
+    default_error_messages = {
+        'unknown_references': "Unknown references `{0}`",
+    }
+
     value_serializer_class = SchemaSerializer
+
+    def validate(self, attrs):
+
+        deferred_references = self.context.get('deferred_references', set())
+        missing_references = deferred_references.difference(attrs.keys())
+        if missing_references:
+            raise serializers.ValidationError(
+                self.error_messages['unknown_references'].format(
+                    list(missing_references),
+                ),
+            )
+        return super(DefinitionsSerializer, self).validate(attrs)
 
 
 class PropertiesSerializer(HomogenousDictSerializer):

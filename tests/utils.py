@@ -38,7 +38,7 @@ def generate_validator_from_schema(schema, **kwargs):
     from flex.serializers.core import PropertiesSerializer
 
     serializer = PropertiesSerializer(data=schema, **kwargs)
-    assert serializer.is_valid()
+    assert serializer.is_valid(), serializer.errors
 
     validator = serializer.save()
     return validator

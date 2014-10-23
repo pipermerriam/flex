@@ -119,9 +119,7 @@ class SchemaSerializer(BaseSchemaSerializer):
 
         if '$ref' in attrs:
             definitions = self.context.get('definitions', {})
-            try:
-                attrs['$ref'] = definitions[attrs['$ref']]
-            except KeyError:
+            if attrs['$ref'] not in definitions:
                 errors['$ref'].append(
                     self.error_messages['unknown_reference'].format(attrs['$ref']),
                 )
@@ -232,7 +230,7 @@ class PropertiesSerializer(HomogenousDictSerializer):
     def save_object(self, obj, **kwargs):
         validators = {}
         for key, schema in obj.items():
-            validators[key] = construct_schema_validator(schema)
+            validators[key] = construct_schema_validator(schema, self.context)
         self.object = functools.partial(validate_schema, validators=validators)
 
 
