@@ -279,11 +279,6 @@ validator_mapping = {
 }
 
 
-# for reference on raising nested validation errors
-#if errors:
-#    errors[key] = list(serializers.ValidationError(dict(errors_)).messages)
-
-
 def validate_schema(obj, validators, inner=None):
     """
     Given a json-like object to validate, and a dictionary of validators, apply
