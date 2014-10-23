@@ -346,8 +346,6 @@ def construct_schema_validator(schema, context):
         )
     if 'properties' in schema:
         intersection = set(schema['properties'].keys()).intersection(schema.keys())
-        if intersection:
-            import ipdb; ipdb.set_trace()
         assert not intersection
 
         for property, property_schema in schema['properties'].items():
