@@ -1,7 +1,9 @@
 import pytest
+
 from flex.constants import (
     INTEGER,
     NUMBER,
+    EMPTY,
 )
 
 from tests.utils import generate_validator_from_schema
@@ -14,20 +16,13 @@ from tests.utils import generate_validator_from_schema
     (-7, 0, 7, 14),
 )
 def test_integer_multiple_of(count):
-    from flex.serializers.core import PropertiesSerializer
-
     schema = {
-        'count': {
-            'type': INTEGER,
-            'multipleOf': 7,
-        },
+        'type': INTEGER,
+        'multipleOf': 7,
     }
-    serializer = PropertiesSerializer(data=schema)
-    assert serializer.is_valid(), serializer.errors
+    validator = generate_validator_from_schema(schema)
 
-    validator = serializer.save()
-
-    validator({'count': count})
+    validator(count)
 
 
 @pytest.mark.parametrize(
@@ -35,21 +30,14 @@ def test_integer_multiple_of(count):
     (1, 2, 3, 9),
 )
 def test_integer_not_multiple_of(count):
-    from flex.serializers.core import PropertiesSerializer
-
     schema = {
-        'count': {
-            'type': INTEGER,
-            'multipleOf': 7,
-        },
+        'type': INTEGER,
+        'multipleOf': 7,
     }
-    serializer = PropertiesSerializer(data=schema)
-    assert serializer.is_valid(), serializer.errors
-
-    validator = serializer.save()
+    validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'count': count})
+        validator(count)
 
 
 
@@ -58,20 +46,13 @@ def test_integer_not_multiple_of(count):
     (0.1, 1, 1.1, 0),
 )
 def test_float_multiple_of(count):
-    from flex.serializers.core import PropertiesSerializer
-
     schema = {
-        'pk': {
-            'type': NUMBER,
-            'multipleOf': 0.1,
-        },
+        'type': NUMBER,
+        'multipleOf': 0.1,
     }
-    serializer = PropertiesSerializer(data=schema)
-    assert serializer.is_valid(), serializer.errors
+    validator = generate_validator_from_schema(schema)
 
-    validator = serializer.save()
-
-    validator({'pk': count})
+    validator(count)
 
 
 @pytest.mark.parametrize(
@@ -79,30 +60,21 @@ def test_float_multiple_of(count):
     (0.4, 1, 1.1999999999),
 )
 def test_float_not_multiple_of(count):
-    from flex.serializers.core import PropertiesSerializer
-
     schema = {
-        'count': {
-            'type': INTEGER,
-            'multipleOf': 0.3,
-        },
+        'type': INTEGER,
+        'multipleOf': 0.3,
     }
-    serializer = PropertiesSerializer(data=schema)
-    assert serializer.is_valid(), serializer.errors
-
-    validator = serializer.save()
+    validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'count': count})
+        validator(count)
 
 
 def test_multiple_of_is_noop_if_not_required_and_not_present():
     schema = {
-        'count': {
-            'type': INTEGER,
-            'multipleOf': 0.3,
-        },
+        'type': INTEGER,
+        'multipleOf': 0.3,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)

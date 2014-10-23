@@ -2,7 +2,10 @@ import re
 import pytest
 
 from flex.serializers.definitions import BaseSchemaSerializer
-from flex.constants import STRING
+from flex.constants import (
+    STRING,
+    EMPTY,
+)
 
 from tests.utils import generate_validator_from_schema
 
@@ -37,14 +40,12 @@ def test_zipcode_regex_on_bad_zips(zipcode):
 )
 def test_pattern_on_good_strings(zipcode):
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'pattern': ZIPCODE_REGEX,
-        },
+        'type': STRING,
+        'pattern': ZIPCODE_REGEX,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'zipcode': zipcode})
+    validator(zipcode)
 
 
 @pytest.mark.parametrize(
@@ -58,24 +59,20 @@ def test_pattern_on_good_strings(zipcode):
 )
 def test_pattern_on_non_matching_strings(zipcode):
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'pattern': ZIPCODE_REGEX,
-        },
+        'type': STRING,
+        'pattern': ZIPCODE_REGEX,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'zipcode': zipcode})
+        validator(zipcode)
 
 
 def test_pattern_is_noop_when_not_required_and_not_present():
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'pattern': ZIPCODE_REGEX,
-        },
+        'type': STRING,
+        'pattern': ZIPCODE_REGEX,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)

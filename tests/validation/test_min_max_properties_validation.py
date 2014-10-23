@@ -2,6 +2,7 @@ import pytest
 
 from flex.constants import (
     OBJECT,
+    EMPTY,
 )
 
 from tests.utils import generate_validator_from_schema
@@ -19,15 +20,13 @@ from tests.utils import generate_validator_from_schema
 )
 def test_min_properties_with_too_few_properties(element):
     schema = {
-        'element': {
-            'type': OBJECT,
-            'minProperties': 2,
-        },
+        'type': OBJECT,
+        'minProperties': 2,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'element': element})
+        validator(element)
 
 
 @pytest.mark.parametrize(
@@ -39,26 +38,22 @@ def test_min_properties_with_too_few_properties(element):
 )
 def test_min_properties_with_enough_properties(element):
     schema = {
-        'element': {
-            'type': OBJECT,
-            'minProperties': 2,
-        },
+        'type': OBJECT,
+        'minProperties': 2,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'element': element})
+    validator(element)
 
 
 def test_min_properties_is_noop_when_not_required_or_present():
     schema = {
-        'element': {
-            'type': OBJECT,
-            'minProperties': 2,
-        },
+        'type': OBJECT,
+        'minProperties': 2,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)
 
 
 #
@@ -73,15 +68,13 @@ def test_min_properties_is_noop_when_not_required_or_present():
 )
 def test_max_properties_with_too_many_properties(element):
     schema = {
-        'element': {
-            'type': OBJECT,
-            'maxProperties': 2,
-        },
+        'type': OBJECT,
+        'maxProperties': 2,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'element': element})
+        validator(element)
 
 
 @pytest.mark.parametrize(
@@ -94,23 +87,19 @@ def test_max_properties_with_too_many_properties(element):
 )
 def test_max_properties_with_enough_properties(element):
     schema = {
-        'element': {
-            'type': OBJECT,
-            'maxProperties': 2,
-        },
+        'type': OBJECT,
+        'maxProperties': 2,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'element': element})
+    validator(element)
 
 
 def test_max_properties_is_noop_when_not_required_or_present():
     schema = {
-        'element': {
-            'type': OBJECT,
-            'maxProperties': 2,
-        },
+        'type': OBJECT,
+        'maxProperties': 2,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)

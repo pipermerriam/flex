@@ -1,5 +1,7 @@
 import pytest
 
+from flex.constants import EMPTY
+
 from tests.utils import generate_validator_from_schema
 
 
@@ -12,13 +14,11 @@ from tests.utils import generate_validator_from_schema
 )
 def test_enum_with_valid_array(letters):
     schema = {
-        'letters': {
-            'enum': [2, 1, 'a', 'b', 'c', True, False],
-        },
+        'enum': [2, 1, 'a', 'b', 'c', True, False],
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'letters': letters})
+    validator(letters)
 
 
 @pytest.mark.parametrize(
@@ -27,22 +27,18 @@ def test_enum_with_valid_array(letters):
 )
 def test_enum_with_invalid_items(letters):
     schema = {
-        'letters': {
-            'enum': [True, False, 1.0, 2.0, 'A'],
-        },
+        'enum': [True, False, 1.0, 2.0, 'A'],
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'letters': letters})
+        validator(letters)
 
 
 def test_enum_noop_when_not_required_and_field_not_present():
     schema = {
-        'letters': {
-            'enum': [True, False, 1.0, 2.0, 'A'],
-        },
+        'enum': [True, False, 1.0, 2.0, 'A'],
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)

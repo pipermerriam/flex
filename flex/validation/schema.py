@@ -11,6 +11,7 @@ from django.core.validators import (
 
 from rest_framework import serializers
 
+from flex.exceptions import SafeNestedValidationError
 from flex.constants import (
     NUMBER,
     STRING,
@@ -278,89 +279,88 @@ validator_mapping = {
 }
 
 
-def validate_schema(obj, validators, inner=False):
+# for reference on raising nested validation errors
+#if errors:
+#    errors[key] = list(serializers.ValidationError(dict(errors_)).messages)
+
+
+def validate_schema(obj, validators, inner=None):
     """
     Given a json-like object to validate, and a dictionary of validators, apply
     the validators to the object.
     """
-    if obj is EMPTY:
-        return
-    errors = {}
+    errors = collections.defaultdict(list)
 
-    for key, value in validators.items():
-        errors_ = collections.defaultdict(list)
+    if '$ref' in validators:
+        ref_ = validators.pop('$ref', {})
+        for k, v in ref_.validators.items():
+            validators.setdefault(k, v)
 
-        if isinstance(obj, collections.Mapping):
-            field = obj.get(key, EMPTY)
-        else:
-            field = obj
-
-        if callable(value):
-            try:
-                value(field)
-            except serializers.ValidationError as err:
-                if hasattr(err, 'error_list'):
-                    errors_[key].extend(err.messages)
-                else:
-                    errors_[key].append(err.messages)
-        elif isinstance(value, collections.Mapping):
-            try:
-                validate_schema(field, value, inner=True)
-            except serializers.ValidationError as err:
-                if hasattr(err, 'error_list'):
-                    errors_[key].extend(err.messages)
-                else:
-                    errors_[key].append(err.messages)
-        else:
-            raise ValueError('WTF')
-
-        if errors_:
-            errors[key] = list(serializers.ValidationError(dict(errors_)).messages)
+    for key, validator in validators.items():
+        try:
+            validator(obj)
+        except serializers.ValidationError as err:
+            errors[key].extend(list(err.messages))
 
     if errors:
         if inner:
-            raise serializers.ValidationError(errors)
+            raise SafeNestedValidationError(dict(errors))
         else:
             raise ValueError(prettify_errors(errors))
 
 
-class LazySchemaValidator(object):
-    def __init__(self, func, args=None, kwargs=None):
-        if args is None:
-            args = tuple()
-        if kwargs is None:
-            kwargs = {}
+def property_validator(obj, key, validators):
+    if obj is EMPTY:
+        return
+    validate_schema(obj.get(key, EMPTY), validators, inner=True)
 
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
+
+class LazyReferenceValidator(object):
+    def __init__(self, reference, context):
+        # TODO: something better than this assertion
+        assert 'definitions' in context
+        assert reference in context['definitions']
+        self.reference = reference
+        self.context = context
 
     def __call__(self, value):
-        validators = self.func(*self.args, **self.kwargs)
-        return validate_schema(value, validators, inner=True)
+        return validate_schema(value, self.validators, inner=True)
+
+    @property
+    def validators(self):
+        return construct_schema_validator(
+            self.context['definitions'][self.reference],
+            self.context,
+        )
 
     def items(self):
-        validators = self.func(*self.args, **self.kwargs)
-        return validators.items()
+        return self.validators.items()
 
 
 def construct_schema_validator(schema, context):
-    definitions = context.get('definitions', {})
     validator = {}
     if '$ref' in schema:
-        validator.update(construct_schema_validator(
-            definitions[schema['$ref']],
+        validator['$ref'] = LazyReferenceValidator(
+            schema['$ref'],
             context,
-        ))
+        )
     if 'properties' in schema:
-        for key, value in schema['properties'].items():
-            validator[key] = LazySchemaValidator(
-                construct_schema_validator,
-                (value, context),
+        intersection = set(schema['properties'].keys()).intersection(schema.keys())
+        if intersection:
+            import ipdb; ipdb.set_trace()
+        assert not intersection
+
+        for property, property_schema in schema['properties'].items():
+            property_validators = construct_schema_validator(
+                property_schema,
+                context,
+            )
+            validator[property] = functools.partial(
+                property_validator,
+                key=property,
+                validators=property_validators,
             )
     for key in schema:
-        if key not in validator_mapping:
-            # TODO: silent failure?
-            continue
-        validator[key] = validator_mapping[key](**schema)
+        if key in validator_mapping:
+            validator[key] = validator_mapping[key](**schema)
     return validator

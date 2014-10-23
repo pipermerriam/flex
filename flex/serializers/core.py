@@ -128,6 +128,10 @@ class SchemaSerializer(BaseSchemaSerializer):
             raise serializers.ValidationError(errors)
         return super(SchemaSerializer, self).validate(attrs)
 
+    def save_object(self, obj, **kwargs):
+        validators = construct_schema_validator(obj, self.context)
+        self.object = functools.partial(validate_schema, validators=validators)
+
 
 class ResponseSerializer(BaseResponseSerializer):
     """

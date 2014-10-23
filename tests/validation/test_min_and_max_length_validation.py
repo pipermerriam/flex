@@ -2,6 +2,7 @@ import pytest
 
 from flex.constants import (
     STRING,
+    EMPTY,
 )
 
 from tests.utils import generate_validator_from_schema
@@ -16,14 +17,12 @@ from tests.utils import generate_validator_from_schema
 )
 def test_minimum_length_with_valid_string(zipcode):
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'minLength': 5,
-        },
+        'type': STRING,
+        'minLength': 5,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'zipcode': zipcode})
+    validator(zipcode)
 
 
 @pytest.mark.parametrize(
@@ -32,27 +31,23 @@ def test_minimum_length_with_valid_string(zipcode):
 )
 def test_minimum_length_with_too_short_string(zipcode):
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'minLength': 5,
-        },
+        'type': STRING,
+        'minLength': 5,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'zipcode': zipcode})
+        validator(zipcode)
 
 
 def test_minimum_length_is_noop_when_not_required_and_not_present():
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'minLength': 5,
-        },
+        'type': STRING,
+        'minLength': 5,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)
 
 
 #
@@ -64,14 +59,12 @@ def test_minimum_length_is_noop_when_not_required_and_not_present():
 )
 def test_maximum_length_with_valid_string(zipcode):
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'maxLength': 10,
-        },
+        'type': STRING,
+        'maxLength': 10,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'zipcode': zipcode})
+    validator(zipcode)
 
 
 @pytest.mark.parametrize(
@@ -80,24 +73,20 @@ def test_maximum_length_with_valid_string(zipcode):
 )
 def test_maximum_length_with_too_long_string(zipcode):
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'maxLength': 10,
-        },
+        'type': STRING,
+        'maxLength': 10,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'zipcode': zipcode})
+        validator(zipcode)
 
 
 def test_maximum_length_is_noop_when_not_required_and_not_present():
     schema = {
-        'zipcode': {
-            'type': STRING,
-            'maxLength': 5,
-        },
+        'type': STRING,
+        'maxLength': 5,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)

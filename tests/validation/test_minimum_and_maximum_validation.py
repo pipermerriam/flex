@@ -2,6 +2,7 @@ import pytest
 
 from flex.constants import (
     NUMBER,
+    EMPTY,
 )
 
 from tests.utils import generate_validator_from_schema
@@ -16,14 +17,12 @@ from tests.utils import generate_validator_from_schema
 )
 def test_inclusive_minimum_validation_with_valid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'minimum': 5,
-        },
+        'type': NUMBER,
+        'minimum': 5,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'width': width})
+    validator(width)
 
 
 @pytest.mark.parametrize(
@@ -32,15 +31,13 @@ def test_inclusive_minimum_validation_with_valid_numbers(width):
 )
 def test_inclusive_minimum_validation_with_invalid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'minimum': 5,
-        },
+        'type': NUMBER,
+        'minimum': 5,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'width': width})
+        validator(width)
 
 
 @pytest.mark.parametrize(
@@ -49,15 +46,13 @@ def test_inclusive_minimum_validation_with_invalid_numbers(width):
 )
 def test_exclusive_minimum_validation_with_valid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'minimum': 5,
-            'exclusiveMinimum': True,
-        },
+        'type': NUMBER,
+        'minimum': 5,
+        'exclusiveMinimum': True,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'width': width})
+    validator(width)
 
 
 @pytest.mark.parametrize(
@@ -66,28 +61,24 @@ def test_exclusive_minimum_validation_with_valid_numbers(width):
 )
 def test_exclusive_minimum_validation_with_invalid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'minimum': 5,
-            'exclusiveMinimum': True,
-        },
+        'type': NUMBER,
+        'minimum': 5,
+        'exclusiveMinimum': True,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'width': width})
+        validator(width)
 
 
 def test_minimum_noop_when_not_required_or_present():
     schema = {
-        'width': {
-            'type': NUMBER,
-            'minimum': 5,
-        },
+        'type': NUMBER,
+        'minimum': 5,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)
 
 
 #
@@ -99,14 +90,12 @@ def test_minimum_noop_when_not_required_or_present():
 )
 def test_inclusive_maximum_validation_with_valid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'maximum': 5,
-        },
+        'type': NUMBER,
+        'maximum': 5,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'width': width})
+    validator(width)
 
 
 @pytest.mark.parametrize(
@@ -115,15 +104,13 @@ def test_inclusive_maximum_validation_with_valid_numbers(width):
 )
 def test_inclusive_maximum_validation_with_invalid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'maximum': 5,
-        },
+        'type': NUMBER,
+        'maximum': 5,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'width': width})
+        validator(width)
 
 
 @pytest.mark.parametrize(
@@ -132,15 +119,13 @@ def test_inclusive_maximum_validation_with_invalid_numbers(width):
 )
 def test_exclusive_maximum_validation_with_valid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'maximum': 5,
-            'exclusiveMaximum': True,
-        },
+        'type': NUMBER,
+        'maximum': 5,
+        'exclusiveMaximum': True,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'width': width})
+    validator(width)
 
 
 @pytest.mark.parametrize(
@@ -149,25 +134,21 @@ def test_exclusive_maximum_validation_with_valid_numbers(width):
 )
 def test_exclusive_maximum_validation_with_invalid_numbers(width):
     schema = {
-        'width': {
-            'type': NUMBER,
-            'maximum': 5,
-            'exclusiveMaximum': True,
-        },
+        'type': NUMBER,
+        'maximum': 5,
+        'exclusiveMaximum': True,
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'width': width})
+        validator(width)
 
 
 def test_maximum_noop_when_not_required_or_present():
     schema = {
-        'width': {
-            'type': NUMBER,
-            'maximum': 5,
-        },
+        'type': NUMBER,
+        'maximum': 5,
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)

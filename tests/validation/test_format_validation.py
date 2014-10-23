@@ -1,5 +1,7 @@
 import pytest
 
+from flex.constants import EMPTY
+
 from tests.utils import generate_validator_from_schema
 
 
@@ -15,13 +17,11 @@ from tests.utils import generate_validator_from_schema
 )
 def test_date_time_format_validation(when):
     schema = {
-        'birthday': {
-            'format': 'date-time',
-        },
+        'format': 'date-time',
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({'birthday': when})
+    validator(when)
 
 
 @pytest.mark.parametrize(
@@ -38,22 +38,18 @@ def test_date_time_format_validation(when):
 )
 def test_date_time_with_invalid_dates_strings(when):
     schema = {
-        'birthday': {
-            'format': 'date-time',
-        },
+        'format': 'date-time',
     }
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValueError):
-        validator({'birthday': when})
+        validator(when)
 
 
 def test_date_time_is_noop_when_not_present_or_required():
     schema = {
-        'birthday': {
-            'format': 'date-time',
-        },
+        'format': 'date-time',
     }
     validator = generate_validator_from_schema(schema)
 
-    validator({})
+    validator(EMPTY)
