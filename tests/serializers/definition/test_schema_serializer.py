@@ -1,7 +1,9 @@
-from flex.serializers.definitions import SchemaSerializer
+from flex.serializers.definitions import (
+    SchemaSerializer,
+)
 
 
-def test_empty_schema():
+def test_empty_schema_is_valid():
     schema = {}
 
     serializer = SchemaSerializer(data=schema)

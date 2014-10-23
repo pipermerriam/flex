@@ -3,7 +3,7 @@ from flex.serializers.core import ParameterSerializer
 from tests.utils import assert_error_message_equal
 
 
-def test_unknown_reference():
+def test_unknown_parameter_reference():
     serializer = ParameterSerializer(
         data=['SomeReference'],
         context={},
@@ -17,7 +17,7 @@ def test_unknown_reference():
     )
 
 
-def test_valid_reference():
+def test_valid_parameter_reference():
     serializer = ParameterSerializer(
         data=['SomeReference'],
         context={

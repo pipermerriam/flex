@@ -1,5 +1,7 @@
 import collections
 
+import six
+
 from rest_framework import serializers
 
 from flex.serializers.common import (
@@ -32,7 +34,23 @@ class SchemaSerializer(BaseSchemaSerializer):
 
 
 class DefinitionsSerializer(HomogenousDictSerializer):
+    default_error_messages = {
+        'unknown_references': "Unknown references `{0}`",
+    }
+
     value_serializer_class = SchemaSerializer
+
+    def validate(self, attrs):
+
+        deferred_references = self.context.get('deferred_references', set())
+        missing_references = deferred_references.difference(attrs.keys())
+        if missing_references:
+            raise serializers.ValidationError(
+                self.error_messages['unknown_references'].format(
+                    list(missing_references),
+                ),
+            )
+        return super(DefinitionsSerializer, self).validate(attrs)
 
 
 class PropertiesSerializer(HomogenousDictSerializer):
@@ -40,7 +58,11 @@ class PropertiesSerializer(HomogenousDictSerializer):
 
 
 class ItemsSerializer(BaseItemsSerializer):
-    pass
+    def from_native(self, data, files=None):
+        if isinstance(data, six.string_types):
+            self.context['deferred_references'].add(data)
+            return data
+        return super(ItemsSerializer, self).from_native(data, files)
 
 
 # These fields include recursive use of the `SchemaSerializer` so they have to

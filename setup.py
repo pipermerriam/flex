@@ -10,7 +10,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-version = "1.1.0"
+version = "1.2.0"
 
 readme = open(os.path.join(DIR, 'README.md')).read()
 
@@ -31,6 +31,7 @@ setup(
         'djangorestframework==2.4.3',
         'six==1.7.3',
         'PyYAML==3.11',
+        'iso8601==0.1.10',
     ],
     license="BSD",
     zip_safe=False,

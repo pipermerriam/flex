@@ -1,9 +1,11 @@
 import collections
 import six
 
-from rest_framework import serializers
+from django.core.validators import (
+    MinValueValidator,
+)
 
-from drf_compound_fields.fields import ListField
+from rest_framework import serializers
 
 from flex.serializers.fields import MaybeListCharField
 from flex.serializers.mixins import (
@@ -14,7 +16,8 @@ from flex.serializers.validators import (
     format_validator,
     parameter_in_validator,
     collection_format_validator,
-    MinValueValidator,
+    regex_validator,
+    is_array_validator,
 )
 from flex.constants import (
     BODY,
@@ -24,6 +27,10 @@ from flex.constants import (
     FORM_DATA,
     MULTI,
     ARRAY,
+    INTEGER,
+    NUMBER,
+    STRING,
+    OBJECT,
 )
 
 
@@ -75,7 +82,25 @@ class HomogenousDictSerializer(serializers.Serializer):
 
 
 class CommonJSONSchemaSerializer(serializers.Serializer):
-    multipleOf = serializers.IntegerField(
+    default_error_messages = {
+        'invalid_type_for_minimum': '`minimum` can only be used for json number types',
+        'invalid_type_for_maximum': '`maximum` can only be used for json number types',
+        'invalid_type_for_multiple_of': '`multipleOf` can only be used for json number types',
+        'invalid_type_for_min_length': '`minLength` can only be used for string types',
+        'invalid_type_for_max_length': '`maxLength` can only be used for string types',
+        'invalid_type_for_min_items': '`minItems` can only be used for array types',
+        'invalid_type_for_max_items': '`maxItems` can only be used for array types',
+        'invalid_type_for_unique_items': '`uniqueItems` can only be used for array types',
+        'exclusive_minimum_requires_minimum': (
+            '`exclusiveMinimum` requires `minimum` to be set'
+        ),
+        'exclusive_maximum_requires_maximum': (
+            '`exclusiveMaximum` requires `maximum` to be set'
+        ),
+        'enum_must_be_of_array_type': 'enum value must be an array',
+    }
+
+    multipleOf = serializers.FloatField(
         required=False, validators=[MinValueValidator(0)],
     )
 
@@ -92,28 +117,113 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
         required=False, validators=[MinValueValidator(0)],
     )
 
-    # TODO: validate regex on `pattern`
-    pattern = serializers.CharField(required=False)
+    pattern = serializers.CharField(required=False, validators=[regex_validator])
 
     maxItems = serializers.IntegerField(required=False)
     minItems = serializers.IntegerField(required=False)
     uniqueItems = serializers.BooleanField(required=False)
 
-    enum = ListField(required=False)
+    enum = serializers.WritableField(required=False, validators=[is_array_validator])
+
+    def validate(self, attrs):
+        errors = collections.defaultdict(list)
+
+        # Minimum
+        if 'minimum' in attrs and 'type' in attrs:
+            if attrs['type'] not in (INTEGER, NUMBER):
+                errors['minimum'].append(
+                    self.error_messages['invalid_type_for_minimum'],
+                )
+
+        if 'exclusiveMinimum' in attrs and 'minimum' not in attrs:
+            errors['exclusiveMinimum'].append(
+                self.error_messages['exclusive_minimum_requires_minimum'],
+            )
+
+        # Maximum
+        if 'maximum' in attrs and 'type' in attrs:
+            if attrs['type'] not in (INTEGER, NUMBER):
+                errors['maximum'].append(
+                    self.error_messages['invalid_type_for_maximum'],
+                )
+
+        if 'exclusiveMaximum' in attrs and 'maximum' not in attrs:
+            errors['exclusiveMaximum'].append(
+                self.error_messages['exclusive_maximum_requires_maximum'],
+            )
+
+        # multipleOf
+        if 'multipleOf' in attrs and 'type' in attrs:
+            if attrs['type'] not in (INTEGER, NUMBER):
+                errors['multipleOf'].append(
+                    self.error_messages['invalid_type_for_multiple_of'],
+                )
+
+        # minLength
+        if 'minLength' in attrs and 'type' in attrs:
+            if attrs['type'] != STRING:
+                errors['minLength'].append(
+                    self.error_messages['invalid_type_for_min_length'],
+                )
+
+        # maxLength
+        if 'maxLength' in attrs and 'type' in attrs:
+            if attrs['type'] != STRING:
+                errors['maxLength'].append(
+                    self.error_messages['invalid_type_for_max_length'],
+                )
+
+        # maxItems
+        if 'maxItems' in attrs and 'type' in attrs:
+            if attrs['type'] != ARRAY:
+                errors['maxItems'].append(
+                    self.error_messages['invalid_type_for_max_items'],
+                )
+
+        # minItems
+        if 'minItems' in attrs and 'type' in attrs:
+            if attrs['type'] != ARRAY:
+                errors['minItems'].append(
+                    self.error_messages['invalid_type_for_min_items'],
+                )
+
+        # uniqueItems
+        if 'uniqueItems' in attrs and 'type' in attrs:
+            if attrs['type'] != ARRAY:
+                errors['uniqueItems'].append(
+                    self.error_messages['invalid_type_for_unique_items'],
+                )
+
+        # enum null value special case.
+        if 'enum' in attrs and attrs['enum'] is None:
+            errors['enum'].append(
+                self.error_messages['enum_must_be_of_array_type'],
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(CommonJSONSchemaSerializer, self).validate(attrs)
 
 
 class BaseSchemaSerializer(CommonJSONSchemaSerializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#schemaObject
     """
-    # TODO. reference path item objects from definitions.
-    ref_ = serializers.CharField(source='$ref', required=False)
+    default_error_messages = {
+        'invalid_type_for_min_properties': 'minProperties can only be used for `object` types',
+        'invalid_type_for_max_properties': 'maxProperties can only be used for `object` types',
+    }
+
     format = serializers.CharField(validators=[format_validator], required=False)
     title = serializers.CharField(required=False)
     default = serializers.WritableField(required=False)
 
-    maxProperties = serializers.IntegerField(required=False)
-    minProperties = serializers.IntegerField(required=False)
+    minProperties = serializers.IntegerField(
+        required=False, validators=[MinValueValidator(0)]
+    )
+    maxProperties = serializers.IntegerField(
+        required=False, validators=[MinValueValidator(0)],
+    )
 
     required = serializers.BooleanField(required=False)
     type = MaybeListCharField(required=False, validators=[type_validator])
@@ -127,6 +237,27 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
     # xml
     # discriminator
 
+    def validate(self, attrs):
+        errors = collections.defaultdict(list)
+
+        # minProperties
+        if 'minProperties' in attrs and attrs.get('type') != OBJECT:
+            errors['minProperties'].append(
+                self.error_messages['invalid_type_for_min_properties'],
+            )
+
+        # maxProperties
+        if 'maxProperties' in attrs and attrs.get('type') != OBJECT:
+            errors['maxProperties'].append(
+                self.error_messages['invalid_type_for_max_properties'],
+            )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(BaseSchemaSerializer, self).validate(attrs)
+
+BaseSchemaSerializer.base_fields['$ref'] = serializers.CharField(required=False)
+
 
 class BaseItemsSerializer(BaseSchemaSerializer):
     def __init__(self, *args, **kwargs):
@@ -137,12 +268,6 @@ class BaseItemsSerializer(BaseSchemaSerializer):
             kwargs['many'] = False
 
         super(BaseItemsSerializer, self).__init__(*args, **kwargs)
-
-    def from_native(self, data, files=None):
-        if isinstance(data, six.string_types):
-            self.context['deferred_references'].add(data)
-            return data
-        return super(BaseItemsSerializer, self).from_native(data, files)
 
 
 class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):

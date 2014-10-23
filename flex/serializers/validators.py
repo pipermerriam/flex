@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+
+import re
 import urlparse
 import operator
 
@@ -7,6 +9,7 @@ import six
 from rest_framework import serializers
 
 from flex.decorators import maybe_iterable
+from flex.utils import is_value_of_type
 from flex.constants import (
     SCHEMES,
     MIMETYPES,
@@ -18,6 +21,7 @@ from flex.constants import (
     SECURITY_TYPES,
     SECURITY_API_KEY_LOCATIONS,
     SECURITY_FLOWS,
+    ARRAY,
 )
 
 
@@ -41,13 +45,13 @@ def path_validator(value):
 @maybe_iterable
 def scheme_validator(value):
     if value not in SCHEMES:
-        raise serializers.ValidationError("Invalid scheme: {0}".format(value))
+        raise serializers.ValidationError("Unknown scheme: {0}".format(value))
 
 
 @maybe_iterable
 def mimetype_validator(value):
     if value not in MIMETYPES:
-        raise serializers.ValidationError("Invalid mimetype: {0}".format(value))
+        raise serializers.ValidationError("Unknown mimetype: {0}".format(value))
 
 
 @maybe_iterable
@@ -58,33 +62,33 @@ def string_type_validator(value):
 
 def format_validator(value):
     if value not in zip(*FORMATS)[1]:
-        raise serializers.ValidationError('Invalid format: {0}'.format(value))
+        raise serializers.ValidationError('Unknown format: {0}'.format(value))
 
 
 @maybe_iterable
 def type_validator(value):
     if value not in PRIMATIVE_TYPES:
-        raise serializers.ValidationError('Invalid type: {0}'.format(value))
+        raise serializers.ValidationError('Unknown type: {0}'.format(value))
 
 
 def header_type_validator(value):
     if value not in HEADER_TYPES:
         raise serializers.ValidationError(
-            "Invalid type for header: `{0}`".format(value),
+            "Unknown type for header: `{0}`".format(value),
         )
 
 
 def parameter_in_validator(value):
     if value not in PARAMETER_IN_VALUES:
         raise serializers.ValidationError(
-            "Invalid value for in: `{0}`".format(value),
+            "Unknown value for in: `{0}`".format(value),
         )
 
 
 def collection_format_validator(value):
     if value not in COLLECTION_FORMATS:
         raise serializers.ValidationError(
-            "Invalid collectionFormat: `{0}`".format(value),
+            "Unknown collectionFormat: `{0}`".format(value),
         )
 
 
@@ -142,4 +146,20 @@ def security_flow_validator(value):
     if value not in SECURITY_FLOWS:
         raise serializers.ValidationError(
             "Unknown security flow: {0}".format(value),
+        )
+
+
+def regex_validator(value):
+    try:
+        re.compile(value)
+    except re.error as e:
+        raise serializers.ValidationError(
+            "Invalid Regex: {0}".format(e.message)
+        )
+
+
+def is_array_validator(value):
+    if not is_value_of_type(value, ARRAY):
+        raise serializers.ValidationError(
+            "Must be an array",
         )

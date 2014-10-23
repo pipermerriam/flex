@@ -7,7 +7,10 @@ import six
 import json
 import yaml
 
-from flex.serializers.core import SwaggerSerializer
+from flex.serializers.core import (
+    SwaggerSerializer,
+    SchemaSerializer,
+)
 from flex.serializers.definitions import SwaggerDefinitionsSerializer
 from flex.utils import prettify_errors
 
@@ -24,14 +27,13 @@ def load_source(source):
         - json string.
         - yaml string.
     """
-    # TODO: content negotiation.
     if isinstance(source, collections.Mapping):
         return source
 
     elif hasattr(source, 'read') and callable(source.read):
         raw_source = source.read()
-    elif os.path.exists(str(source)):
-        with open(source, 'r') as source_file:
+    elif os.path.exists(os.path.expanduser(str(source))):
+        with open(os.path.expanduser(str(source)), 'r') as source_file:
             raw_source = source_file.read()
     elif isinstance(source, six.string_types):
         raw_source = source
@@ -61,7 +63,7 @@ def parse(raw_schema):
     if not definitions_serializer.is_valid():
 
         message = "Swagger definitions did not validate:\n\n"
-        message += '\n'.join(prettify_errors(definitions_serializer.errors))
+        message += prettify_errors(definitions_serializer.errors)
         raise ValueError(message)
 
     swagger_definitions = definitions_serializer.object
@@ -74,7 +76,7 @@ def parse(raw_schema):
 
     if not swagger_serializer.is_valid():
         message = "Swagger schema did not validate:\n\n"
-        message += '\n'.join(prettify_errors(swagger_serializer.errors))
+        message += prettify_errors(swagger_serializer.errors)
         raise ValueError(message)
 
     return swagger_serializer.object
@@ -83,3 +85,15 @@ def parse(raw_schema):
 def load(target):
     raw_schema = load_source(target)
     return parse(raw_schema)
+
+
+def validate(schema, target=None):
+    schema_serializer = SchemaSerializer(data=schema)
+    if not schema_serializer.is_valid():
+        message = "JSON Schema did not validate:\n\n"
+        message += prettify_errors(schema_serializer.errors)
+        raise ValueError(message)
+
+    if target is not None:
+        validator = schema_serializer.save()
+        validator(target)

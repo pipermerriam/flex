@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import functools
 import collections
 import six
 
@@ -35,6 +36,10 @@ from flex.constants import (
     CSV,
     ARRAY,
 )
+from flex.validation.schema import (
+    validate_schema,
+    construct_schema_validators,
+)
 
 
 class InfoSerializer(serializers.Serializer):
@@ -50,7 +55,19 @@ class InfoSerializer(serializers.Serializer):
 
 
 class ItemsSerializer(BaseItemsSerializer):
-    pass
+    default_error_messages = {
+        'unknown_reference': 'Unknown definition reference `{0}`',
+    }
+
+    def from_native(self, data, files):
+        if isinstance(data, six.string_types):
+            definitions = self.context.get('definitions', {})
+            if data not in definitions:
+                raise serializers.ValidationError(
+                    self.error_messages['unknown_reference'].format(data),
+                )
+            return data
+        return super(ItemsSerializer, self).from_native(data, files)
 
 
 class HeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
@@ -73,6 +90,7 @@ class HeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
 
     def validate(self, attrs):
         errors = collections.defaultdict(list)
+
         if attrs.get('type') == ARRAY and 'items' not in attrs:
             errors['items'].append(
                 self.error_messages['items_required'],
@@ -92,7 +110,27 @@ class HeadersSerializer(HomogenousDictSerializer):
 
 
 class SchemaSerializer(BaseSchemaSerializer):
-    pass
+    default_error_messages = {
+        'unknown_reference': 'Unknown definition reference `{0}`'
+    }
+
+    def validate(self, attrs):
+        errors = collections.defaultdict(list)
+
+        if '$ref' in attrs:
+            definitions = self.context.get('definitions', {})
+            if attrs['$ref'] not in definitions:
+                errors['$ref'].append(
+                    self.error_messages['unknown_reference'].format(attrs['$ref']),
+                )
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(SchemaSerializer, self).validate(attrs)
+
+    def save_object(self, obj, **kwargs):
+        validators = construct_schema_validators(obj, self.context)
+        self.object = functools.partial(validate_schema, validators=validators)
 
 
 class ResponseSerializer(BaseResponseSerializer):
@@ -135,7 +173,7 @@ class ParameterSerializer(BaseParameterSerializer):
                 return
             else:
                 return data
-        return super(BaseParameterSerializer, self).from_native(data, files)
+        return super(ParameterSerializer, self).from_native(data, files)
 
     def validate_reference(self, reference):
         if reference not in self.context.get('parameters', {}):

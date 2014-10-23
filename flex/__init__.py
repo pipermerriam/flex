@@ -1,9 +1,10 @@
 import django
 from django.conf import settings
 
-settings.configure()
+if not settings.configured:
+    settings.configure()
 django.setup()
 
-VERSION = '1.1.0'
+VERSION = '1.2.0'
 
 from .core import load  # NOQA
