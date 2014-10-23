@@ -301,7 +301,7 @@ def validate_schema(obj, validators, inner=None):
         if inner:
             raise SafeNestedValidationError(dict(errors))
         else:
-            raise ValueError(prettify_errors(errors))
+            raise ValueError('Invalid:\n' + prettify_errors(errors))
 
 
 def property_validator(obj, key, validators):

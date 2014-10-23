@@ -7,7 +7,10 @@ import six
 import json
 import yaml
 
-from flex.serializers.core import SwaggerSerializer
+from flex.serializers.core import (
+    SwaggerSerializer,
+    SchemaSerializer,
+)
 from flex.serializers.definitions import SwaggerDefinitionsSerializer
 from flex.utils import prettify_errors
 
@@ -24,7 +27,6 @@ def load_source(source):
         - json string.
         - yaml string.
     """
-    # TODO: content negotiation.
     if isinstance(source, collections.Mapping):
         return source
 
@@ -83,3 +85,15 @@ def parse(raw_schema):
 def load(target):
     raw_schema = load_source(target)
     return parse(raw_schema)
+
+
+def validate(schema, target=None):
+    schema_serializer = SchemaSerializer(data=schema)
+    if not schema_serializer.is_valid():
+        message = "JSON Schema did not validate:\n\n"
+        message += prettify_errors(schema_serializer.errors)
+        raise ValueError(message)
+
+    if target is not None:
+        validator = schema_serializer.save()
+        validator(target)
