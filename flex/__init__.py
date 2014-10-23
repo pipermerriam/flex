@@ -1,7 +1,8 @@
 import django
 from django.conf import settings
 
-settings.configure()
+if not settings.configured:
+    settings.configure()
 django.setup()
 
 VERSION = '1.1.0'

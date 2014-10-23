@@ -311,6 +311,13 @@ def property_validator(obj, key, validators):
 
 
 class LazyReferenceValidator(object):
+    """
+    This class acts as a lazy validator for references in schemas to prevent an
+    infinite recursion error when a schema references itself, or there is a
+    reference loop between more than one schema.
+
+    The validator is only constructed if validator is needed.
+    """
     def __init__(self, reference, context):
         # TODO: something better than this assertion
         assert 'definitions' in context
@@ -323,7 +330,7 @@ class LazyReferenceValidator(object):
 
     @property
     def validators(self):
-        return construct_schema_validator(
+        return construct_schema_validators(
             self.context['definitions'][self.reference],
             self.context,
         )
@@ -332,10 +339,14 @@ class LazyReferenceValidator(object):
         return self.validators.items()
 
 
-def construct_schema_validator(schema, context):
-    validator = {}
+def construct_schema_validators(schema, context):
+    """
+    Given a schema object, construct a dictionary of validators needed to
+    validate a response matching the given schema.
+    """
+    validators = {}
     if '$ref' in schema:
-        validator['$ref'] = LazyReferenceValidator(
+        validators['$ref'] = LazyReferenceValidator(
             schema['$ref'],
             context,
         )
@@ -344,16 +355,16 @@ def construct_schema_validator(schema, context):
         assert not intersection
 
         for property, property_schema in schema['properties'].items():
-            property_validators = construct_schema_validator(
+            property_validators = construct_schema_validators(
                 property_schema,
                 context,
             )
-            validator[property] = functools.partial(
+            validators[property] = functools.partial(
                 property_validator,
                 key=property,
                 validators=property_validators,
             )
     for key in schema:
         if key in validator_mapping:
-            validator[key] = validator_mapping[key](**schema)
-    return validator
+            validators[key] = validator_mapping[key](**schema)
+    return validators

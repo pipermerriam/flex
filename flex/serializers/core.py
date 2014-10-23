@@ -38,7 +38,7 @@ from flex.constants import (
 )
 from flex.validation.schema import (
     validate_schema,
-    construct_schema_validator,
+    construct_schema_validators,
 )
 
 
@@ -129,7 +129,7 @@ class SchemaSerializer(BaseSchemaSerializer):
         return super(SchemaSerializer, self).validate(attrs)
 
     def save_object(self, obj, **kwargs):
-        validators = construct_schema_validator(obj, self.context)
+        validators = construct_schema_validators(obj, self.context)
         self.object = functools.partial(validate_schema, validators=validators)
 
 
@@ -230,12 +230,6 @@ class TagSerializer(serializers.Serializer):
 
 class PropertiesSerializer(HomogenousDictSerializer):
     value_serializer_class = SchemaSerializer
-
-    def save_object(self, obj, **kwargs):
-        validators = {}
-        for key, schema in obj.items():
-            validators[key] = construct_schema_validator(schema, self.context)
-        self.object = functools.partial(validate_schema, validators=validators)
 
 
 # These fields include recursive use of the `SchemaSerializer` so they have to
