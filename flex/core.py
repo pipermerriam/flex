@@ -30,8 +30,8 @@ def load_source(source):
 
     elif hasattr(source, 'read') and callable(source.read):
         raw_source = source.read()
-    elif os.path.exists(str(source)):
-        with open(source, 'r') as source_file:
+    elif os.path.exists(os.path.expanduser(str(source))):
+        with open(os.path.expanduser(str(source)), 'r') as source_file:
             raw_source = source_file.read()
     elif isinstance(source, six.string_types):
         raw_source = source
@@ -61,7 +61,7 @@ def parse(raw_schema):
     if not definitions_serializer.is_valid():
 
         message = "Swagger definitions did not validate:\n\n"
-        message += '\n'.join(prettify_errors(definitions_serializer.errors))
+        message += prettify_errors(definitions_serializer.errors)
         raise ValueError(message)
 
     swagger_definitions = definitions_serializer.object
@@ -74,7 +74,7 @@ def parse(raw_schema):
 
     if not swagger_serializer.is_valid():
         message = "Swagger schema did not validate:\n\n"
-        message += '\n'.join(prettify_errors(swagger_serializer.errors))
+        message += prettify_errors(swagger_serializer.errors)
         raise ValueError(message)
 
     return swagger_serializer.object
