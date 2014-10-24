@@ -6,11 +6,11 @@ import os
 DIR = os.path.dirname(os.path.abspath(__file__))
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup, find_packages
 
-version = "1.3.0"
+version = "1.4.0"
 
 readme = open(os.path.join(DIR, 'README.md')).read()
 
@@ -36,9 +36,7 @@ setup(
     license="BSD",
     zip_safe=False,
     keywords='rest swagger',
-    packages=[
-        'flex',
-    ],
+    packages=find_packages(),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
