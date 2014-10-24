@@ -128,15 +128,36 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
 
     enum = serializers.WritableField(required=False, validators=[is_array_validator])
 
+    def check_type_for_attr(self, attrs, field_name, types, errors, error_key):
+        """
+        Shortcut for common pattern of having a keyword that depends on the
+        type of the object.  If the types provided do not have any intersection
+        with the required types, then an error is created.
+        """
+        if field_name in attrs and 'type' in attrs:
+            declared_types = attrs['type']
+            if isinstance(declared_types, six.string_types):
+                declared_types = [declared_types]
+
+            if isinstance(types, six.string_types):
+                types = [types]
+
+            if not set(types).intersection(declared_types):
+                errors[field_name].append(
+                    self.error_messages[error_key],
+                )
+
     def validate(self, attrs):
         errors = collections.defaultdict(list)
 
         # Minimum
-        if 'minimum' in attrs and 'type' in attrs:
-            if attrs['type'] not in (INTEGER, NUMBER):
-                errors['minimum'].append(
-                    self.error_messages['invalid_type_for_minimum'],
-                )
+        self.check_type_for_attr(
+            attrs,
+            'minimum',
+            (INTEGER, NUMBER),
+            errors,
+            'invalid_type_for_minimum',
+        )
 
         if 'exclusiveMinimum' in attrs and 'minimum' not in attrs:
             errors['exclusiveMinimum'].append(
@@ -144,11 +165,13 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
             )
 
         # Maximum
-        if 'maximum' in attrs and 'type' in attrs:
-            if attrs['type'] not in (INTEGER, NUMBER):
-                errors['maximum'].append(
-                    self.error_messages['invalid_type_for_maximum'],
-                )
+        self.check_type_for_attr(
+            attrs,
+            'maximum',
+            (INTEGER, NUMBER),
+            errors,
+            'invalid_type_for_maximum',
+        )
 
         if 'exclusiveMaximum' in attrs and 'maximum' not in attrs:
             errors['exclusiveMaximum'].append(
@@ -156,46 +179,58 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
             )
 
         # multipleOf
-        if 'multipleOf' in attrs and 'type' in attrs:
-            if attrs['type'] not in (INTEGER, NUMBER):
-                errors['multipleOf'].append(
-                    self.error_messages['invalid_type_for_multiple_of'],
-                )
+        self.check_type_for_attr(
+            attrs,
+            'multipleOf',
+            (INTEGER, NUMBER),
+            errors,
+            'invalid_type_for_multiple_of',
+        )
 
         # minLength
-        if 'minLength' in attrs and 'type' in attrs:
-            if attrs['type'] != STRING:
-                errors['minLength'].append(
-                    self.error_messages['invalid_type_for_min_length'],
-                )
+        self.check_type_for_attr(
+            attrs,
+            'minLength',
+            STRING,
+            errors,
+            'invalid_type_for_min_length',
+        )
 
         # maxLength
-        if 'maxLength' in attrs and 'type' in attrs:
-            if attrs['type'] != STRING:
-                errors['maxLength'].append(
-                    self.error_messages['invalid_type_for_max_length'],
-                )
-
-        # maxItems
-        if 'maxItems' in attrs and 'type' in attrs:
-            if attrs['type'] != ARRAY:
-                errors['maxItems'].append(
-                    self.error_messages['invalid_type_for_max_items'],
-                )
+        self.check_type_for_attr(
+            attrs,
+            'maxLength',
+            STRING,
+            errors,
+            'invalid_type_for_max_length',
+        )
 
         # minItems
-        if 'minItems' in attrs and 'type' in attrs:
-            if attrs['type'] != ARRAY:
-                errors['minItems'].append(
-                    self.error_messages['invalid_type_for_min_items'],
-                )
+        self.check_type_for_attr(
+            attrs,
+            'minItems',
+            ARRAY,
+            errors,
+            'invalid_type_for_min_items',
+        )
+
+        # maxItems
+        self.check_type_for_attr(
+            attrs,
+            'maxItems',
+            ARRAY,
+            errors,
+            'invalid_type_for_max_items',
+        )
 
         # uniqueItems
-        if 'uniqueItems' in attrs and 'type' in attrs:
-            if attrs['type'] != ARRAY:
-                errors['uniqueItems'].append(
-                    self.error_messages['invalid_type_for_unique_items'],
-                )
+        self.check_type_for_attr(
+            attrs,
+            'uniqueItems',
+            ARRAY,
+            errors,
+            'invalid_type_for_unique_items',
+        )
 
         # enum null value special case.
         if 'enum' in attrs and attrs['enum'] is None:
@@ -244,16 +279,22 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
         errors = collections.defaultdict(list)
 
         # minProperties
-        if 'minProperties' in attrs and attrs.get('type') != OBJECT:
-            errors['minProperties'].append(
-                self.error_messages['invalid_type_for_min_properties'],
-            )
+        self.check_type_for_attr(
+            attrs,
+            'minProperties',
+            OBJECT,
+            errors,
+            'invalid_type_for_min_properties',
+        )
 
         # maxProperties
-        if 'maxProperties' in attrs and attrs.get('type') != OBJECT:
-            errors['maxProperties'].append(
-                self.error_messages['invalid_type_for_max_properties'],
-            )
+        self.check_type_for_attr(
+            attrs,
+            'maxProperties',
+            OBJECT,
+            errors,
+            'invalid_type_for_max_properties',
+        )
 
         if errors:
             raise serializers.ValidationError(errors)
