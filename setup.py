@@ -10,7 +10,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-version = "1.2.0"
+version = "1.3.0"
 
 readme = open(os.path.join(DIR, 'README.md')).read()
 
@@ -36,6 +36,9 @@ setup(
     license="BSD",
     zip_safe=False,
     keywords='rest swagger',
+    packages=[
+        'flex',
+    ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
