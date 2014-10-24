@@ -1,5 +1,14 @@
-from flex.serializers.core import SchemaSerializer
-from flex.constants import INTEGER
+import pytest
+
+from flex.serializers.common import BaseItemsSerializer
+from flex.serializers.core import (
+    SchemaSerializer,
+)
+from flex.constants import (
+    INTEGER,
+    ARRAY,
+    STRING,
+)
 
 from tests.utils import assert_error_message_equal
 
@@ -40,8 +49,36 @@ def test_valid_reference():
 #
 # items validation tests
 #
+@pytest.mark.parametrize(
+    'items',
+    (
+        1234,  # integer
+        1.234,  # number
+        True,  # boolean
+        None,  # null
+    ),
+)
+def test_items_invalid_when_not_array_or_object_or_reference(items):
+    schema = {
+        'type': ARRAY,
+        'items': [items],
+    }
+
+    serializer = SchemaSerializer(
+        data=schema,
+    )
+
+    assert not serializer.is_valid()
+    assert 'items' in serializer.errors
+    assert_error_message_equal(
+        serializer.errors['items'][0],
+        BaseItemsSerializer.default_error_messages['invalid_type_for_items'],
+    )
+
+
 def test_items_as_missing_reference():
     schema = {
+        'type': ARRAY,
         'items': 'SomeReference',
     }
     serializer = SchemaSerializer(
@@ -57,6 +94,7 @@ def test_items_as_missing_reference():
 
 def test_items_as_existing_reference():
     schema = {
+        'type': ARRAY,
         'items': 'SomeReference',
     }
     serializer = SchemaSerializer(
@@ -70,6 +108,7 @@ def test_items_as_existing_reference():
 
 def test_items_validated_as_valid_schema_object():
     schema = {
+        'type': ARRAY,
         'items': {
             'type': 'unknown-type',
         }
@@ -100,6 +139,7 @@ def test_items_as_array_of_invalid_schemas():
 
 def test_items_as_array_of_valid_schemas():
     schema = {
+        'type': ARRAY,
         'items': [
             {'type': INTEGER},
             {'minLength': 3},
@@ -113,6 +153,7 @@ def test_items_as_array_of_valid_schemas():
 
 def test_items_as_array_of_references_with_missing_reference():
     schema = {
+        'type': ARRAY,
         'items': ['SomeReference', 'SomeOtherReference']
     }
     serializer = SchemaSerializer(
@@ -132,6 +173,7 @@ def test_items_as_array_of_references_with_missing_reference():
 
 def test_items_as_array_of_valid_references():
     schema = {
+        'type': ARRAY,
         'items': ['SomeReference', 'SomeOtherReference']
     }
     serializer = SchemaSerializer(
@@ -143,4 +185,28 @@ def test_items_as_array_of_valid_references():
             },
         },
     )
+    assert 'items' not in serializer.errors
+
+
+def test_items_with_mixed_array_of_references_and_schemas():
+    schema = {
+        'type': ARRAY,
+        'items': [
+            {
+                'type': INTEGER,
+                'minimum': 4,
+            },
+            'SomeReference',
+            {
+                'type': STRING,
+                'minLength': 4,
+            },
+        ]
+    }
+
+    serializer = SchemaSerializer(
+        data=schema,
+        context={'definitions': {'SomeReference': {}}}
+    )
+
     assert 'items' not in serializer.errors

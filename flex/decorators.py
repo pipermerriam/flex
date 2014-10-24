@@ -1,11 +1,8 @@
 import functools
 
-from rest_framework import serializers
-
 from flex.utils import (
     is_non_string_iterable,
-    is_value_of_type,
-    get_type_for_value,
+    is_value_of_any_type,
 )
 from flex.constants import EMPTY
 
@@ -20,17 +17,11 @@ def maybe_iterable(func):
     return inner
 
 
-def enforce_type(type_):
+def skip_if_not_of_type(*types):
     def outer(func):
         @functools.wraps(func)
         def inner(value, *args, **kwargs):
-            if value is EMPTY or is_value_of_type(value, type_):
+            if value is EMPTY or is_value_of_any_type(value, types):
                 return func(value, *args, **kwargs)
-            else:
-                raise serializers.ValidationError(
-                    "Value must be of type {0}.  {1} is of type {2}".format(
-                        type_, value, get_type_for_value(value),
-                    ),
-                )
         return inner
     return outer
