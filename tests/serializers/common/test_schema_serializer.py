@@ -50,6 +50,24 @@ def test_minimum_is_valid_with_numeric_types(type_):
     assert 'minimum' not in serializer.errors
 
 
+@pytest.mark.parametrize(
+    'types',
+    (
+        (INTEGER, NUMBER),
+        (STRING, NUMBER),
+        (NUMBER, NULL),
+    ),
+)
+def test_minimum_is_valid_if_at_least_one_type_is_numeric(types):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': types,
+            'minimum': 0,
+        },
+    )
+    assert 'minimum' not in serializer.errors
+
+
 #
 # maximum validation tests
 #
@@ -80,6 +98,24 @@ def test_maximum_is_valid_with_numeric_types(type_):
     serializer = BaseSchemaSerializer(
         data={
             'type': type_,
+            'maximum': 0,
+        },
+    )
+    assert 'maximum' not in serializer.errors
+
+
+@pytest.mark.parametrize(
+    'types',
+    (
+        (INTEGER, NUMBER),
+        (STRING, NUMBER),
+        (NUMBER, NULL),
+    ),
+)
+def test_maximum_is_valid_if_at_least_one_type_is_numeric(types):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': types,
             'maximum': 0,
         },
     )
@@ -184,6 +220,24 @@ def test_multiple_of_valid_for_json_number_types(type_):
     assert 'multipleOf' not in serializer.errors
 
 
+@pytest.mark.parametrize(
+    'types',
+    (
+        (INTEGER, NUMBER),
+        (STRING, NUMBER),
+        (INTEGER, NULL),
+    )
+)
+def test_multiple_of_valid_if_any_of_declared_types_are_numeric(types):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': types,
+            'multipleOf': 10,
+        },
+    )
+    assert 'multipleOf' not in serializer.errors
+
+
 #
 # minLength validation tests
 #
@@ -217,6 +271,24 @@ def test_min_length_valid_with_string_type():
     serializer = BaseSchemaSerializer(
         data={
             'type': STRING,
+            'minLength': 10,
+        },
+    )
+    assert 'minLength' not in serializer.errors
+
+
+@pytest.mark.parametrize(
+    'types',
+    (
+        (STRING,),
+        (NULL, STRING),
+        (STRING, INTEGER),
+    ),
+)
+def test_min_length_valid_if_any_declared_type_is_string(types):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': types,
             'minLength': 10,
         },
     )
@@ -262,6 +334,24 @@ def test_max_length_valid_with_string_type():
     assert 'maxLength' not in serializer.errors
 
 
+@pytest.mark.parametrize(
+    'types',
+    (
+        (STRING,),
+        (NULL, STRING),
+        (STRING, INTEGER),
+    ),
+)
+def test_max_length_valid_if_any_declared_type_is_string(types):
+    serializer = BaseSchemaSerializer(
+        data={
+            'type': types,
+            'maxLength': 10,
+        },
+    )
+    assert 'maxLength' not in serializer.errors
+
+
 #
 # maxItems tests
 @pytest.mark.parametrize(
@@ -290,10 +380,19 @@ def test_max_items_invalid_with_non_array_type(type_):
     )
 
 
-def test_max_items_valid_with_array_type():
+@pytest.mark.parametrize(
+    'types',
+    (
+        ARRAY,
+        (ARRAY,),
+        (STRING, ARRAY),
+        (ARRAY, OBJECT),
+    ),
+)
+def test_max_items_valid_with_array_type(types):
     serializer = BaseSchemaSerializer(
         data={
-            'type': ARRAY,
+            'type': types,
             'maxItems': 5,
         },
     )
@@ -329,10 +428,19 @@ def test_min_items_invalid_with_non_arraw_type(type_):
     )
 
 
-def test_min_items_valid_with_array_type():
+@pytest.mark.parametrize(
+    'types',
+    (
+        ARRAY,
+        (ARRAY,),
+        (STRING, ARRAY),
+        (ARRAY, OBJECT),
+    ),
+)
+def test_min_items_valid_with_array_type(types):
     serializer = BaseSchemaSerializer(
         data={
-            'type': ARRAY,
+            'type': types,
             'minItems': 5,
         },
     )
@@ -368,10 +476,19 @@ def test_unique_items_invalid_with_non_arraw_type(type_):
     )
 
 
-def test_unique_items_valid_with_array_type():
+@pytest.mark.parametrize(
+    'types',
+    (
+        ARRAY,
+        (BOOLEAN, ARRAY),
+        (INTEGER, ARRAY),
+        (ARRAY, OBJECT),
+    ),
+)
+def test_unique_items_valid_with_array_type(types):
     serializer = BaseSchemaSerializer(
         data={
-            'type': ARRAY,
+            'type': types,
             'uniqueItems': True,
         },
     )
@@ -402,7 +519,6 @@ def test_non_array_for_enum_is_invalid(enum):
 
 
 def test_valid_enum_iterable():
-
     serializer = BaseSchemaSerializer(
         data={
             'enum': ['a', 1, True, ['inner', 'array'], {'a': 'b', 'c': 'd'}, 2.0, None],
@@ -440,10 +556,19 @@ def test_min_properties_invalid_for_non_object_types(type_):
     )
 
 
-def test_min_properties_valid_for_object_type():
+@pytest.mark.parametrize(
+    'types',
+    (
+        OBJECT,
+        (OBJECT, ARRAY),
+        (OBJECT, NULL),
+        (INTEGER, STRING, OBJECT),
+    ),
+)
+def test_min_properties_valid_for_object_type(types):
     serializer = BaseSchemaSerializer(
         data={
-            'type': OBJECT,
+            'type': types,
             'minProperties': 3,
         },
     )
@@ -493,10 +618,19 @@ def test_max_properties_invalid_for_non_object_types(type_):
     )
 
 
-def test_max_properties_valid_for_object_type():
+@pytest.mark.parametrize(
+    'types',
+    (
+        OBJECT,
+        (OBJECT, ARRAY),
+        (OBJECT, NULL),
+        (INTEGER, STRING, OBJECT),
+    ),
+)
+def test_max_properties_valid_for_object_type(types):
     serializer = BaseSchemaSerializer(
         data={
-            'type': OBJECT,
+            'type': types,
             'maxProperties': 3,
         },
     )
