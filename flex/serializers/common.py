@@ -7,6 +7,9 @@ from django.core.validators import (
 
 from rest_framework import serializers
 
+from flex.utils import (
+    is_value_of_any_type,
+)
 from flex.serializers.fields import MaybeListCharField
 from flex.serializers.mixins import (
     TypedDefaultMixin,
@@ -260,14 +263,26 @@ BaseSchemaSerializer.base_fields['$ref'] = serializers.CharField(required=False)
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):
+    default_error_messages = {
+        'invalid_type_for_items': '`items` must be a referenc, a schema, or an array of schemas.',
+    }
+
     def __init__(self, *args, **kwargs):
-        data = kwargs.get('data')
-        if isinstance(data, collections.Mapping):
-            kwargs['data'] = [data]
-        if isinstance(data, six.string_types):
-            kwargs['many'] = False
+        if 'data' in kwargs:
+            data = kwargs['data']
+            if isinstance(data, collections.Mapping):
+                kwargs['many'] = False
+            elif isinstance(data, six.string_types):
+                kwargs['many'] = False
 
         super(BaseItemsSerializer, self).__init__(*args, **kwargs)
+
+    def from_native(self, data, files=None):
+        if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
+            raise serializers.ValidationError(
+                self.error_messages['invalid_type_for_items']
+            )
+        return super(BaseItemsSerializer, self).from_native(data, files)
 
 
 class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):

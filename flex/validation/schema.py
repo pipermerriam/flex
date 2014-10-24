@@ -1,15 +1,17 @@
 import re
+import itertools
 import operator
 import decimal
 import collections
 import functools
 
+import six
+
+from django.core.exceptions import ValidationError
 from django.core.validators import (
     MinLengthValidator,
     MaxLengthValidator,
 )
-
-from rest_framework import serializers
 
 from flex.exceptions import SafeNestedValidationError
 from flex.constants import (
@@ -19,7 +21,7 @@ from flex.constants import (
     OBJECT,
     EMPTY,
 )
-from flex.decorators import enforce_type
+from flex.decorators import skip_if_not_of_type
 from flex.utils import (
     prettify_errors,
     is_value_of_any_type,
@@ -41,7 +43,7 @@ def skip_if_empty(func):
 @skip_if_empty
 def validate_type(value, types):
     if not is_value_of_any_type(value, types):
-        raise serializers.ValidationError("Invalid Type: {0}".format(value))
+        raise ValidationError("Invalid Type: {0}".format(value))
 
 
 def generate_type_validator(**kwargs):
@@ -52,14 +54,14 @@ def generate_type_validator(**kwargs):
 
 
 @skip_if_empty
-@enforce_type(NUMBER)
+@skip_if_not_of_type(NUMBER)
 def validate_multiple_of(value, divisor):
     """
     Given a value and a divisor, validate that the value is divisible by the
     divisor.
     """
     if not decimal.Decimal(str(value)) % decimal.Decimal(str(divisor)) == 0:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "{0} is not a multiple of {1}".format(value, divisor),
         )
 
@@ -69,7 +71,7 @@ def generate_multiple_of_validator(multipleOf, **kwargs):
 
 
 @skip_if_empty
-@enforce_type(NUMBER)
+@skip_if_not_of_type(NUMBER)
 def validate_minimum(value, minimum, is_exclusive):
     if is_exclusive:
         comparison_text = "greater than"
@@ -79,7 +81,7 @@ def validate_minimum(value, minimum, is_exclusive):
         compare_fn = operator.ge
 
     if not compare_fn(value, minimum):
-        raise serializers.ValidationError(
+        raise ValidationError(
             "{0} must be {1} than {2}".format(value, comparison_text, minimum),
         )
 
@@ -89,7 +91,7 @@ def generate_minimum_validator(minimum, exclusiveMinimum=False, **kwargs):
 
 
 @skip_if_empty
-@enforce_type(NUMBER)
+@skip_if_not_of_type(NUMBER)
 def validate_maximum(value, maximum, is_exclusive):
     if is_exclusive:
         comparison_text = "less than"
@@ -99,7 +101,7 @@ def validate_maximum(value, maximum, is_exclusive):
         compare_fn = operator.le
 
     if not compare_fn(value, maximum):
-        raise serializers.ValidationError(
+        raise ValidationError(
             "{0} must be {1} than {2}".format(value, comparison_text, maximum),
         )
 
@@ -109,18 +111,18 @@ def generate_maximum_validator(maximum, exclusiveMaximum=False, **kwargs):
 
 
 def generate_min_length_validator(minLength, **kwargs):
-    return skip_if_empty(enforce_type(STRING)(MinLengthValidator(minLength).__call__))
+    return skip_if_empty(skip_if_not_of_type(STRING)(MinLengthValidator(minLength).__call__))
 
 
 def generate_max_length_validator(maxLength, **kwargs):
-    return skip_if_empty(enforce_type(STRING)(MaxLengthValidator(maxLength).__call__))
+    return skip_if_empty(skip_if_not_of_type(STRING)(MaxLengthValidator(maxLength).__call__))
 
 
 @skip_if_empty
-@enforce_type(ARRAY)
+@skip_if_not_of_type(ARRAY)
 def validate_min_items(value, minimum):
     if len(value) < minimum:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Array must have at least {0} items.  It had {1}".format(
                 minimum, len(value),
             ),
@@ -132,10 +134,10 @@ def generate_min_items_validator(minItems, **kwargs):
 
 
 @skip_if_empty
-@enforce_type(ARRAY)
+@skip_if_not_of_type(ARRAY)
 def validate_max_items(value, maximum):
     if len(value) > maximum:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Array must have no more than {0} items.  It had {1}".format(
                 maximum, len(value),
             ),
@@ -147,12 +149,12 @@ def generate_max_items_validator(maxItems, **kwargs):
 
 
 @skip_if_empty
-@enforce_type(ARRAY)
+@skip_if_not_of_type(ARRAY)
 def validate_unique_items(value):
     counter = collections.Counter(value)
     dupes = [v for v, count in counter.items() if count > 1]
     if dupes:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Items must be unique.  The following items appeard more than once: {0}".format(
                 repr(dupes),
             ),
@@ -187,7 +189,7 @@ def deep_equal(a, b):
 @skip_if_empty
 def validate_enum(value, options):
     if not any(deep_equal(value, option) for option in options):
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Invalid value.  {0} is not one of the available options ({1})".format(
                 value, options,
             )
@@ -199,10 +201,10 @@ def generate_enum_validator(enum, **kwargs):
 
 
 @skip_if_empty
-@enforce_type(OBJECT)
+@skip_if_not_of_type(OBJECT)
 def validate_min_properties(value, minimum):
     if len(value.keys()) < minimum:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Object must have more than {0} properties.  It had {1}".format(
                 minimum, len(value.keys()),
             ),
@@ -214,10 +216,10 @@ def generate_min_properties_validator(minProperties, **kwargs):
 
 
 @skip_if_empty
-@enforce_type(OBJECT)
+@skip_if_not_of_type(OBJECT)
 def validate_max_properties(value, maximum):
     if len(value.keys()) > maximum:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Object must have less than {0} properties.  It had {1}".format(
                 maximum, len(value.keys()),
             ),
@@ -229,10 +231,10 @@ def generate_max_properties_validator(maxProperties, **kwargs):
 
 
 @skip_if_empty
-@enforce_type(STRING)
+@skip_if_not_of_type(STRING)
 def validate_pattern(value, regex):
     if not regex.match(value):
-        raise serializers.ValidationError(
+        raise ValidationError(
             "{0} did not match the pattern `{1}`.".format(value, regex.pattern),
         )
 
@@ -250,7 +252,7 @@ def generate_format_validator(format, **kwargs):
 
 def validate_required(value):
     if value is EMPTY:
-        raise serializers.ValidationError("This field is required.")
+        raise ValidationError("This field is required.")
 
 
 def generate_required_validator(required, **kwargs):
@@ -294,7 +296,7 @@ def validate_schema(obj, validators, inner=None):
     for key, validator in validators.items():
         try:
             validator(obj)
-        except serializers.ValidationError as err:
+        except ValidationError as err:
             errors[key].extend(list(err.messages))
 
     if errors:
@@ -304,10 +306,37 @@ def validate_schema(obj, validators, inner=None):
             raise ValueError('Invalid:\n' + prettify_errors(errors))
 
 
-def property_validator(obj, key, validators):
+def validate_properties(obj, key, validators):
     if obj is EMPTY:
         return
     validate_schema(obj.get(key, EMPTY), validators, inner=True)
+
+
+def generate_items_validators(items, context):
+    if isinstance(items, collections.Mapping):
+        items_validators = construct_schema_validators(
+            items,
+            context,
+        )
+    elif isinstance(items, six.string_types):
+        items_validators = {
+            '$ref': LazyReferenceValidator(items, context),
+        }
+    else:
+        assert 'Should not be possible'
+    return items_validators
+
+
+def validate_items(objs, validators):
+    errors = []
+    for obj, validator in zip(objs, validators):
+        try:
+            validate_schema(obj, validator, inner=True)
+        except ValidationError as e:
+            errors.extend(list(e.messages))
+
+    if errors:
+        raise SafeNestedValidationError(errors)
 
 
 class LazyReferenceValidator(object):
@@ -360,10 +389,35 @@ def construct_schema_validators(schema, context):
                 context,
             )
             validators[property] = functools.partial(
-                property_validator,
+                validate_properties,
                 key=property,
                 validators=property_validators,
             )
+    if 'items' in schema:
+        items = schema['items']
+        if isinstance(items, collections.Mapping) or isinstance(items, six.string_types):
+            # If items is a reference or a schema, we pass it through as an
+            # ever repeating list of the same validation dictionary, thus
+            # validating all of the objects against the same schema.
+            items_validators = itertools.repeat(generate_items_validators(
+                items,
+                context,
+            ))
+        elif isinstance(items, collections.Sequence):
+            # We generate a list of validator dictionaries and then chain it
+            # with an empty schema that repeats forever.  This ensures that if
+            # the array of objects to be validated is longer than the array of
+            # validators, then the extra elements will always validate since
+            # they will be validated against an empty schema.
+            items_validators = itertools.chain(
+                map(functools.partial(generate_items_validators, context=context), items),
+                itertools.repeat({}),
+            )
+        else:
+            assert "Should not be possible"
+        validators['items'] = functools.partial(
+            validate_items, validators=items_validators,
+        )
     for key in schema:
         if key in validator_mapping:
             validators[key] = validator_mapping[key](**schema)

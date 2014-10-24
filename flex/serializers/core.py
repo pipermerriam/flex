@@ -248,7 +248,9 @@ class SwaggerSerializer(serializers.Serializer):
     Primary Serializer for swagger schema
     """
     swagger = serializers.ChoiceField(
-        choices=[('2.0', '2.0')],
+        choices=[
+            ('2.0', '2.0'),
+        ],
     )
     info = InfoSerializer()
     host = serializers.CharField(

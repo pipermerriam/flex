@@ -275,7 +275,7 @@ def test_max_length_valid_with_string_type():
         OBJECT,
     ),
 )
-def test_max_items_invalid_with_non_arraw_type(type_):
+def test_max_items_invalid_with_non_array_type(type_):
     serializer = BaseSchemaSerializer(
         data={
             'type': type_,

@@ -1,12 +1,14 @@
 import pytest
 
-from rest_framework import serializers
-
 from flex.utils import is_non_string_iterable
 from flex.serializers.fields import (
     MaybeListCharField,
     SecurityRequirementReferenceField,
 )
+
+from django.core.exceptions import ValidationError
+
+from rest_framework import serializers
 
 from tests.utils import assert_error_message_equal
 
@@ -34,15 +36,15 @@ def test_maybe_list_char_field_runs_validators_on_singular_strings():
     def validator(value):
         if is_non_string_iterable(value):
             if not all([v.startswith('bar') for v in value]):
-                raise serializers.ValidationError('error')
+                raise ValidationError('error')
         else:
             if not value.startswith('bar'):
-                raise serializers.ValidationError('error')
+                raise ValidationError('error')
 
     field = MaybeListCharField(validators=[validator])
     data = {'foo': 'not-bar'}
     into = {}
-    with pytest.raises(serializers.ValidationError):
+    with pytest.raises(ValidationError):
         field.field_from_native(data, {}, 'foo', into)
 
 
@@ -50,15 +52,15 @@ def test_maybe_list_char_field_runs_validators_on_lists():
     def validator(value):
         if is_non_string_iterable(value):
             if not all([v.startswith('bar') for v in value]):
-                raise serializers.ValidationError('error')
+                raise ValidationError('error')
         else:
             if not value.startswith('bar'):
-                raise serializers.ValidationError('error')
+                raise ValidationError('error')
 
     field = MaybeListCharField(validators=[validator])
     data = {'foo': ['a-string', 'another-string']}
     into = {}
-    with pytest.raises(serializers.ValidationError):
+    with pytest.raises(ValidationError):
         field.field_from_native(data, {}, 'foo', into)
 
 
