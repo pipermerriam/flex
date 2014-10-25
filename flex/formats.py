@@ -1,13 +1,24 @@
+import re
 import functools
 
 import iso8601
+import rfc3987
+import validate_email
 
 from django.core.exceptions import ValidationError
 
 from flex.utils import is_value_of_any_type
 from flex.constants import (
     STRING,
+    INTEGER,
+    UUID,
+    DATETIME,
+    INT32,
+    INT64,
+    EMAIL,
+    URI,
 )
+from flex.error_messages import MESSAGES
 
 
 class FormatRegistry(object):
@@ -47,9 +58,72 @@ registry = FormatRegistry()
 register = registry.register
 
 
-@register('date-time', STRING)
+"""
+('number', 'float'),
+('number', 'double'),
+('string', 'byte'),
+('string', 'date'),
+"""
+
+
+@register(URI, STRING)
+def uri_validator(value):
+    parts = rfc3987.parse(value, rule='URI')
+    if not parts['scheme'] or not parts['authority']:
+        raise ValidationError(MESSAGES['format']['invalid_uri'].format(value))
+
+
+def number_of_bits(n):
+    try:
+        return n.bit_length()
+    except AttributeError:
+        return len(bin(n)) - 1
+
+
+@register(INT32, INTEGER)
+def int32_validator(value):
+    num_bits = number_of_bits(value)
+    if num_bits > 32:
+        raise ValidationError(MESSAGES['format']['too_many_bits'].format(
+            value, num_bits, 32
+        ))
+
+
+@register(INT64, INTEGER)
+def int64_validator(value):
+    num_bits = number_of_bits(value)
+    if num_bits > 64:
+        raise ValidationError(MESSAGES['format']['too_many_bits'].format(
+            value, num_bits, 64
+        ))
+
+
+@register(EMAIL, STRING)
+def email_validator(value):
+    if not validate_email.validate_email(value):
+        raise ValidationError(MESSAGES['format']['invalid_email'].format(value))
+
+
+@register(DATETIME, STRING)
 def date_time_format_validator(value):
     try:
         iso8601.parse_date(value)
-    except iso8601.ParseError as e:
-        raise ValidationError(e.message)
+    except iso8601.ParseError:
+        raise ValidationError(MESSAGES['format']['invalid_datetime'].format(value))
+
+
+UUID_PATTERN = re.compile(
+    '^'
+    '[a-f0-9]{8}-'
+    '[a-f0-9]{4}-'
+    '[1345][a-f0-9]{3}-'
+    '[a-f0-9]{4}'
+    '-[a-f0-9]{12}'
+    '$'
+)
+
+
+@register(UUID, STRING)
+def uuid_format_validator(value):
+    if not UUID_PATTERN.match(value):
+        raise ValidationError(MESSAGES['format']['invalid_uuid'].format(value))

@@ -15,19 +15,6 @@ MIMETYPES = (
 )
 
 
-FORMATS = (
-    ('integer', 'int32'),
-    ('integer', 'int64'),
-    ('number', 'float'),
-    ('number', 'double'),
-    ('string', 'byte'),
-    ('string', 'date'),
-    ('string', 'date-time'),
-    ('string', 'email'),
-    ('string', 'uri'),
-)
-
-
 NULL = 'null'
 BOOLEAN = 'boolean'
 INTEGER = 'integer'
@@ -37,10 +24,11 @@ ARRAY = 'array'
 OBJECT = 'object'
 
 PRIMATIVE_TYPES = {
+    '': (type(None),),
     None: (type(None),),
     NULL: (type(None),),
     BOOLEAN: (bool,),
-    INTEGER: (int,),
+    INTEGER: (int, long),
     NUMBER: (numbers.Number,),
     STRING: six.string_types,
     ARRAY: (collections.Sequence,),
@@ -122,3 +110,35 @@ Sentinal empty value for use with distinguishing `None` from a key not
 being present.
 """
 EMPTY = Empty()
+
+UUID = 'uuid'
+DATETIME = 'date-time'
+EMAIL = 'email'
+INT32 = 'int32'
+INT64 = 'int64'
+URI = 'uri'
+
+
+FORMATS = (
+    ('integer', 'int32'),
+    ('integer', 'int64'),
+    ('number', 'float'),
+    ('number', 'double'),
+    ('string', 'byte'),
+    ('string', 'date'),
+    ('string', 'date-time'),
+    ('string', 'email'),
+    ('string', 'uri'),
+)
+
+
+# Request Methods
+GET = 'get'
+PUT = 'put'
+POST = 'post'
+DELETE = 'delete'
+OPTIONS = 'options'
+HEAD = 'head'
+PATCH = 'patch'
+
+REQUEST_METHODS = (GET, PUT, POST, DELETE, OPTIONS, HEAD, PATCH)

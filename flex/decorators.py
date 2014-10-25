@@ -25,3 +25,41 @@ def skip_if_not_of_type(*types):
                 return func(value, *args, **kwargs)
         return inner
     return outer
+
+
+RESERVED_WORDS = (
+    'in',
+    'format',
+    'type',
+)
+
+
+def rewrite_reserved_words(func):
+    """
+    Given a function whos kwargs need to contain a reserved word such as 'in',
+    allow calling that function with the keyword as 'in_', such that function
+    kwargs are rewritten to use the reserved word.
+    """
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        for word in RESERVED_WORDS:
+            key = "{0}_".format(word)
+            if key in kwargs:
+                kwargs[word] = kwargs.pop(key)
+        return func(*args, **kwargs)
+    return inner
+
+
+def suffix_reserved_words(func):
+    """
+    Given a function that is called with a reseved word, rewrite the keyword
+    with an underscore suffix.
+    """
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        for word in RESERVED_WORDS:
+            if word in kwargs:
+                key = "{0}_".format(word)
+                kwargs[key] = kwargs.pop(word)
+        return func(*args, **kwargs)
+    return inner

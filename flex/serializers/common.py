@@ -51,6 +51,7 @@ class HomogenousDictSerializer(serializers.Serializer):
     """
     value_serializer_class = None
     value_serializer_kwargs = None
+    allow_empty = False
 
     def __init__(self, *args, **kwargs):
         self.value_serializer_kwargs = {}
@@ -65,9 +66,12 @@ class HomogenousDictSerializer(serializers.Serializer):
         data = kwargs.get('data')
         super(HomogenousDictSerializer, self).__init__(*args, **kwargs)
         if data:
-            for key in data:
+            fields = [
+                key for key, value in data.items() if (value is not None or self.allow_empty)
+            ]
+            for field_name in fields:
                 self.fields.setdefault(
-                    key,
+                    field_name,
                     self.value_serializer_class(**self.value_serializer_kwargs),
                 )
 

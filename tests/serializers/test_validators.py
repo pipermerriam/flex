@@ -3,8 +3,6 @@ import pytest
 
 import six
 
-from rest_framework import serializers
-
 from flex.serializers.validators import (
     host_validator,
     path_validator,
@@ -34,6 +32,8 @@ from flex.constants import (
     SECURITY_API_KEY_LOCATIONS,
     SECURITY_FLOWS,
 )
+
+from rest_framework import serializers
 
 
 #
@@ -109,17 +109,35 @@ def test_accepts_unicode():
 #
 # mimetype_validator tests
 #
-def test_mimetype_invalid_value():
+@pytest.mark.parametrize(
+    'mimetype',
+    (
+        'application/json',
+        'image/svg+xml',
+        'application/vnd.oasis.opendocument.text',
+        'text/plain; charset=utf-8',
+        'video/mp4',
+        'video/mp4; codecs="avc1.640028"',
+        "video/mp4; codecs='avc1.640028'",
+        'application/xhtml+xml',
+        'image/png',
+        'application/vnd.ms-excel',
+    )
+)
+def test_mimetype_validator_on_valid_mimetypes(mimetype):
+    mimetype_validator(mimetype)
+
+
+@pytest.mark.parametrize(
+    'mimetype',
+    (
+        'invalidtypename/json',
+        'noslash',
+    )
+)
+def test_mimetype_validator_on_invalid_mimetypes(mimetype):
     with pytest.raises(serializers.ValidationError):
-        mimetype_validator('not-a-real-mimetype')
-
-
-def test_mimetype_singular_value():
-    mimetype_validator(MIMETYPES[0])
-
-
-def test_mimetype_iterable_value():
-    mimetype_validator([MIMETYPES[0]])
+        mimetype_validator(mimetype)
 
 
 #

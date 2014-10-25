@@ -1,0 +1,72 @@
+swagger: '2.0'
+produces: [application/json]
+schemes: [http]
+basePath: /v3
+consumes: [application/json]
+info: {title: Engagement API, version: 3.0.0}
+paths:
+  /get:
+    get:
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: Get
+    post:
+      responses:
+        405:
+          description: Method Not Allowed
+  /post:
+    post:
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: Post
+definitions:
+  Get:
+    properties:
+      origin:
+        type: string
+        #format: ipv4
+      headers:
+        $ref: Headers
+      args:
+        type: object
+      url:
+        type: string
+        #format: uri
+  Headers:
+    properties:
+      Content-Length:
+        type: string
+      Accept-Encoding:
+        type: string
+      Host:
+        type: string
+        #format: uri
+      Accept:
+        type: string
+      UserAgent:
+        type: string
+      Connection:
+        type: string
+  Post:
+    properties:
+      files:
+      origin:
+      form:
+      url:
+      args:
+      headers:
+      json:
+        type: null
+      data:
+        #{u'files': {}, u'origin': u'127.0.0.1', u'form': {}, u'url': u'http://127.0.0.1:61758/post', u'args': {}, u'headers': {u'Content-Length': u'0', u'Accept-Encoding': u'gzip, deflate', u'Host': u'127.0.0.1:61758', u'Accept': u'*/*', u'User-Agent': u'python-requests/2.4.3 CPython/2.7.8 Darwin/14.0.0', u'Connection': u'keep-alive'}, u'json': None, u'data': u''}
+parameters:
+  Page:
+  - {description: The page of results to be returned, exclusiveMinimum: true, in: query,
+    minimum: 0, name: page, type: integer}
+  PageSize:
+  - {description: The page of results to be returned, exclusiveMinimum: true, in: query,
+    maximum: 100, minimum: 0, name: page_size, type: integer}

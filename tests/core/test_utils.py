@@ -1,11 +1,15 @@
 import six
 import pytest
+import collections
+import random
 
 from flex.utils import (
     is_non_string_iterable,
     is_value_of_type,
     format_errors,
     get_type_for_value,
+    cast_value_to_type,
+    chain_reduce_partial,
 )
 from flex.constants import (
     NULL,
@@ -131,18 +135,18 @@ def test_string():
 
 
 def test_short_iterable():
-    input = ["error-a", "error-b"]
+    input_ = ["error-a", "error-b"]
     expected = [
         "0. 'error-a'",
         "1. 'error-b'",
     ]
-    actual = list(format_errors(input))
+    actual = list(format_errors(input_))
 
     assert set(actual) == set(expected)
 
 
 def test_mapping_with_string_values():
-    input = {
+    input_ = {
         'foo': 'bar',
         'bar': 'baz',
     }
@@ -150,13 +154,13 @@ def test_mapping_with_string_values():
         "'foo': 'bar'",
         "'bar': 'baz'",
     ]
-    actual = list(format_errors(input))
+    actual = list(format_errors(input_))
 
     assert set(actual) == set(expected)
 
 
 def test_mapping_with_iterables():
-    input = {
+    input_ = {
         'foo': ['bar', 'baz'],
         'bar': ['baz', 'foo'],
     }
@@ -168,13 +172,13 @@ def test_mapping_with_iterables():
         "    0. 'baz'",
         "    1. 'foo'",
     ]
-    actual = list(format_errors(input))
+    actual = list(format_errors(input_))
 
     assert set(actual) == set(expected)
 
 
 def test_mapping_with_mappings():
-    input = {
+    input_ = {
         'foo': {
             'bar': 'error-a',
             'baz': 'error-b',
@@ -192,13 +196,13 @@ def test_mapping_with_mappings():
         "    - 'baz': 'error-c'",
         "    - 'foo': 'error-d'",
     ]
-    actual = list(format_errors(input))
+    actual = list(format_errors(input_))
 
     assert set(actual) == set(expected)
 
 
 def test_iterable_of_mappings():
-    input = [
+    input_ = [
         {'foo': 'bar'},
         {'bar': ['baz', 'foo']},
     ]
@@ -208,7 +212,7 @@ def test_iterable_of_mappings():
         "    0. 'baz'",
         "    1. 'foo'",
     ]
-    actual = list(format_errors(input))
+    actual = list(format_errors(input_))
 
     assert set(actual) == set(expected)
 
@@ -276,5 +280,65 @@ def test_get_type_for_array(value):
         {'b': 2, 'c': 3},
     ),
 )
-def test_get_type_for_array(value):
+def test_get_type_for_object(value):
     assert get_type_for_value(value) == OBJECT
+
+
+@pytest.mark.parametrize(
+    'value,type_,expected',
+    (
+        ('5', NUMBER, 5),
+        ('8', INTEGER, 8),
+        ('1.6', INTEGER, 1),
+        ('2.3', NUMBER, 2.3),
+        (15, STRING, '15'),
+        (12.5, STRING, '12.5'),
+        (True, NUMBER, 1),
+        (True, STRING, 'True'),
+        (False, NUMBER, 0),
+        (False, STRING, 'False'),
+        ('0', BOOLEAN, True),
+        (0, BOOLEAN, False),
+        ('', BOOLEAN, False),
+        ('abc', ARRAY, ['a', 'b', 'c']),
+        (collections.OrderedDict((('a', 1), ('b', 2))), ARRAY, ['a', 'b']),
+        ([], BOOLEAN, False),
+    )
+)
+def test_casting_appropriate_values_to_type(value, type_, expected):
+    assert cast_value_to_type(value, type_) == expected
+
+
+@pytest.mark.parametrize(
+    'value,type_',
+    (
+        ([], NUMBER),
+        ('abc', NUMBER),
+        (1, NULL),
+        ('abc', NULL),
+        ([], NULL),
+        ({}, NULL),
+        (True, NULL),
+        (['a', 'b'], OBJECT),
+    )
+)
+def test_casting_inappropriate_values_to_type(value, type_):
+    with pytest.raises((TypeError, ValueError)):
+        cast_value_to_type(value, type_)
+
+
+#
+# chain_reduce_partial tests
+#
+def test_chain_reduce_partial():
+    def fn_a(v):
+        return v * 3
+
+    def fn_b(v):
+        return v * 5
+
+    fn_c = chain_reduce_partial(fn_a, fn_b)
+
+    for _ in range(100):
+        v = random.randint(-1000000, 1000000)
+        assert fn_c(v) == fn_b(fn_a(v))

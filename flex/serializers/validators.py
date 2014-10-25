@@ -6,14 +6,15 @@ import operator
 
 import six
 
+from django.core.validators import RegexValidator
+
 from rest_framework import serializers
 
+from flex.formats import registry
 from flex.decorators import maybe_iterable
 from flex.utils import is_value_of_type
 from flex.constants import (
     SCHEMES,
-    MIMETYPES,
-    FORMATS,
     PRIMATIVE_TYPES,
     PARAMETER_IN_VALUES,
     COLLECTION_FORMATS,
@@ -48,10 +49,36 @@ def scheme_validator(value):
         raise serializers.ValidationError("Unknown scheme: {0}".format(value))
 
 
+# top-level type name / [ tree. ] subtype name [ +suffix ] [ ; parameters ]
+
+TOP_LEVEL_TYPE_NAMES = set((
+    'application',
+    'audio',
+    'example',
+    'image',
+    'message',
+    'model',
+    'multipart',
+    'text',
+    'video',
+))
+
+
+MIMETYPE_PATTERN = (
+    '^'
+    '(application|audio|example|image|message|model|multipart|text|video)'  # top-level type name
+    '/'
+    '(vnd(\.[-a-zA-Z0-9]+)*\.)?'  # vendor tree
+    '([-a-zA-Z0-9]+)'  # media type
+    '(\+(xml|json|ber|der|fastinfoset|wbxml|zip))?'
+    '((; [-a-zA-Z0-9]+=(([-\.a-zA-Z0-9]+)|(("|\')[-\.a-zA-Z0-9]+("|\'))))+)?'  # parameters
+    '$'
+)
+
+
 @maybe_iterable
 def mimetype_validator(value):
-    if value not in MIMETYPES:
-        raise serializers.ValidationError("Unknown mimetype: {0}".format(value))
+    return RegexValidator(MIMETYPE_PATTERN)(value)
 
 
 @maybe_iterable
@@ -61,7 +88,9 @@ def string_type_validator(value):
 
 
 def format_validator(value):
-    if value not in zip(*FORMATS)[1]:
+    if value not in registry.formats:
+        # TODO: unknown formats are ok, but want to be sure we have all of the
+        # common ones before removing this.
         raise serializers.ValidationError('Unknown format: {0}'.format(value))
 
 
