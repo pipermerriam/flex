@@ -24,7 +24,7 @@ def test_required_parameters_invalid_when_not_present():
     parameter_values = {}
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'required' in err.value.messages[0]['id'][0]
@@ -51,4 +51,4 @@ def test_parameters_allowed_missing_when_not_required():
     parameters = serializer.object
     parameter_values = {}
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)

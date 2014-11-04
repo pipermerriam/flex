@@ -41,7 +41,7 @@ def test_multiple_of_validation_for_invalid_values(divisor, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'multipleOf' in err.value.messages[0]['id'][0]
@@ -76,4 +76,4 @@ def test_multiple_of_validation_for_valid_multiples(divisor, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)

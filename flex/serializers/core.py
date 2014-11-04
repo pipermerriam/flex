@@ -39,8 +39,10 @@ from flex.constants import (
     PATH,
     REQUEST_METHODS,
 )
+from flex.validation.common import (
+    validate_object,
+)
 from flex.validation.schema import (
-    validate_schema,
     construct_schema_validators,
 )
 from flex.paths import (
@@ -142,7 +144,7 @@ class SchemaSerializer(BaseSchemaSerializer):
 
     def save_object(self, obj, **kwargs):
         validators = construct_schema_validators(obj, self.context)
-        self.object = functools.partial(validate_schema, validators=validators)
+        self.object = functools.partial(validate_object, validators=validators)
 
 
 class ResponseSerializer(BaseResponseSerializer):

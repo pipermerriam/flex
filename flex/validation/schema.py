@@ -12,7 +12,6 @@ from flex.constants import (
     EMPTY,
 )
 from flex.decorators import skip_if_not_of_type
-from flex.context_managers import ErrorCollection
 from flex.validation.common import (
     skip_if_empty,
     generate_type_validator,
@@ -28,6 +27,7 @@ from flex.validation.common import (
     generate_unique_items_validator,
     generate_pattern_validator,
     generate_enum_validator,
+    validate_object,
 )
 
 
@@ -61,50 +61,7 @@ def generate_max_properties_validator(maxProperties, **kwargs):
     return functools.partial(validate_max_properties, maximum=maxProperties)
 
 
-validator_mapping = {
-    'type': generate_type_validator,
-    'multipleOf': generate_multiple_of_validator,
-    'minimum': generate_minimum_validator,
-    'maximum': generate_maximum_validator,
-    'minLength': generate_min_length_validator,
-    'maxLength': generate_max_length_validator,
-    'minItems': generate_min_items_validator,
-    'maxItems': generate_max_items_validator,
-    'uniqueItems': generate_unique_items_validator,
-    'enum': generate_enum_validator,
-    'minProperties': generate_min_properties_validator,
-    'maxProperties': generate_max_properties_validator,
-    'pattern': generate_pattern_validator,
-    'format': generate_format_validator,
-    'required': generate_required_validator,
-}
-
-
-def validate_schema(obj, validators, inner=None):
-    """
-    Given a json-like object to validate, and a dictionary of validators, apply
-    the validators to the object.
-    """
-    with ErrorCollection(inner=inner) as errors:
-        if '$ref' in validators:
-            ref_ = validators.pop('$ref', {})
-            for k, v in ref_.validators.items():
-                validators.setdefault(k, v)
-
-        for key, validator in validators.items():
-            try:
-                validator(obj)
-            except ValidationError as err:
-                errors[key].extend(list(err.messages))
-
-
-def validate_properties(obj, key, validators):
-    if obj is EMPTY:
-        return
-    validate_schema(obj.get(key, EMPTY), validators, inner=True)
-
-
-def generate_items_validators(items, context):
+def construct_items_validators(items, context):
     if isinstance(items, collections.Mapping):
         items_validators = construct_schema_validators(
             items,
@@ -123,12 +80,64 @@ def validate_items(objs, validators):
     errors = []
     for obj, validator in zip(objs, validators):
         try:
-            validate_schema(obj, validator, inner=True)
+            validate_object(obj, validator, inner=True)
         except ValidationError as e:
             errors.extend(list(e.messages))
 
     if errors:
         raise SafeNestedValidationError(errors)
+
+
+def generate_items_validator(items, context, **kwargs):
+    if isinstance(items, collections.Mapping) or isinstance(items, six.string_types):
+        # If items is a reference or a schema, we pass it through as an
+        # ever repeating list of the same validation dictionary, thus
+        # validating all of the objects against the same schema.
+        items_validators = itertools.repeat(construct_items_validators(
+            items,
+            context,
+        ))
+    elif isinstance(items, collections.Sequence):
+        # We generate a list of validator dictionaries and then chain it
+        # with an empty schema that repeats forever.  This ensures that if
+        # the array of objects to be validated is longer than the array of
+        # validators, then the extra elements will always validate since
+        # they will be validated against an empty schema.
+        items_validators = itertools.chain(
+            map(functools.partial(construct_items_validators, context=context), items),
+            itertools.repeat({}),
+        )
+    else:
+        assert "Should not be possible"
+    return functools.partial(
+        validate_items, validators=items_validators,
+    )
+
+
+validator_mapping = {
+    'type': generate_type_validator,
+    'multipleOf': generate_multiple_of_validator,
+    'minimum': generate_minimum_validator,
+    'maximum': generate_maximum_validator,
+    'minLength': generate_min_length_validator,
+    'maxLength': generate_max_length_validator,
+    'minItems': generate_min_items_validator,
+    'maxItems': generate_max_items_validator,
+    'uniqueItems': generate_unique_items_validator,
+    'enum': generate_enum_validator,
+    'minProperties': generate_min_properties_validator,
+    'maxProperties': generate_max_properties_validator,
+    'pattern': generate_pattern_validator,
+    'format': generate_format_validator,
+    'required': generate_required_validator,
+    'items': generate_items_validator,
+}
+
+
+def validate_properties(obj, key, validators):
+    if obj is EMPTY:
+        return
+    validate_object(obj.get(key, EMPTY), validators, inner=True)
 
 
 class LazyReferenceValidator(object):
@@ -147,7 +156,7 @@ class LazyReferenceValidator(object):
         self.context = context
 
     def __call__(self, value):
-        return validate_schema(value, self.validators, inner=True)
+        return validate_object(value, self.validators, inner=True)
 
     @property
     def validators(self):
@@ -175,10 +184,6 @@ def construct_schema_validators(schema, context):
             being validated rather than the object itself.  In this case, we
             need recurse back into this function to generate a dictionary of
             validators for the property.
-        - items:
-            Validating items implies that we are working with an iterable of
-            things to be validated and that we may have to validate each
-            individual array item in some different way.
     """
     validators = {}
     if '$ref' in schema:
@@ -191,42 +196,18 @@ def construct_schema_validators(schema, context):
         intersection = set(schema['properties'].keys()).intersection(schema.keys())
         assert not intersection
 
-        for property, property_schema in schema['properties'].items():
+        for property_, property_schema in schema['properties'].items():
             property_validators = construct_schema_validators(
                 property_schema,
                 context,
             )
-            validators[property] = functools.partial(
+            validators[property_] = functools.partial(
                 validate_properties,
-                key=property,
+                key=property_,
                 validators=property_validators,
             )
-    if 'items' in schema:
-        items = schema['items']
-        if isinstance(items, collections.Mapping) or isinstance(items, six.string_types):
-            # If items is a reference or a schema, we pass it through as an
-            # ever repeating list of the same validation dictionary, thus
-            # validating all of the objects against the same schema.
-            items_validators = itertools.repeat(generate_items_validators(
-                items,
-                context,
-            ))
-        elif isinstance(items, collections.Sequence):
-            # We generate a list of validator dictionaries and then chain it
-            # with an empty schema that repeats forever.  This ensures that if
-            # the array of objects to be validated is longer than the array of
-            # validators, then the extra elements will always validate since
-            # they will be validated against an empty schema.
-            items_validators = itertools.chain(
-                map(functools.partial(generate_items_validators, context=context), items),
-                itertools.repeat({}),
-            )
-        else:
-            assert "Should not be possible"
-        validators['items'] = functools.partial(
-            validate_items, validators=items_validators,
-        )
+    assert 'context' not in schema
     for key in schema:
         if key in validator_mapping:
-            validators[key] = validator_mapping[key](**schema)
+            validators[key] = validator_mapping[key](context=context, **schema)
     return validators

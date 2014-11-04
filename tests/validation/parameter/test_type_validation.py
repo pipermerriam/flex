@@ -36,7 +36,7 @@ def test_parameter_validation_enforces_type(type_, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'type' in err.value.messages[0]['id'][0]
@@ -72,4 +72,4 @@ def test_parameter_validation_with_correct_type(type_, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)

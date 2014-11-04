@@ -10,6 +10,7 @@ from django.core.validators import (
     MaxLengthValidator,
 )
 
+from flex.context_managers import ErrorCollection
 from flex.formats import registry
 from flex.utils import (
     is_value_of_any_type,
@@ -295,3 +296,20 @@ def validate_enum(value, options):
 
 def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
+
+
+def validate_object(obj, validators, inner=False):
+    """
+    Takes a mapping and applies a mapping of validator functions to it
+    collecting and reraising any validation errors that occur.
+    """
+    with ErrorCollection(inner=inner) as errors:
+        if '$ref' in validators:
+            ref_ = validators.pop('$ref')
+            for k, v in ref_.validators.items():
+                validators.setdefault(k, v)
+        for key, validator in validators.items():
+            try:
+                validator(obj)
+            except ValidationError as err:
+                errors[key].extend(list(err.messages))
