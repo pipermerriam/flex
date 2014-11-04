@@ -5,6 +5,7 @@ from flex.constants import (
     STRING,
     EMPTY,
 )
+from flex.error_messages import MESSAGES
 
 from tests.utils import generate_validator_from_schema
 
@@ -216,7 +217,7 @@ def test_required_circular_reference():
     assert 'parent' in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]
     assert 'parent' in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]
     assert 'required' in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]
-    assert 'This field is required.' in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['required']
+    assert MESSAGES['required']['required'] in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['required']
 
 
 def test_nested_references_are_validated():

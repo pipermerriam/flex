@@ -241,6 +241,7 @@ SchemaSerializer.base_fields['allOf'] = SchemaSerializer(required=False, many=Tr
 
 class PathsSerializer(HomogenousDictSerializer):
     value_serializer_class = PathItemSerializer
+    allow_empty = True
 
 
 class SwaggerSerializer(serializers.Serializer):

@@ -1,3 +1,4 @@
+import functools
 import math
 import collections
 import numbers
@@ -35,6 +36,20 @@ def is_value_of_type(value, type_):
 
 def is_value_of_any_type(value, types):
     return any(is_value_of_type(value, type_) for type_ in types)
+
+
+def cast_value_to_type(value, type_):
+    if type_ == STRING:
+        return six.text_type(value)
+    elif type_ == INTEGER:
+        return int(float(value))
+    elif type_ == NUMBER:
+        return float(value)
+    elif type_ == ARRAY:
+        return list(value)
+    elif type_ == OBJECT:
+        return dict(value)
+    return PRIMATIVE_TYPES[type_][0](value)
 
 
 def get_type_for_value(value):
@@ -121,3 +136,28 @@ def format_errors(errors, indent=0, prefix='', suffix=''):
 
 def prettify_errors(errors):
     return '\n'.join(format_errors(errors))
+
+
+def chain_reduce_partial(*functions):
+    """
+    Given an iterable of functions, returns a callable that takes a value and
+    passes it through all of the given functions in order.
+
+    def a(x):
+        ...
+
+    def b(x):
+        ...
+
+    c = chain_reduce_partial(a, b)
+
+    This is equivilent to
+
+    def c(x):
+        return b(a(x))
+    """
+    return functools.partial(
+        functools.reduce,
+        lambda value, fn: fn(value),
+        functions,
+    )

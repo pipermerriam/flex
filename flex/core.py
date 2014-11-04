@@ -14,6 +14,8 @@ from flex.serializers.core import (
 from flex.serializers.definitions import SwaggerDefinitionsSerializer
 from flex.utils import prettify_errors
 
+from flex.validation.response import generate_response_validator
+
 
 def load_source(source):
     """
@@ -83,12 +85,21 @@ def parse(raw_schema):
 
 
 def load(target):
+    """
+    Given one of the supported target formats, load a swagger schema into it's
+    python representation.
+    """
     raw_schema = load_source(target)
     return parse(raw_schema)
 
 
-def validate(schema, target=None):
-    schema_serializer = SchemaSerializer(data=schema)
+def validate(schema, target=None, **kwargs):
+    """
+    Given the python representation of a JSONschema as defined in the swagger
+    spec, validate that the schema complies to spec.  If `target` is provided,
+    that target will be validated against the provided schema.
+    """
+    schema_serializer = SchemaSerializer(data=schema, **kwargs)
     if not schema_serializer.is_valid():
         message = "JSON Schema did not validate:\n\n"
         message += prettify_errors(schema_serializer.errors)
@@ -97,3 +108,7 @@ def validate(schema, target=None):
     if target is not None:
         validator = schema_serializer.save()
         validator(target)
+
+
+def ResponseValidator(schema):
+    return generate_response_validator(schema)

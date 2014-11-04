@@ -1,7 +1,12 @@
 import pytest
+import uuid
 
 from flex.formats import (
     date_time_format_validator,
+    uuid_format_validator,
+    int32_validator,
+    int64_validator,
+    email_validator,
 )
 
 
@@ -51,3 +56,98 @@ def test_date_time_format_validator_detects_invalid_values(value):
 def test_date_time_format_validator_with_valid_dateties(value):
     from django.core.exceptions import ValidationError
     date_time_format_validator(value)
+
+
+#
+# uuid format tests
+#
+def test_uuid1_matches():
+    for _ in range(100):
+        uuid_format_validator(str(uuid.uuid1()))
+
+def test_uuid3_matches():
+    for _ in range(100):
+        uuid_format_validator(str(uuid.uuid3(uuid.uuid4(), 'test-4')))
+        uuid_format_validator(str(uuid.uuid3(uuid.uuid1(), 'test-1')))
+
+def test_uuid4_matches():
+    for _ in range(100):
+        uuid_format_validator(str(uuid.uuid4()))
+
+def test_uuid5_matches():
+    for _ in range(100):
+        uuid_format_validator(str(uuid.uuid5(uuid.uuid4(), 'test-4')))
+        uuid_format_validator(str(uuid.uuid5(uuid.uuid1(), 'test-1')))
+
+
+MAX_INT32 = 2 ** 32 - 1
+MIN_INT32 = -1 * 2 ** 32 + 1
+MAX_INT64 = 2 ** 64 - 1
+MIN_INT64 = -1 * 2 ** 64 + 1
+
+
+#
+#  int32 and int64 format tests.
+#
+@pytest.mark.parametrize(
+    'n',
+    (MIN_INT32, -1, 0, 1, MAX_INT32),
+)
+def test_int32_with_in_range_number(n):
+    int32_validator(n)
+
+
+@pytest.mark.parametrize(
+    'n',
+    (MIN_INT32 - 1, MAX_INT32 + 1),
+)
+def test_int32_with_out_of_range_number(n):
+    from django.core.exceptions import ValidationError
+    with pytest.raises(ValidationError):
+        int32_validator(n)
+
+
+@pytest.mark.parametrize(
+    'n',
+    (MIN_INT64, -1, 0, 1, MAX_INT64),
+)
+def test_int64_with_in_range_number(n):
+    int64_validator(n)
+
+
+@pytest.mark.parametrize(
+    'n',
+    (MIN_INT64 - 1, MAX_INT64 + 1),
+)
+def test_int64_with_out_of_range_number(n):
+    from django.core.exceptions import ValidationError
+    with pytest.raises(ValidationError):
+        int64_validator(n)
+
+
+#
+# email validators
+#
+@pytest.mark.parametrize(
+    'email_address',
+    (
+        'test@example.com',
+        'test+extra@example.com',
+    ),
+)
+def test_email_validation_with_valid_email_addresses(email_address):
+    email_validator(email_address)
+
+
+@pytest.mark.parametrize(
+    'email_address',
+    (
+        'example.com',
+        'www.example.com',
+        'not-an-email-address-at-all',
+    ),
+)
+def test_email_validation_with_invalid_email_addresses(email_address):
+    from django.core.exceptions import ValidationError
+    with pytest.raises(ValidationError):
+        email_validator(email_address)

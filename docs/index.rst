@@ -29,8 +29,8 @@ Then in your code.
    schema = flex.load('path/to/schema.yaml')
 
 
-Supported Formats
------------------
+Supported Schema Formats
+------------------------
 
 The ``flex.load`` function supports the following.
 
@@ -105,6 +105,42 @@ specification.
        - 'friends':
            - 'minimum':
                - u'`minimum` can only be used for json number types'
+
+Response Validation
+-------------------
+
+Response validation takes a supported response object that represents a
+request/response cycle for an API call and validates it against a swagger
+schema.
+
+.. code-block:: python
+
+   >>> import requests
+   >>> from flex.core import load, ResponseValidator
+   >>> schema = load("path/to/schema.yaml")
+   >>> validator = ResponseValidator(schema)
+   >>> response = requests.get('http://www.example.com/api/')
+   >>> validator(response)
+   ValueError: Invalid
+   'response':
+       - 'Request status code was not found in the known response codes.  Got `301`: Expected one of: `[200]`'
+
+
+Response validation does the following steps.
+
+1. Matches the request path to the appropriate api path.
+2. Validate the request method.
+3. Validate the request parameters (currently only path and query parameters).
+4. Validate the response status code.
+
+The following validation is not yet implemented.
+
+- Parameter validation for Headers, Form Data, and Body parameters.
+- Response body validation.
+- Response header validation.
+
+Currently, response validation only supports response objects from the
+``requests`` library.
 
 
 Contents:
