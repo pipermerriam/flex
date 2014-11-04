@@ -3,6 +3,7 @@ import six
 from flex.serializers.core import ParameterSerializer
 from flex.paths import (
     get_path_parameter_values,
+    get_parameter_names_from_path,
 )
 from flex.constants import (
     INTEGER,
@@ -40,3 +41,19 @@ def test_getting_parameter_values_from_path():
     assert 'id' in values
     assert isinstance(values['username'], six.string_types)
     assert isinstance(values['id'], int)
+
+
+#
+# get_parameter_names_from_path tests
+#
+def test_non_parametrized_path_returns_empty():
+    path = "/get/with/no-parameters"
+    names = get_parameter_names_from_path(path)
+    assert len(names) == 0
+
+
+def test_getting_names_from_parametrized_path():
+    path = "/get/{username}/also/{with_underscores}/and/{id}"
+    names = get_parameter_names_from_path(path)
+    assert len(names) == 3
+    assert ("username", "with_underscores", "id") == names

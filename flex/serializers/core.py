@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from drf_compound_fields.fields import ListField
 
+from flex.context_managers import ErrorCollection
 from flex.serializers.fields import (
     SecurityRequirementReferenceField,
 )
@@ -35,11 +36,21 @@ from flex.serializers.validators import (
 from flex.constants import (
     CSV,
     ARRAY,
+    PATH,
+    REQUEST_METHODS,
 )
 from flex.validation.schema import (
     validate_schema,
     construct_schema_validators,
 )
+from flex.paths import (
+    get_parameter_names_from_path,
+)
+from flex.parameters import (
+    filter_parameters,
+    merge_parameter_lists,
+)
+from flex.error_messages import MESSAGES
 
 
 class InfoSerializer(serializers.Serializer):
@@ -242,6 +253,46 @@ SchemaSerializer.base_fields['allOf'] = SchemaSerializer(required=False, many=Tr
 class PathsSerializer(HomogenousDictSerializer):
     value_serializer_class = PathItemSerializer
     allow_empty = True
+
+    def validate(self, attrs):
+        with ErrorCollection(inner=True) as errors:
+            for api_path, path_definition in attrs.items():
+                parameter_names = get_parameter_names_from_path(api_path)
+
+                if path_definition is None:
+                    for name in parameter_names:
+                        errors[api_path].append(
+                            MESSAGES["path"]["missing_parameter"].format(
+                                api_path, name,
+                            ),
+                        )
+                    return
+
+                path_level_parameters = path_definition.get('parameters', [])
+
+                for method, operation_definition in path_definition.items():
+                    if method not in REQUEST_METHODS:
+                        continue
+                    if operation_definition is None:
+                        operation_definition = {}
+                    operation_level_parameters = operation_definition.get('parameters', [])
+                    merged_parameters = merge_parameter_lists(
+                        path_level_parameters,
+                        operation_level_parameters,
+                    )
+                    for name in parameter_names:
+                        if not filter_parameters(merged_parameters, name=name, in_=PATH):
+                            key = "{method}:{api_path}".format(
+                                method=method.upper(),
+                                api_path=api_path,
+                            )
+                            errors[key].append(
+                                MESSAGES["path"]["missing_parameter"].format(
+                                    api_path, name,
+                                ),
+                            )
+
+        return super(PathsSerializer, self).validate(attrs)
 
 
 class SwaggerSerializer(serializers.Serializer):

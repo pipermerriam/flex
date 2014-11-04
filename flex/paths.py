@@ -59,6 +59,10 @@ def process_path_part(part, parameters):
         return escape_regex_special_chars(part)
 
 
+def get_parameter_names_from_path(api_path):
+    return tuple(p.strip('{}') for p in PARAMETER_REGEX.findall(api_path))
+
+
 def path_to_pattern(api_path, parameters):
     """
     Given an api path, possibly with parameter notation, return a pattern
