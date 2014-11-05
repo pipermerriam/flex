@@ -5,6 +5,6 @@ if not settings.configured:
     settings.configure()
 django.setup()
 
-VERSION = open('VERSION').read().strip()
+VERSION = '1.9.0'
 
 from .core import load  # NOQA
