@@ -52,7 +52,7 @@ PATTERN_MESSAGES = {
 REQUEST_MESSAGES = {
     'unknown_path': 'Request path did not match any of the known api paths.',
     'invalid_method': (
-        'Request status code was not found in the known response codes.  Got '
+        'Request was not one of the allowed request methods.  Got '
         '`{0}`: Expected one of: `{1}`'
     ),
 }
@@ -62,6 +62,15 @@ RESPONSE_MESSAGES = {
     'invalid_status_code': (
         "Request status code was not found in the known response codes.  Got "
         "`{0}`: Expected one of: `{1}`"
+    )
+}
+
+
+PATH_MESSAGES = {
+    'missing_parameter': (
+        "The parameter named `{0}` is declared to be a PATH parameter but does "
+        "not appear in the api path `{1}`.  All path parameters must exist as a "
+        "parameter in the api path"
     )
 }
 
@@ -80,4 +89,5 @@ MESSAGES = {
     'pattern': PATTERN_MESSAGES,
     'request': REQUEST_MESSAGES,
     'response': RESPONSE_MESSAGES,
+    'path': PATH_MESSAGES,
 }

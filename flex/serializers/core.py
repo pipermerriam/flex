@@ -8,6 +8,7 @@ from rest_framework import serializers
 
 from drf_compound_fields.fields import ListField
 
+from flex.context_managers import ErrorCollection
 from flex.serializers.fields import (
     SecurityRequirementReferenceField,
 )
@@ -35,11 +36,22 @@ from flex.serializers.validators import (
 from flex.constants import (
     CSV,
     ARRAY,
+    PATH,
+    REQUEST_METHODS,
 )
 from flex.validation.schema import (
     validate_schema,
     construct_schema_validators,
 )
+from flex.paths import (
+    get_parameter_names_from_path,
+)
+from flex.parameters import (
+    filter_parameters,
+    merge_parameter_lists,
+    dereference_parameter_list,
+)
+from flex.error_messages import MESSAGES
 
 
 class InfoSerializer(serializers.Serializer):
@@ -160,6 +172,14 @@ class ParameterSerializer(BaseParameterSerializer):
     schema = SchemaSerializer(required=False)
     items = ItemsSerializer(required=False, many=True)
 
+    @property
+    def many(self):
+        return True
+
+    @many.setter
+    def many(self, value):
+        pass
+
     def from_native(self, data, files=None):
         if isinstance(data, six.string_types):
             try:
@@ -242,6 +262,63 @@ SchemaSerializer.base_fields['allOf'] = SchemaSerializer(required=False, many=Tr
 class PathsSerializer(HomogenousDictSerializer):
     value_serializer_class = PathItemSerializer
     allow_empty = True
+
+    def validate(self, attrs):
+        with ErrorCollection(inner=True) as errors:
+            for api_path, path_definition in attrs.items():
+                path_parameter_names = set(get_parameter_names_from_path(api_path))
+
+                if path_definition is None:
+                    continue
+
+                api_path_level_parameters = dereference_parameter_list(
+                    path_definition.get('parameters', []),
+                    parameter_definitions=self.context.get('parameters', {}),
+                )
+
+                path_request_methods = set(REQUEST_METHODS).intersection(
+                    path_definition.keys(),
+                )
+
+                if not path_request_methods:
+                    for parameter in api_path_level_parameters:
+                        if parameter['name'] not in path_parameter_names:
+                            errors[api_path].append(
+                                MESSAGES["path"]["missing_parameter"].format(
+                                    parameter['name'], api_path,
+                                ),
+                            )
+
+                for method, operation_definition in path_definition.items():
+                    if method not in REQUEST_METHODS:
+                        continue
+                    if operation_definition is None:
+                        operation_definition = {}
+                    operation_level_parameters = dereference_parameter_list(
+                        operation_definition.get('parameters', []),
+                        parameter_definitions=self.context.get('parameters', {}),
+                    )
+                    parameters_in_path = filter_parameters(
+                        merge_parameter_lists(
+                            api_path_level_parameters,
+                            operation_level_parameters,
+                        ),
+                        in_=PATH,
+                    )
+
+                    for parameter in parameters_in_path:
+                        if parameter['name'] not in path_parameter_names:
+                            key = "{method}:{api_path}".format(
+                                method=method.upper(),
+                                api_path=api_path,
+                            )
+                            errors[key].append(
+                                MESSAGES["path"]["missing_parameter"].format(
+                                    parameter['name'], api_path,
+                                ),
+                            )
+
+        return super(PathsSerializer, self).validate(attrs)
 
 
 class SwaggerSerializer(serializers.Serializer):
