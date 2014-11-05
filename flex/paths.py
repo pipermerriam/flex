@@ -12,6 +12,8 @@ from flex.parameters import (
 
 REGEX_REPLACEMENTS = (
     ('\.', '\.'),
+    ('\{', '\{'),
+    ('\}', '\}'),
 )
 
 
@@ -53,10 +55,13 @@ def process_path_part(part, parameters):
     """
     if PARAMETER_REGEX.match(part):
         parameter_name = part.strip('{}')
-        parameter = find_parameter(parameters, name=parameter_name, in_=PATH)
-        return construct_parameter_pattern(parameter)
-    else:
-        return escape_regex_special_chars(part)
+        try:
+            parameter = find_parameter(parameters, name=parameter_name, in_=PATH)
+        except ValueError:
+            pass
+        else:
+            return construct_parameter_pattern(parameter)
+    return escape_regex_special_chars(part)
 
 
 def get_parameter_names_from_path(api_path):

@@ -21,60 +21,60 @@ from tests.utils import assert_error_message_equal
 
 def test_parameter_in_path_but_missing_required():
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': PATH}]
+        data={'name': 'test', 'in': PATH}
     )
 
     assert not serializer.is_valid()
-    assert 'required' in serializer.errors[0]
+    assert 'required' in serializer.errors
     assert_error_message_equal(
-        serializer.errors[0]['required'][0],
+        serializer.errors['required'][0],
         serializer.error_messages['path_parameters_are_required'],
     )
 
 
 def test_parameter_in_path_but_declared_not_required():
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': PATH, 'required': False}]
+        data={'name': 'test', 'in': PATH, 'required': False}
     )
 
     assert not serializer.is_valid()
-    assert 'required' in serializer.errors[0]
+    assert 'required' in serializer.errors
     assert_error_message_equal(
-        serializer.errors[0]['required'][0],
+        serializer.errors['required'][0],
         serializer.error_messages['path_parameters_are_required'],
     )
 
 
 def test_parameter_in_path_with_required_truthy():
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': PATH, 'required': True}]
+        data={'name': 'test', 'in': PATH, 'required': True}
     )
 
-    assert 'required' not in serializer.errors[0]
+    assert 'required' not in serializer.errors
 
 
 def assert_parameter_in_body_with_no_schema():
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': BODY}]
+        data={'name': 'test', 'in': BODY}
     )
 
     assert not serializer.is_valid()
-    assert 'schema' in serializer.errors[0]
+    assert 'schema' in serializer.errors
     assert_error_message_equal(
-        serializer.errors[0]['schema'][0],
+        serializer.errors['schema'][0],
         serializer.error_messages['schema_required'],
     )
 
 
 def assert_parameter_in_body_with_no_type():
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': BODY}]
+        data={'name': 'test', 'in': BODY}
     )
 
     assert not serializer.is_valid()
-    assert 'type' in serializer.errors[0]
+    assert 'type' in serializer.errors
     assert_error_message_equal(
-        serializer.errors[0]['type'][0],
+        serializer.errors['type'][0],
         serializer.error_messages['type_required'],
     )
 
@@ -88,13 +88,13 @@ def assert_parameter_in_body_with_no_type():
 )
 def test_invalid_in_value_for_multi_collection_format(in_):
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': in_, 'collectionFormat': MULTI}]
+        data={'name': 'test', 'in': in_, 'collectionFormat': MULTI}
     )
 
     assert not serializer.is_valid()
-    assert 'collectionFormat' in serializer.errors[0]
+    assert 'collectionFormat' in serializer.errors
     assert_error_message_equal(
-        serializer.errors[0]['collectionFormat'][0],
+        serializer.errors['collectionFormat'][0],
         serializer.error_messages['collection_format_must_be_multi'],
     )
 
@@ -108,10 +108,10 @@ def test_invalid_in_value_for_multi_collection_format(in_):
 )
 def test_valid_in_values_for_multi_collection_format(in_):
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': in_, 'collectionFormat': MULTI}]
+        data={'name': 'test', 'in': in_, 'collectionFormat': MULTI}
     )
 
-    assert 'collectionFormat' not in serializer.errors[0]
+    assert 'collectionFormat' not in serializer.errors
 
 
 @pytest.mark.parametrize(
@@ -129,25 +129,25 @@ def test_valid_in_values_for_multi_collection_format(in_):
 )
 def test_mistyped_parameter_default_boolean_to_string(type_, default):
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': QUERY, 'type': type_, 'default': default}]
+        data={'name': 'test', 'in': QUERY, 'type': type_, 'default': default}
     )
 
     assert not serializer.is_valid()
-    assert 'default' in serializer.errors[0]
+    assert 'default' in serializer.errors
     assert_error_message_equal(
-        serializer.errors[0]['default'][0],
+        serializer.errors['default'][0],
         serializer.error_messages['default_is_incorrect_type'],
     )
 
 
 def test_items_required_if_type_is_array():
     serializer = BaseParameterSerializer(
-        data=[{'name': 'test', 'in': QUERY, 'type': ARRAY}]
+        data={'name': 'test', 'in': QUERY, 'type': ARRAY}
     )
 
     assert not serializer.is_valid()
-    assert 'items' in serializer.errors[0]
+    assert 'items' in serializer.errors
     assert_error_message_equal(
-        serializer.errors[0]['items'][0],
+        serializer.errors['items'][0],
         serializer.error_messages['items_required'],
     )

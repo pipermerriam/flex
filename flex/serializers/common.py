@@ -70,9 +70,11 @@ class HomogenousDictSerializer(serializers.Serializer):
                 key for key, value in data.items() if (value is not None or self.allow_empty)
             ]
             for field_name in fields:
+                field = self.value_serializer_class(**self.value_serializer_kwargs)
+                field.initialize(parent=self, field_name=field_name)
                 self.fields.setdefault(
                     field_name,
-                    self.value_serializer_class(**self.value_serializer_kwargs),
+                    field,
                 )
 
     def field_from_native(self, data, files, field_name, into):
@@ -363,14 +365,6 @@ class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
         required=False, validators=[collection_format_validator], default=CSV,
     )
     default = serializers.WritableField(required=False)
-
-    @property
-    def many(self):
-        return True
-
-    @many.setter
-    def many(self, value):
-        pass
 
     def validate(self, attrs):
         errors = collections.defaultdict(list)

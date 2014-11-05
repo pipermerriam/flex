@@ -4,6 +4,7 @@ from flex.serializers.core import ParameterSerializer
 from flex.paths import (
     get_path_parameter_values,
     get_parameter_names_from_path,
+    path_to_pattern,
 )
 from flex.constants import (
     INTEGER,
@@ -57,3 +58,21 @@ def test_getting_names_from_parametrized_path():
     names = get_parameter_names_from_path(path)
     assert len(names) == 3
     assert ("username", "with_underscores", "id") == names
+
+
+#
+# path_to_pattern tests
+#
+def test_undeclared_api_path_parameters_are_skipped():
+    """
+    Test that parameters that are declared in the path string but do not appear
+    in the parameter definitions are ignored.
+    """
+    path = '/get/{username}/posts/{id}/'
+    serializer = ParameterSerializer(many=True, data=[
+        ID_IN_PATH,
+    ])
+    assert serializer.is_valid(), serializer.errors
+    parameters = serializer.object
+    pattern = path_to_pattern(path, parameters)
+    assert pattern == '^/get/\{username\}/posts/(?P<id>.+)/$'

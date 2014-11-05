@@ -68,9 +68,9 @@ RESPONSE_MESSAGES = {
 
 PATH_MESSAGES = {
     'missing_parameter': (
-        "The api path `{0}` contains a parameter named `{1}` which does not "
-        "appear in the parameters definitions.  All path parameters must be "
-        "defined"
+        "The parameter named `{0}` is declared to be a PATH parameter but does "
+        "not appear in the api path `{1}`.  All path parameters must exist as a "
+        "parameter in the api path"
     )
 }
 

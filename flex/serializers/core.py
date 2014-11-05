@@ -49,6 +49,7 @@ from flex.paths import (
 from flex.parameters import (
     filter_parameters,
     merge_parameter_lists,
+    dereference_parameter_list,
 )
 from flex.error_messages import MESSAGES
 
@@ -171,6 +172,14 @@ class ParameterSerializer(BaseParameterSerializer):
     schema = SchemaSerializer(required=False)
     items = ItemsSerializer(required=False, many=True)
 
+    @property
+    def many(self):
+        return True
+
+    @many.setter
+    def many(self, value):
+        pass
+
     def from_native(self, data, files=None):
         if isinstance(data, six.string_types):
             try:
@@ -257,38 +266,55 @@ class PathsSerializer(HomogenousDictSerializer):
     def validate(self, attrs):
         with ErrorCollection(inner=True) as errors:
             for api_path, path_definition in attrs.items():
-                parameter_names = get_parameter_names_from_path(api_path)
+                path_parameter_names = set(get_parameter_names_from_path(api_path))
 
                 if path_definition is None:
-                    for name in parameter_names:
-                        errors[api_path].append(
-                            MESSAGES["path"]["missing_parameter"].format(
-                                api_path, name,
-                            ),
-                        )
-                    return
+                    continue
 
-                path_level_parameters = path_definition.get('parameters', [])
+                api_path_level_parameters = dereference_parameter_list(
+                    path_definition.get('parameters', []),
+                    parameter_definitions=self.context.get('parameters', {}),
+                )
+
+                path_request_methods = set(REQUEST_METHODS).intersection(
+                    path_definition.keys(),
+                )
+
+                if not path_request_methods:
+                    for parameter in api_path_level_parameters:
+                        if parameter['name'] not in path_parameter_names:
+                            errors[api_path].append(
+                                MESSAGES["path"]["missing_parameter"].format(
+                                    parameter['name'], api_path,
+                                ),
+                            )
 
                 for method, operation_definition in path_definition.items():
                     if method not in REQUEST_METHODS:
                         continue
                     if operation_definition is None:
                         operation_definition = {}
-                    operation_level_parameters = operation_definition.get('parameters', [])
-                    merged_parameters = merge_parameter_lists(
-                        path_level_parameters,
-                        operation_level_parameters,
+                    operation_level_parameters = dereference_parameter_list(
+                        operation_definition.get('parameters', []),
+                        parameter_definitions=self.context.get('parameters', {}),
                     )
-                    for name in parameter_names:
-                        if not filter_parameters(merged_parameters, name=name, in_=PATH):
+                    parameters_in_path = filter_parameters(
+                        merge_parameter_lists(
+                            api_path_level_parameters,
+                            operation_level_parameters,
+                        ),
+                        in_=PATH,
+                    )
+
+                    for parameter in parameters_in_path:
+                        if parameter['name'] not in path_parameter_names:
                             key = "{method}:{api_path}".format(
                                 method=method.upper(),
                                 api_path=api_path,
                             )
                             errors[key].append(
                                 MESSAGES["path"]["missing_parameter"].format(
-                                    api_path, name,
+                                    parameter['name'], api_path,
                                 ),
                             )
 

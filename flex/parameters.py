@@ -1,3 +1,5 @@
+import collections
+
 from flex.decorators import rewrite_reserved_words
 from flex.utils import cast_value_to_type
 
@@ -55,3 +57,10 @@ def merge_parameter_lists(*parameter_definitions):
             key = (parameter['name'], parameter['in'])
             merged_parameters[key] = parameter
     return merged_parameters.values()
+
+
+def dereference_parameter_list(parameters, parameter_definitions):
+    return [
+        (p if isinstance(p, collections.Mapping) else parameter_definitions[p])
+        for p in parameters
+    ]
