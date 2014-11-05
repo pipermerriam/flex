@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
+import urlparse
 import os
 import collections
+import requests
 
 import six
 import json
@@ -38,17 +40,21 @@ def load_source(source):
         with open(os.path.expanduser(str(source)), 'r') as source_file:
             raw_source = source_file.read()
     elif isinstance(source, six.string_types):
-        raw_source = source
+        parts = urlparse.urlparse(source)
+        if parts.scheme and parts.netloc:
+            raw_source = requests.get(source).content
+        else:
+            raw_source = source
 
     try:
         try:
-            return yaml.load(raw_source)
-        except yaml.scanner.ScannerError:
+            return json.loads(raw_source)
+        except ValueError:
             pass
 
         try:
-            return json.loads(raw_source)
-        except ValueError:
+            return yaml.load(raw_source)
+        except yaml.scanner.ScannerError:
             pass
     except NameError:
         pass
