@@ -43,7 +43,7 @@ def test_minimum_validation_for_invalid_values(minimum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'minimum' in err.value.messages[0]['id'][0]
@@ -84,7 +84,7 @@ def test_exclusive_minimum_validation_for_invalid_values(minimum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'minimum' in err.value.messages[0]['id'][0]
@@ -121,7 +121,7 @@ def test_minimum_validation_for_valid_values(minimum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)
 
 
 @pytest.mark.parametrize(
@@ -150,7 +150,7 @@ def test_exclusive_minimum_validation_for_valid_values(minimum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)
 
 
 #
@@ -183,7 +183,7 @@ def test_maximum_validation_for_invalid_values(maximum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'maximum' in err.value.messages[0]['id'][0]
@@ -224,7 +224,7 @@ def test_exclusive_maximum_validation_for_invalid_values(maximum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'maximum' in err.value.messages[0]['id'][0]
@@ -261,7 +261,7 @@ def test_maximum_validation_for_valid_values(maximum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)
 
 
 @pytest.mark.parametrize(
@@ -290,4 +290,4 @@ def test_exclusive_maximum_validation_for_valid_values(maximum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)

@@ -45,7 +45,7 @@ def test_min_items_on_values_with_too_few_items(min_items, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'minItems' in err.value.messages[0]['id'][0]
@@ -81,7 +81,7 @@ def test_min_items_on_values_with_valid_array_length(min_items, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)
 
 
 #
@@ -115,7 +115,7 @@ def test_max_items_on_values_with_too_many_items(max_items, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'maxItems' in err.value.messages[0]['id'][0]
@@ -152,4 +152,4 @@ def test_max_items_on_values_with_valid_array_length(max_items, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)

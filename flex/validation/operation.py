@@ -80,11 +80,12 @@ def validate_request_parameters(request, validators):
                 errors[key].extend(list(err.messages))
 
 
-def generate_path_parameters_validator(api_path, path_parameters):
+def generate_path_parameters_validator(api_path, path_parameters, context):
     path_parameter_validator = functools.partial(
         validate_path_parameters,
         api_path=api_path,
         path_parameters=path_parameters,
+        context=context,
         inner=True,
     )
     return chain_reduce_partial(
@@ -93,10 +94,11 @@ def generate_path_parameters_validator(api_path, path_parameters):
     )
 
 
-def generate_query_parameters_validator(query_parameters):
+def generate_query_parameters_validator(query_parameters, context):
     query_parameter_validator = functools.partial(
         validate_query_parameters,
         query_parameters=query_parameters,
+        context=context,
         inner=True,
     )
     return chain_reduce_partial(
@@ -105,7 +107,7 @@ def generate_query_parameters_validator(query_parameters):
     )
 
 
-def generate_parameters_validator(api_path, path_definition, parameters, **kwargs):
+def generate_parameters_validator(api_path, path_definition, parameters, context, **kwargs):
     """
     Generates a validator function to validate.
 
@@ -126,11 +128,13 @@ def generate_parameters_validator(api_path, path_definition, parameters, **kwarg
 
     # PATH
     in_path_parameters = filter_parameters(all_parameters, in_=PATH)
-    validators['path'] = generate_path_parameters_validator(api_path, in_path_parameters)
+    validators['path'] = generate_path_parameters_validator(
+        api_path, in_path_parameters, context,
+    )
 
     # QUERY
     in_query_parameters = filter_parameters(all_parameters, in_=QUERY)
-    validators['query'] = generate_query_parameters_validator(in_query_parameters)
+    validators['query'] = generate_query_parameters_validator(in_query_parameters, context)
 
     return chain_reduce_partial(
         operator.attrgetter('request'),

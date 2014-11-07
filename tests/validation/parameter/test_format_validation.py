@@ -43,7 +43,7 @@ def test_parameter_format_validation_on_invalid_values(format_, value, error_key
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'format' in err.value.messages[0]['id'][0]
@@ -77,4 +77,4 @@ def test_parameter_format_validation_succeeds_on_valid_values(format_, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters)
+    validate_parameters(parameter_values, parameters, {})

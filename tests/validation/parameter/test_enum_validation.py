@@ -53,7 +53,7 @@ def test_enum_validation_with_invalid_values(enum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'enum' in err.value.messages[0]['id'][0]
@@ -92,4 +92,4 @@ def test_enum_validation_with_allowed_values(enum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)

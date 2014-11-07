@@ -47,7 +47,7 @@ def test_unique_items_validation_with_duplicates(value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'uniqueItems' in err.value.messages[0]['id'][0]
@@ -84,4 +84,4 @@ def test_unique_items_validation_with_no_duplicates(value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters)
+    validate_parameters(parameter_values, parameters, {})

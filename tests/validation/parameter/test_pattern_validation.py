@@ -42,7 +42,7 @@ def test_pattern_validation_with_invalid_values(pattern, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, inner=True)
+        validate_parameters(parameter_values, parameters, {}, inner=True)
 
     assert 'id' in err.value.messages[0]
     assert 'pattern' in err.value.messages[0]['id'][0]
@@ -76,4 +76,4 @@ def test_pattern_validation_with_matching_values(pattern, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, inner=True)
+    validate_parameters(parameter_values, parameters, {}, inner=True)
