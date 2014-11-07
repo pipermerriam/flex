@@ -37,10 +37,10 @@ PRIMATIVE_TYPES = {
 
 HEADER_TYPES = (
     STRING,
+    INTEGER,
     NUMBER,
     BOOLEAN,
     ARRAY,
-    OBJECT,
 )
 
 

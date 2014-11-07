@@ -1,7 +1,4 @@
-from flex.http import (
-    Request,
-    Response,
-)
+import json
 
 from tests.factories import (
     RequestFactory,
@@ -29,3 +26,15 @@ def test_query_data_for_multi_value_keys():
         url='http://www.example.com/api/?token=1234&token=5678&secret=abcd',
     )
     assert request.query_data == {'token': ['1234', '5678'], 'secret': ['abcd']}
+
+
+def test_response_factory_propogates_url_to_request():
+    response = ResponseFactory(url='http://www.example.com/should-propogate-up/')
+    assert response.url == response.request.url
+
+
+def test_response_data_as_json():
+    expected = {'foo': '1234'}
+    response = ResponseFactory(content=json.dumps(expected))
+
+    assert response.data == expected

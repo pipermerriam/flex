@@ -22,6 +22,7 @@ from flex.serializers.common import (
     BaseParameterSerializer,
     BaseSchemaSerializer,
     BaseItemsSerializer,
+    BaseHeaderSerializer,
 )
 from flex.serializers.validators import (
     host_validator,
@@ -29,7 +30,6 @@ from flex.serializers.validators import (
     scheme_validator,
     mimetype_validator,
     string_type_validator,
-    header_type_validator,
     format_validator,
     collection_format_validator,
 )
@@ -84,36 +84,8 @@ class ItemsSerializer(BaseItemsSerializer):
         return super(ItemsSerializer, self).from_native(data, files)
 
 
-class HeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
-    """
-    https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#header-object-
-    """
-    default_error_messages = {
-        'items_required': (
-            "When type is \"array\" the \"items\" is required"
-        ),
-    }
-    description = serializers.CharField(required=False)
-    type = serializers.CharField(validators=[header_type_validator])
-    format = serializers.CharField(validators=[format_validator], required=False)
+class HeaderSerializer(BaseHeaderSerializer):
     items = ItemsSerializer(required=False, many=True)
-    collectionFormat = serializers.CharField(
-        required=False, validators=[collection_format_validator], default=CSV,
-    )
-    default = serializers.WritableField(required=False)
-
-    def validate(self, attrs):
-        errors = collections.defaultdict(list)
-
-        if attrs.get('type') == ARRAY and 'items' not in attrs:
-            errors['items'].append(
-                self.error_messages['items_required'],
-            )
-        self.validate_default_type(attrs, errors)
-
-        if errors:
-            raise serializers.ValidationError(errors)
-        return super(HeaderSerializer, self).validate(attrs)
 
 
 class HeadersSerializer(HomogenousDictSerializer):
@@ -151,7 +123,6 @@ class ResponseSerializer(BaseResponseSerializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#responseObject
     """
-    description = serializers.CharField()
     schema = SchemaSerializer(required=False)
     headers = HeadersSerializer(required=False)
     # TODO: how do we do examples

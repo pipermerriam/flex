@@ -10,6 +10,7 @@ from flex.serializers.common import (
     BaseSchemaSerializer,
     BaseParameterSerializer,
     BaseItemsSerializer,
+    BaseHeaderSerializer,
 )
 from flex.serializers.validators import (
     security_type_validator,
@@ -28,7 +29,10 @@ from flex.constants import (
 
 class SchemaSerializer(BaseSchemaSerializer):
     def from_native(self, data, files=None):
-        if '$ref' in data:
+        if isinstance(data, six.string_types):
+            self.context['deferred_references'].add(data)
+            return data
+        elif '$ref' in data:
             self.context['deferred_references'].add(data['$ref'])
         return super(SchemaSerializer, self).from_native(data, files)
 
@@ -70,6 +74,18 @@ class ItemsSerializer(BaseItemsSerializer):
 SchemaSerializer.base_fields['properties'] = PropertiesSerializer(required=False)
 SchemaSerializer.base_fields['items'] = ItemsSerializer(required=False, many=True)
 SchemaSerializer.base_fields['allOf'] = SchemaSerializer(required=False, many=True)
+
+
+class HeaderSerializer(BaseHeaderSerializer):
+    items = ItemsSerializer(required=False, many=True)
+    schema = SchemaSerializer(required=False)
+
+
+class HeadersSerializer(HomogenousDictSerializer):
+    """
+    https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#headersObject
+    """
+    value_serializer_class = HeaderSerializer
 
 
 class ParameterSerializer(BaseParameterSerializer):
@@ -162,7 +178,9 @@ class ResponseSerializer(BaseResponseSerializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#responseObject
     """
-    pass
+    schema = SchemaSerializer(required=False)
+    headers = HeadersSerializer(required=False)
+    # example  # TODO: how do we do example.
 
 
 class ResponseDefinitionsSerializer(HomogenousDictSerializer):

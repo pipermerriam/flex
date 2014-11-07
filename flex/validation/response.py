@@ -1,4 +1,5 @@
 import functools
+import operator
 
 from django.core.exceptions import ValidationError
 
@@ -11,6 +12,8 @@ from flex.validation.operation import (
     construct_operation_validators,
     validate_operation,
 )
+from flex.validation.common import validate_object
+from flex.validation.schema import construct_schema_validators
 from flex.error_messages import MESSAGES
 from flex.constants import REQUEST_METHODS
 from flex.http import normalize_response
@@ -76,6 +79,18 @@ def validate_status_code_to_response_definition(response, operation):
             ),
         )
     return response_definition
+
+
+def generate_response_body_validator(schema, context, inner=False):
+    validators = construct_schema_validators(schema, context=context)
+    return chain_reduce_partial(
+        operator.attrgetter('data'),
+        functools.partial(
+            validate_object,
+            validators=validators,
+            inner=True,
+        ),
+    )
 
 
 def validate_response(response, paths, base_path, context, inner=False):
@@ -144,21 +159,29 @@ def validate_response(response, paths, base_path, context, inner=False):
             )
         except ValidationError as err:
             errors['response'].append(err.message)
-            return
-
-        # 5
-        # TODO
+        else:
+            # 5
+            response_body_validator = generate_response_body_validator(
+                response_definition['schema'],
+                context=context,
+                inner=inner,
+            )
+            try:
+                response_body_validator(response)
+            except ValidationError as err:
+                errors['response_body'].extend(err.messages)
 
         # 6
         # TODO
 
 
-def generate_response_validator(schema):
+def generate_response_validator(schema, **kwargs):
     response_validator = functools.partial(
         validate_response,
         paths=schema['paths'],
         base_path=schema.get('basePath', ''),
         context=schema,
+        **kwargs
     )
     return chain_reduce_partial(
         normalize_response,
