@@ -21,6 +21,11 @@ from flex.validation.parameter import (
     validate_path_parameters,
     validate_query_parameters,
 )
+from flex.validation.header import (
+    construct_header_validators,
+    validate_header,
+)
+from flex.validation.common import validate_object
 
 
 def validate_operation(request, validators, inner=False):
@@ -142,10 +147,24 @@ def generate_parameters_validator(api_path, path_definition, parameters, context
     )
 
 
+def generate_header_validator(headers, context, **kwargs):
+    validators = {}
+    for header_name, header_definition in headers.items():
+        validators[header_name] = functools.partial(
+            validate_header,
+            construct_header_validators(header_definition, context=context)
+        )
+    return chain_reduce_partial(
+        operator.attrgetter('request.headers'),
+        functools.partial(validate_object, validators=validators),
+    )
+
+
 validator_mapping = {
     'consumes': generate_request_content_type_validator,
     'produces': generate_response_content_type_validator,
     'parameters': generate_parameters_validator,
+    'headers': generate_header_validator,
 }
 
 

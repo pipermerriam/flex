@@ -153,7 +153,7 @@ def validate_response(response, paths, base_path, context, inner=False):
 
         # 4
         try:
-            response_definition = validate_status_code_to_response_definition(  # NOQA
+            response_definition = validate_status_code_to_response_definition(
                 response=response,
                 operation=operation,
             )
