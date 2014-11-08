@@ -12,6 +12,8 @@ from flex.http import (
 from flex.constants import (
     QUERY,
     PATH,
+    EMPTY,
+    HEADER,
 )
 from flex.parameters import (
     filter_parameters,
@@ -23,7 +25,6 @@ from flex.validation.parameter import (
 )
 from flex.validation.header import (
     construct_header_validators,
-    validate_header,
 )
 from flex.validation.common import validate_object
 
@@ -112,6 +113,24 @@ def generate_query_parameters_validator(query_parameters, context):
     )
 
 
+def generate_header_validator(headers, context, **kwargs):
+    validators = {}
+    for header_definition in headers:
+        header_validator = functools.partial(
+            validate_object,
+            validators=construct_header_validators(header_definition, context=context),
+            inner=True,
+        )
+        validators[header_definition['name']] = chain_reduce_partial(
+            operator.methodcaller('get', header_definition['name'], EMPTY),
+            header_validator,
+        )
+    return chain_reduce_partial(
+        operator.attrgetter('headers'),
+        functools.partial(validate_object, validators=validators, inner=True),
+    )
+
+
 def generate_parameters_validator(api_path, path_definition, parameters, context, **kwargs):
     """
     Generates a validator function to validate.
@@ -141,22 +160,13 @@ def generate_parameters_validator(api_path, path_definition, parameters, context
     in_query_parameters = filter_parameters(all_parameters, in_=QUERY)
     validators['query'] = generate_query_parameters_validator(in_query_parameters, context)
 
+    # HEADERS
+    in_header_parameters = filter_parameters(all_parameters, in_=HEADER)
+    validators['headers'] = generate_header_validator(in_header_parameters, context)
+
     return chain_reduce_partial(
         operator.attrgetter('request'),
         functools.partial(validate_request_parameters, validators=validators),
-    )
-
-
-def generate_header_validator(headers, context, **kwargs):
-    validators = {}
-    for header_name, header_definition in headers.items():
-        validators[header_name] = functools.partial(
-            validate_header,
-            construct_header_validators(header_definition, context=context)
-        )
-    return chain_reduce_partial(
-        operator.attrgetter('request.headers'),
-        functools.partial(validate_object, validators=validators),
     )
 
 

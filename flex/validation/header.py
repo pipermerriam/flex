@@ -1,9 +1,6 @@
-import functools
-
 from flex.validation.common import (
     generate_type_validator,
     generate_format_validator,
-    generate_items_validator,
     generate_maximum_validator,
     generate_minimum_validator,
     generate_min_length_validator,
@@ -14,6 +11,9 @@ from flex.validation.common import (
     generate_unique_items_validator,
     generate_enum_validator,
     generate_multiple_of_validator,
+)
+from flex.validation.schema import (
+    generate_items_validator,
 )
 
 

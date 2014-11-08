@@ -1,6 +1,8 @@
 import urlparse
 import json
 
+from flex.constants import EMPTY
+
 
 class URLMixin(object):
     @property
@@ -27,12 +29,13 @@ class Request(URLMixin):
     """
     method = None
 
-    def __init__(self, url, method, content_type=None, body=None, request=None):
+    def __init__(self, url, method, content_type=None, body=None, request=None, headers=None):
         self._request = request
         self.body = body
         self.url = url
         self.method = method
         self.content_type = content_type
+        self.headers = headers or {}
 
 
 def normalize_request(request):
@@ -77,7 +80,9 @@ class Response(URLMixin):
 
     @property
     def data(self):
-        if self.content_type == 'application/json':
+        if self.content is EMPTY:
+            return self.content
+        elif self.content_type == 'application/json':
             return json.loads(self.content)
         raise NotImplementedError("No content negotiation for this content type")
 

@@ -2,6 +2,7 @@ import factory
 
 from flex.serializers.definitions import SwaggerDefinitionsSerializer
 from flex.serializers.core import SwaggerSerializer
+from flex.constants import EMPTY
 from flex.http import (
     Request,
     Response,
@@ -12,8 +13,9 @@ class RequestFactory(factory.Factory):
     url = 'http://www.example.com/'
     method = 'get'
     content_type = 'application/json'
-    body = ''
+    body = EMPTY
     request = None
+    headers = factory.Dict({})
 
     class Meta:
         model = Request
@@ -22,7 +24,7 @@ class RequestFactory(factory.Factory):
 class ResponseFactory(factory.Factory):
     url = 'http://www.example.com/'
     content_type = 'application/json'
-    content = ''
+    content = EMPTY
     status_code = 200
 
     request = factory.SubFactory(

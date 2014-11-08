@@ -162,7 +162,7 @@ def validate_response(response, paths, base_path, context, inner=False):
         else:
             # 5
             response_body_validator = generate_response_body_validator(
-                response_definition['schema'],
+                response_definition.get('schema', {}),
                 context=context,
                 inner=inner,
             )
