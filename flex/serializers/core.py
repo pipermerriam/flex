@@ -12,12 +12,8 @@ from flex.context_managers import ErrorCollection
 from flex.serializers.fields import (
     SecurityRequirementReferenceField,
 )
-from flex.serializers.mixins import (
-    TypedDefaultMixin,
-)
 from flex.serializers.common import (
     HomogenousDictSerializer,
-    CommonJSONSchemaSerializer,
     BaseResponseSerializer,
     BaseParameterSerializer,
     BaseSchemaSerializer,
@@ -30,12 +26,8 @@ from flex.serializers.validators import (
     scheme_validator,
     mimetype_validator,
     string_type_validator,
-    format_validator,
-    collection_format_validator,
 )
 from flex.constants import (
-    CSV,
-    ARRAY,
     PATH,
     REQUEST_METHODS,
 )
