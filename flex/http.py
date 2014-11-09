@@ -1,6 +1,8 @@
 import urlparse
 import json
 
+from flex.constants import EMPTY
+
 
 class URLMixin(object):
     @property
@@ -27,18 +29,22 @@ class Request(URLMixin):
     """
     method = None
 
-    def __init__(self, url, method, content_type=None, body=None, request=None):
+    def __init__(self, url, method, content_type=None, body=None, request=None, headers=None):
         self._request = request
         self.body = body
         self.url = url
         self.method = method
         self.content_type = content_type
+        self.headers = headers or {}
 
 
 def normalize_request(request):
     """
     Given a request, normalize it to the internal Request class.
     """
+    if isinstance(request, Request):
+        return request
+
     url = request.url
     method = request.method.lower()
     content_type = request.headers.get('Content-Type')
@@ -59,7 +65,8 @@ class Response(URLMixin):
     _response = None
     status_code = None
 
-    def __init__(self, request, content, url, status_code, content_type, response=None):
+    def __init__(self, request, content, url, status_code, content_type,
+                 response=None):
         self._response = response
         self.request = request
         self.content = content
@@ -73,8 +80,11 @@ class Response(URLMixin):
 
     @property
     def data(self):
-        # TODO: content negotiation
-        return json.loads(self.content)
+        if self.content is EMPTY:
+            return self.content
+        elif self.content_type == 'application/json':
+            return json.loads(self.content)
+        raise NotImplementedError("No content negotiation for this content type")
 
 
 def normalize_response(response):
@@ -82,6 +92,8 @@ def normalize_response(response):
     Given a response, normalize it to the internal Response class.  This also
     involves normalizing the associated request object.
     """
+    if isinstance(response, Response):
+        return response
     request = normalize_request(response.request)
 
     url = response.url

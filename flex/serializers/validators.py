@@ -24,6 +24,7 @@ from flex.constants import (
     SECURITY_FLOWS,
     ARRAY,
 )
+from flex.error_messages import MESSAGES
 
 
 def host_validator(value):
@@ -103,7 +104,7 @@ def type_validator(value):
 def header_type_validator(value):
     if value not in HEADER_TYPES:
         raise serializers.ValidationError(
-            "Unknown type for header: `{0}`".format(value),
+            MESSAGES['type']['invalid_header_type'].format(value),
         )
 
 

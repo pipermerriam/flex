@@ -34,7 +34,8 @@ Supported Schema Formats
 
 The ``flex.load`` function supports the following.
 
-- A path to either a ``json`` or ``yaml`` file.
+- A url to either a ``json`` or ``yaml`` schema.
+- A path to either a ``json`` or ``yaml`` schema.
 - A file object whose contents are ``json`` or ``yaml``
 - A string whose contents are ``json`` or ``yaml``
 - A native python object that is a ``Mapping`` (like a dictionary).
@@ -130,17 +131,60 @@ Response validation does the following steps.
 
 1. Matches the request path to the appropriate api path.
 2. Validate the request method.
-3. Validate the request parameters (currently only path and query parameters).
+3. Validate the request parameters (currently path, query, and header).
 4. Validate the response status code.
+5. Validate the response body.
 
 The following validation is not yet implemented.
 
-- Parameter validation for Headers, Form Data, and Body parameters.
-- Response body validation.
+- Parameter validation for Form Data, and Body parameters.
 - Response header validation.
 
 Currently, response validation only supports response objects from the
 ``requests`` library.
+
+
+Formats
+-------
+
+Flex implements format validation for the following formats
+
+* ``uuid``:
+  Version 1, 3, 4, and 5
+* ``datetime``:
+  iso8601 formatted datetimes via https://pypi.python.org/pypi/iso8601.
+* ``int32``:
+  Integers up to 32 bits.
+* ``int64``:
+  Integers up to 64 bits.
+* ``email``:
+  via https://pypi.python.org/pypi/validate_email
+* ``uri``:
+  via https://pypi.python.org/pypi/rfc3987
+
+Flex supports registering your own custom formats for validation.
+
+
+.. code-block:: python
+
+   >>> from flex.formats import register
+   >>> @register('title-case', 'string')
+   ... def title_case_format_validator(value):
+   ...     if not value == value.title():
+   ...         raise ValidationError("Must be title cased")
+
+
+In the example above, we have registered a new format ``title-case`` which is
+applicatble to values of type string.  A validator function needs to take a
+single value and raise a ``ValidationError`` if the value is invalid.
+
+The ``register`` decorator takes the name of the format as it's first argument,
+and then the remaining arguments should be the types that the format validator
+can apply to.
+
+.. note::
+   Take note that format validation is skipped if the value is not of one of
+   the specified types the format validator is declared for.
 
 
 Contents:
