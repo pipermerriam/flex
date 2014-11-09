@@ -21,6 +21,7 @@ from flex.serializers.validators import (
     collection_format_validator,
     regex_validator,
     is_array_validator,
+    header_type_validator,
 )
 from flex.constants import (
     BODY,
@@ -41,7 +42,7 @@ class BaseResponseSerializer(serializers.Serializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#responseObject
     """
-    pass
+    description = serializers.CharField()
 
 
 class HomogenousDictSerializer(serializers.Serializer):
@@ -398,6 +399,37 @@ class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
             raise serializers.ValidationError(errors)
 
         return super(BaseParameterSerializer, self).validate(attrs)
+
+
+class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
+    """
+    https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#header-object-
+    """
+    default_error_messages = {
+        'items_required': (
+            "When type is \"array\" the \"items\" is required"
+        ),
+    }
+    description = serializers.CharField(required=False)
+    type = serializers.CharField(validators=[header_type_validator])
+    format = serializers.CharField(validators=[format_validator], required=False)
+    collectionFormat = serializers.CharField(
+        required=False, validators=[collection_format_validator], default=CSV,
+    )
+    default = serializers.WritableField(required=False)
+
+    def validate(self, attrs):
+        errors = collections.defaultdict(list)
+
+        if attrs.get('type') == ARRAY and 'items' not in attrs:
+            errors['items'].append(
+                self.error_messages['items_required'],
+            )
+        self.validate_default_type(attrs, errors)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super(BaseHeaderSerializer, self).validate(attrs)
 
 
 # Cannot declare this as a property on the class because `in` is a reserved word.
