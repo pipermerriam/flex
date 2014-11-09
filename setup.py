@@ -10,7 +10,7 @@ try:
 except ImportError:
     from distutils.core import setup, find_packages
 
-version = '1.9.0'
+version = '2.0.0'
 
 readme = open(os.path.join(DIR, 'README.md')).read()
 

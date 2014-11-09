@@ -1,0 +1,5 @@
+2.0.0
+-----
+
+- Extends response validation to request headers.
+- Extends response validation to response body.
