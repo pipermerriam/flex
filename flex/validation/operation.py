@@ -26,7 +26,10 @@ from flex.validation.parameter import (
 from flex.validation.header import (
     construct_header_validators,
 )
-from flex.validation.common import validate_object
+from flex.validation.common import (
+    validate_object,
+    generate_value_processor,
+)
 
 
 def validate_operation(request, validators, inner=False):
@@ -60,7 +63,7 @@ def generate_request_content_type_validator(consumes, **kwargs):
 
 
 def validate_response_content_type(response, content_types):
-    assert isinstance(response, Response)  # TODO: remove this sanity check
+    assert isinstance(response, Response)
     if response.content_type not in content_types:
         raise ValidationError(
             'Invalid content type `{0}`.  Must be one of `{1}`.'.format(
@@ -116,6 +119,10 @@ def generate_query_parameters_validator(query_parameters, context):
 def generate_header_validator(headers, context, **kwargs):
     validators = {}
     for header_definition in headers:
+        header_processor = generate_value_processor(
+            context=context,
+            **header_definition
+        )
         header_validator = functools.partial(
             validate_object,
             validators=construct_header_validators(header_definition, context=context),
@@ -123,6 +130,7 @@ def generate_header_validator(headers, context, **kwargs):
         )
         validators[header_definition['name']] = chain_reduce_partial(
             operator.methodcaller('get', header_definition['name'], EMPTY),
+            header_processor,
             header_validator,
         )
     return chain_reduce_partial(
@@ -137,7 +145,7 @@ def generate_parameters_validator(api_path, path_definition, parameters, context
 
     - request.path against the path parameters.
     - request.query against the query parameters.
-    - TODO: request.headers against the header parameters.
+    - request.headers against the header parameters.
     - TODO: request.body against the body parameters.
     - TODO: request.formData against any form data.
     """
@@ -184,8 +192,6 @@ def construct_operation_validators(api_path, path_definition, operation, context
     # - consumes (did the request conform to the content types this api consumes)
     # - produces (did the response conform to the content types this endpoint produces)
     # - parameters (did the parameters of this request validate)
-    #   TODO: move path parameter validation to here, because each operation
-    #         can override any of the path level parameters.
     # - schemes (was the request scheme correct)
     # - security: TODO since security isn't yet implemented.
     try:

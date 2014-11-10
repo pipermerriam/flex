@@ -5,7 +5,7 @@ from flex.constants import (
     INTEGER,
 )
 from flex.validation.response import (
-    generate_response_validator,
+    generate_api_call_validator,
 )
 from flex.error_messages import MESSAGES
 
@@ -32,7 +32,7 @@ def test_basic_response_body_schema_validation_with_invalid_value():
             },
         },
     )
-    response_validator = generate_response_validator(schema, inner=True)
+    response_validator = generate_api_call_validator(schema, inner=True)
 
     response = ResponseFactory(
         url='http://www.example.com/get',
@@ -44,9 +44,10 @@ def test_basic_response_body_schema_validation_with_invalid_value():
     with pytest.raises(ValidationError) as err:
         response_validator(response)
 
-    assert 'response_body' in err.value.messages[0]
-    assert 'type' in err.value.messages[0]['response_body'][0]
+    assert 'response' in err.value.messages[0]
+    assert 'schema' in err.value.messages[0]['response'][0]
+    assert 'type' in err.value.messages[0]['response'][0]['schema'][0]
     assert_error_message_equal(
-        err.value.messages[0]['response_body'][0]['type'][0],
+        err.value.messages[0]['response'][0]['schema'][0]['type'][0],
         MESSAGES['type']['invalid'],
     )

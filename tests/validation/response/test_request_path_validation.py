@@ -2,7 +2,7 @@ import pytest
 
 from flex.serializers.core import PathsSerializer
 from flex.validation.response import (
-    validate_response,
+    validate_api_call,
     validate_request_to_path,
 )
 from flex.error_messages import MESSAGES
@@ -32,7 +32,7 @@ def test_response_validation_with_invalid_request_path():
     response = ResponseFactory(url='http://www.example.com/not-an-api-path')
 
     with pytest.raises(ValidationError) as err:
-        validate_response(
+        validate_api_call(
             response,
             paths=schema['paths'],
             base_path=schema.get('base_path', ''),

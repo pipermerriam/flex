@@ -3,6 +3,9 @@ import decimal
 import operator
 import functools
 import collections
+import itertools
+
+import six
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
@@ -16,12 +19,15 @@ from flex.utils import (
     is_value_of_any_type,
     is_non_string_iterable,
     get_type_for_value,
+    chain_reduce_partial,
+    cast_value_to_type,
 )
 from flex.constants import (
     EMPTY,
     NUMBER,
     STRING,
     ARRAY,
+    DELIMETERS,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -313,3 +319,63 @@ def validate_object(obj, validators, inner=False):
                 validator(obj)
             except ValidationError as err:
                 errors[key].extend(list(err.messages))
+
+
+@suffix_reserved_words
+def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs):
+    """
+    Create a callable that will take the string value of a header and cast it
+    to the appropriate type.  This can involve:
+
+    - splitting a header of type 'array' by its delimeters.
+    - type casting the internal elements of the array.
+    """
+    processors = []
+    if is_non_string_iterable(type_):
+        assert False, "This should not be possible"
+    else:
+        if type_ == ARRAY and collectionFormat:
+            delimeter = DELIMETERS[collectionFormat]
+            # split the string based on the delimeter specified by the
+            # `collectionFormat`
+            processors.append(operator.methodcaller('split', delimeter))
+            # remove any Falsy values like empty strings.
+            processors.append(functools.partial(filter, bool))
+            # strip off any whitespace
+            processors.append(functools.partial(map, operator.methodcaller('strip')))
+            if items is not None:
+                if isinstance(items, collections.Mapping):
+                    items_processors = itertools.repeat(
+                        generate_value_processor(**items)
+                    )
+                elif isinstance(items, collections.Sequence):
+                    items_processors = itertools.chain(
+                        (generate_value_processor(**item) for item in items),
+                        itertools.repeat(lambda v: v),
+                    )
+                elif isinstance(items, six.string_types):
+                    raise NotImplementedError("Not implemented")
+                else:
+                    assert False, "Should not be possible"
+                # 1. zip the processor and the array items together
+                # 2. apply the processor to each array item.
+                # 3. cast the starmap generator to a list.
+                processors.append(
+                    chain_reduce_partial(
+                        functools.partial(zip, items_processors),
+                        functools.partial(itertools.starmap, lambda fn, v: fn(v)),
+                        list,
+                    )
+                )
+        else:
+            processors.append(
+                functools.partial(cast_value_to_type, type_=type_)
+            )
+
+    def processor(value):
+        try:
+            return chain_reduce_partial(*processors)(value)
+        except (ValueError, TypeError):
+            return value
+
+    return processor

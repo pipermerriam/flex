@@ -35,6 +35,9 @@ PRIMATIVE_TYPES = {
     OBJECT: (collections.Mapping,),
 }
 
+TRUE_VALUES = set(('true', 'True', '1'))
+FALSE_VALUES = set(('false', 'False', '0', ''))
+
 HEADER_TYPES = (
     STRING,
     INTEGER,
@@ -60,14 +63,24 @@ PARAMETER_IN_VALUES = (
 
 CSV = 'csv'
 MULTI = 'multi'
+SSV = 'ssv'
+TSV = 'tsv'
+PIPES = 'pipes'
 
 COLLECTION_FORMATS = (
     CSV,
-    'ssv',
-    'tsv',
-    'pipes',
+    SSV,
+    TSV,
+    PIPES,
     MULTI,
 )
+
+DELIMETERS = {
+    CSV: ',',
+    SSV: ' ',
+    TSV: '\t',
+    PIPES: '|',
+}
 
 
 API_KEY = 'apiKey'

@@ -15,8 +15,14 @@ from flex.validation.operation import (
 from flex.validation.common import validate_object
 from flex.validation.schema import construct_schema_validators
 from flex.error_messages import MESSAGES
-from flex.constants import REQUEST_METHODS
+from flex.constants import (
+    REQUEST_METHODS,
+    EMPTY,
+)
 from flex.http import normalize_response
+from flex.validation.header import (
+    construct_header_validators,
+)
 
 
 def validate_request_to_path(request, paths, base_path, context):
@@ -81,7 +87,7 @@ def validate_status_code_to_response_definition(response, operation):
     return response_definition
 
 
-def generate_response_body_validator(schema, context, inner=False):
+def generate_response_body_validator(schema, context, **kwargs):
     validators = construct_schema_validators(schema, context=context)
     return chain_reduce_partial(
         operator.attrgetter('data'),
@@ -93,7 +99,50 @@ def generate_response_body_validator(schema, context, inner=False):
     )
 
 
-def validate_response(response, paths, base_path, context, inner=False):
+def generate_response_header_validator(headers, context, **kwargs):
+    validators = {}
+    for key, header_definition in headers.items():
+        header_validator = functools.partial(
+            validate_object,
+            validators=construct_header_validators(header_definition, context=context),
+            inner=True,
+        )
+        # Chain the individual header validation function with a methodcaller
+        # that will fetch the header with
+        # `response.headers.get(header_name, EMPTY)`
+        # and then feed that into the validation function.
+        validators[key] = chain_reduce_partial(
+            operator.methodcaller('get', key, EMPTY),
+            header_validator,
+        )
+    return chain_reduce_partial(
+        operator.attrgetter('headers'),
+        functools.partial(validate_object, validators=validators, inner=True),
+    )
+
+
+validator_mapping = {
+    'schema': generate_response_body_validator,
+    'headers': generate_response_header_validator,
+}
+
+
+def generate_response_validator(response_definition, context):
+    validators = {}
+    for key in validator_mapping:
+        if key in response_definition:
+            validators[key] = validator_mapping[key](context=context, **response_definition)
+
+    return functools.partial(
+        validate_object,
+        validators=validators,
+        inner=True,
+    )
+
+
+def validate_api_call(response, paths, base_path, context, inner=False):
+    # TODO: rename this to `validate_api_call` and separate request and
+    # response validation.
     """
     Response validation involves the following steps.
 
@@ -161,23 +210,22 @@ def validate_response(response, paths, base_path, context, inner=False):
             errors['response'].append(err.message)
         else:
             # 5
-            response_body_validator = generate_response_body_validator(
-                response_definition.get('schema', {}),
+            response_validator = generate_response_validator(
+                response_definition,
                 context=context,
-                inner=inner,
             )
             try:
-                response_body_validator(response)
+                response_validator(response)
             except ValidationError as err:
-                errors['response_body'].extend(err.messages)
+                errors['response'].extend(err.messages)
 
         # 6
         # TODO
 
 
-def generate_response_validator(schema, **kwargs):
+def generate_api_call_validator(schema, **kwargs):
     response_validator = functools.partial(
-        validate_response,
+        validate_api_call,
         paths=schema['paths'],
         base_path=schema.get('basePath', ''),
         context=schema,
