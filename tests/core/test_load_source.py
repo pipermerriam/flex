@@ -1,4 +1,5 @@
 import tempfile
+import collections
 
 import json
 import yaml
@@ -78,4 +79,26 @@ def test_yaml_file_path():
 
     result = load_source(tmp_file.name)
 
+    assert result == native
+
+
+def test_url(httpbin):
+    native = {
+        'origin': '127.0.0.1',
+        #'headers': {
+        #    'Content-Length': '',
+        #    'Accept-Encoding': 'gzip, deflate',
+        #    'Host': '127.0.0.1:54634',
+        #    'Accept': '*/*',
+        #    'User-Agent': 'python-requests/2.4.3 CPython/2.7.8 Darwin/14.0.0',
+        #    'Connection': 'keep-alive',
+        #},
+        'args': {},
+        #'url': 'http://127.0.0.1:54634/get',
+    }
+    source = httpbin.url + '/get'
+    result = load_source(source)
+    assert isinstance(result, collections.Mapping)
+    result.pop('headers')
+    result.pop('url')
     assert result == native
