@@ -14,15 +14,11 @@ def main(s):
         print(
             """You need to supply a file to a schema or 
             a url to a schema, for the validator to work.""")
-        return 0
+        return 1
     try:
         load(s)
         print('Validation passed')
-        return 1
+        return 0
     except ValueError, e:
         print(e.message)
-        return 0
-
-
-if __name__ == '__main__':
-    main()
+        return 1
