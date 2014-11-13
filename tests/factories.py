@@ -26,6 +26,7 @@ class ResponseFactory(factory.Factory):
     content_type = 'application/json'
     content = EMPTY
     status_code = 200
+    headers = factory.Dict({})
 
     request = factory.SubFactory(
         RequestFactory, url=factory.SelfAttribute('..url'),

@@ -66,13 +66,14 @@ class Response(URLMixin):
     status_code = None
 
     def __init__(self, request, content, url, status_code, content_type,
-                 response=None):
+                 headers=None, response=None):
         self._response = response
         self.request = request
         self.content = content
         self.url = url
         self.status_code = status_code
         self.content_type = content_type
+        self.headers = headers or {}
 
     @property
     def path(self):

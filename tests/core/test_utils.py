@@ -289,7 +289,6 @@ def test_get_type_for_object(value):
     (
         ('5', NUMBER, 5),
         ('8', INTEGER, 8),
-        ('1.6', INTEGER, 1),
         ('2.3', NUMBER, 2.3),
         (15, STRING, '15'),
         (12.5, STRING, '12.5'),
@@ -297,12 +296,15 @@ def test_get_type_for_object(value):
         (True, STRING, 'True'),
         (False, NUMBER, 0),
         (False, STRING, 'False'),
-        ('0', BOOLEAN, True),
-        (0, BOOLEAN, False),
+        ('1', BOOLEAN, True),
+        ('true', BOOLEAN, True),
+        ('True', BOOLEAN, True),
         ('', BOOLEAN, False),
+        ('false', BOOLEAN, False),
+        ('False', BOOLEAN, False),
+        ('0', BOOLEAN, False),
         ('abc', ARRAY, ['a', 'b', 'c']),
         (collections.OrderedDict((('a', 1), ('b', 2))), ARRAY, ['a', 'b']),
-        ([], BOOLEAN, False),
     )
 )
 def test_casting_appropriate_values_to_type(value, type_, expected):
@@ -315,6 +317,7 @@ def test_casting_appropriate_values_to_type(value, type_, expected):
         ([], NUMBER),
         ('abc', NUMBER),
         (1, NULL),
+        ('1.6', INTEGER),
         ('abc', NULL),
         ([], NULL),
         ({}, NULL),

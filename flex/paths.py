@@ -6,7 +6,6 @@ from flex.constants import (
 )
 from flex.parameters import (
     find_parameter,
-    type_cast_parameters,
 )
 
 
@@ -116,11 +115,3 @@ def match_request_path_to_api_path(path_definitions, request_path, base_path='')
         ))
     else:
         return matches[0]
-
-
-def get_path_parameter_values(request_path, api_path, path_parameters):
-    raw_values = path_to_regex(
-        api_path,
-        path_parameters,
-    ).match(request_path).groupdict()
-    return type_cast_parameters(raw_values, path_parameters)

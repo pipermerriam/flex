@@ -19,20 +19,45 @@ from flex.validation.common import (
     generate_pattern_validator,
     generate_enum_validator,
     validate_object,
+    generate_value_processor,
 )
 from flex.validation.schema import (
     construct_schema_validators,
     generate_items_validator,
 )
-from flex.paths import get_path_parameter_values
+from flex.parameters import find_parameter
+from flex.paths import path_to_regex
 from flex.constants import EMPTY
+
+
+def type_cast_parameters(parameter_values, parameter_definitions, context):
+    typed_parameters = {}
+    for key in parameter_values.keys():
+        try:
+            parameter_definition = find_parameter(parameter_definitions, name=key)
+        except KeyError:
+            continue
+        value = parameter_values[key]
+        value_processor = generate_value_processor(context=context, **parameter_definition)
+        typed_parameters[key] = value_processor(value)
+    return typed_parameters
+
+
+def get_path_parameter_values(request_path, api_path, path_parameters, context):
+    raw_values = path_to_regex(
+        api_path,
+        path_parameters,
+    ).match(request_path).groupdict()
+    return type_cast_parameters(raw_values, path_parameters, context=context)
 
 
 def validate_path_parameters(request_path, api_path, path_parameters, context, inner=False):
     """
     Helper function for validating a request path
     """
-    parameter_values = get_path_parameter_values(request_path, api_path, path_parameters)
+    parameter_values = get_path_parameter_values(
+        request_path, api_path, path_parameters, context,
+    )
     validate_parameters(parameter_values, path_parameters, context=context, inner=inner)
 
 
@@ -92,7 +117,6 @@ validator_mapping = {
 }
 
 
-# TODO: rename this since it is no longer path specific.
 def construct_multi_parameter_validators(parameters, context):
     """
     Given an iterable of parameters, returns a dictionary of validator

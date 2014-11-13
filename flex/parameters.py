@@ -1,7 +1,6 @@
 import collections
 
 from flex.decorators import rewrite_reserved_words
-from flex.utils import cast_value_to_type
 
 
 @rewrite_reserved_words
@@ -30,20 +29,6 @@ def find_parameter(parameters, **kwargs):
     elif len(matching_parameters) > 1:
         raise ValueError("More than 1 parameter matched")
     raise ValueError("No parameters matched")
-
-
-def type_cast_parameters(parameter_values, parameter_definitions):
-    typed_parameters = {}
-    for key in parameter_values.keys():
-        try:
-            parameter_definition = find_parameter(parameter_definitions, name=key)
-        except KeyError:
-            continue
-        if 'type' not in parameter_definition:
-            continue
-        value = parameter_values[key]
-        typed_parameters[key] = cast_value_to_type(value, parameter_definition['type'])
-    return typed_parameters
 
 
 def merge_parameter_lists(*parameter_definitions):

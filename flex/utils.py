@@ -14,6 +14,8 @@ from flex.constants import (
     STRING,
     ARRAY,
     OBJECT,
+    TRUE_VALUES,
+    FALSE_VALUES,
 )
 
 
@@ -42,13 +44,21 @@ def cast_value_to_type(value, type_):
     if type_ == STRING:
         return six.text_type(value)
     elif type_ == INTEGER:
-        return int(float(value))
+        return int(value)
     elif type_ == NUMBER:
         return float(value)
     elif type_ == ARRAY:
         return list(value)
     elif type_ == OBJECT:
         return dict(value)
+    elif type_ == BOOLEAN:
+        if value in TRUE_VALUES:
+            return True
+        elif value in FALSE_VALUES:
+            return False
+        else:
+            raise TypeError("Invalid value for boolean: `{0}`".format(repr(value)))
+    # TODO: the only thing left is null type.
     return PRIMATIVE_TYPES[type_][0](value)
 
 
