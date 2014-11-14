@@ -9,13 +9,16 @@ import six
 import json
 import yaml
 
+from django.core.exceptions import ValidationError
+
+from flex.context_managers import ErrorCollection
 from flex.serializers.core import (
     SwaggerSerializer,
     SchemaSerializer,
 )
 from flex.serializers.definitions import SwaggerDefinitionsSerializer
 from flex.utils import prettify_errors
-
+from flex.validation.request import generate_request_validator
 from flex.validation.response import generate_response_validator
 
 
@@ -116,5 +119,15 @@ def validate(schema, target=None, **kwargs):
         validator(target)
 
 
-def ResponseValidator(schema):
-    return generate_response_validator(schema)
+def validate_api_call(schema, request, response):
+    with ErrorCollection() as errors:
+        try:
+            operation_definition = generate_request_validator(schema, inner=True)(request)
+        except ValidationError as err:
+            errors['request'].append(err.messages)
+            return
+
+        try:
+            generate_response_validator(operation_definition, schema, inner=True)(response)
+        except ValidationError as err:
+            errors['response'].append(err.messages)

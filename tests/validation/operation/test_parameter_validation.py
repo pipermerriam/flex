@@ -15,7 +15,6 @@ from flex.error_messages import MESSAGES
 from tests.utils import assert_error_message_equal
 from tests.factories import (
     RequestFactory,
-    ResponseFactory,
     SchemaFactory,
 )
 
@@ -76,27 +75,22 @@ def test_operation_parameter_validation_uses_correct_parameter_definitions():
         },
     )
 
-    url = 'http://www.example.com/get/fernando/posts/45/'
 
-    response = ResponseFactory(
-        request=RequestFactory(
-            url=url,
-        ),
-        url=url,
-    )
+    request = RequestFactory(url='http://www.example.com/get/fernando/posts/45/')
+
     api_path = '/get/{username}/posts/{id}/'
     path_definition = schema['paths']['/get/{username}/posts/{id}/']
-    operation = response.request.method
+    operation_definition = schema['paths']['/get/{username}/posts/{id}/']['get']
 
     validators = construct_operation_validators(
         api_path=api_path,
         path_definition=path_definition,
-        operation=operation,
+        operation_definition=operation_definition,
         context=schema,
     )
 
     with pytest.raises(ValidationError) as err:
-        validate_operation(response, validators, inner=True)
+        validate_operation(request, validators, inner=True)
 
     assert 'parameters' in err.value.messages[0]
     assert 'path' in err.value.messages[0]['parameters'][0]

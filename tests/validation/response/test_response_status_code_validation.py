@@ -1,7 +1,7 @@
 import pytest
 
 from flex.validation.response import (
-    validate_api_call,
+    validate_response,
 )
 from flex.error_messages import MESSAGES
 
@@ -33,16 +33,15 @@ def test_response_parameter_validation():
     response = ResponseFactory(url='http://www.example.com/get', status_code=301)
 
     with pytest.raises(ValidationError) as err:
-        validate_api_call(
+        validate_response(
             response,
-            paths=schema['paths'],
-            base_path=schema.get('base_path', ''),
+            operation_definition=schema['paths']['/get']['get'],
             context=schema,
             inner=True,
         )
 
-    assert 'response' in err.value.messages[0]
+    assert 'status_code' in err.value.messages[0]
     assert_error_message_equal(
-        err.value.messages[0]['response'][0],
+        err.value.messages[0]['status_code'][0],
         MESSAGES['response']['invalid_status_code'],
     )

@@ -1,7 +1,7 @@
 import pytest
 
 from flex.validation.response import (
-    validate_api_call,
+    validate_response,
 )
 from flex.error_messages import MESSAGES
 from flex.constants import (
@@ -20,7 +20,7 @@ def test_response_header_validation():
 
     schema = SchemaFactory(
         paths={
-            '/get/': {
+            '/get': {
                 'get': {
                     'responses': {200: {
                         'description': "Success",
@@ -34,24 +34,23 @@ def test_response_header_validation():
     )
 
     response = ResponseFactory(
-        url='http://www.example.com/get/',
+        url='http://www.example.com/get',
         headers={'Foo': 'abc'},
     )
 
     with pytest.raises(ValidationError) as err:
-        validate_api_call(
+        validate_response(
             response,
-            paths=schema['paths'],
-            base_path=schema.get('base_path', ''),
+            operation_definition=schema['paths']['/get']['get'],
             context=schema,
             inner=True,
         )
 
-    assert 'response' in err.value.messages[0]
-    assert 'headers' in err.value.messages[0]['response'][0]
-    assert 'Foo' in err.value.messages[0]['response'][0]['headers'][0]
-    assert 'type' in err.value.messages[0]['response'][0]['headers'][0]['Foo'][0]
+    assert 'body' in err.value.messages[0]
+    assert 'headers' in err.value.messages[0]['body'][0]
+    assert 'Foo' in err.value.messages[0]['body'][0]['headers'][0]
+    assert 'type' in err.value.messages[0]['body'][0]['headers'][0]['Foo'][0]
     assert_error_message_equal(
-        err.value.messages[0]['response'][0]['headers'][0]['Foo'][0]['type'][0],
+        err.value.messages[0]['body'][0]['headers'][0]['Foo'][0]['type'][0],
         MESSAGES['type']['invalid'],
     )

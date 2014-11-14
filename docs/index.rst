@@ -107,21 +107,20 @@ specification.
            - 'minimum':
                - u'`minimum` can only be used for json number types'
 
-Response Validation
+API Call Validation
 -------------------
 
-Response validation takes a supported response object that represents a
-request/response cycle for an API call and validates it against a swagger
-schema.
+API call validation takes a supported request and response object that
+represents a request/response cycle for an API call and validates it against a
+swagger schema.
 
 .. code-block:: python
 
    >>> import requests
-   >>> from flex.core import load, ResponseValidator
+   >>> from flex.core import load, validate_api_call
    >>> schema = load("path/to/schema.yaml")
-   >>> validator = ResponseValidator(schema)
    >>> response = requests.get('http://www.example.com/api/')
-   >>> validator(response)
+   >>> validate_api_call(schema, request=response.request, response=response)
    ValueError: Invalid
    'response':
        - 'Request status code was not found in the known response codes.  Got `301`: Expected one of: `[200]`'
