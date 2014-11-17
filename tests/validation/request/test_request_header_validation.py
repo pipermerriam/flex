@@ -1,7 +1,7 @@
 import pytest
 
-from flex.validation.response import (
-    validate_api_call,
+from flex.validation.request import (
+    validate_request,
 )
 from flex.error_messages import MESSAGES
 from flex.constants import (
@@ -16,7 +16,7 @@ from flex.constants import (
 
 from tests.factories import (
     SchemaFactory,
-    ResponseFactory,
+    RequestFactory,
 )
 from tests.utils import assert_error_message_equal
 
@@ -41,27 +41,27 @@ def test_request_header_validation():
         },
     )
 
-    response = ResponseFactory(
+    request = RequestFactory(
         url='http://www.example.com/get/',
-        request__headers={'Authorization': 'abc'},
+        headers={'Authorization': 'abc'},
     )
 
     with pytest.raises(ValidationError) as err:
-        validate_api_call(
-            response,
+        validate_request(
+            request,
             paths=schema['paths'],
             base_path=schema.get('base_path', ''),
             context=schema,
             inner=True,
         )
 
-    assert 'request' in err.value.messages[0]
-    assert 'parameters' in err.value.messages[0]['request'][0][0]
-    assert 'headers' in err.value.messages[0]['request'][0][0]['parameters'][0]
-    assert 'Authorization' in err.value.messages[0]['request'][0][0]['parameters'][0]['headers'][0]
-    assert 'type' in err.value.messages[0]['request'][0][0]['parameters'][0]['headers'][0]['Authorization'][0]
+    assert 'method' in err.value.messages[0]
+    assert 'parameters' in err.value.messages[0]['method'][0][0]
+    assert 'headers' in err.value.messages[0]['method'][0][0]['parameters'][0]
+    assert 'Authorization' in err.value.messages[0]['method'][0][0]['parameters'][0]['headers'][0]
+    assert 'type' in err.value.messages[0]['method'][0][0]['parameters'][0]['headers'][0]['Authorization'][0]
     assert_error_message_equal(
-        err.value.messages[0]['request'][0][0]['parameters'][0]['headers'][0]['Authorization'][0]['type'][0],
+        err.value.messages[0]['method'][0][0]['parameters'][0]['headers'][0]['Authorization'][0]['type'][0],
         MESSAGES['type']['invalid'],
     )
 
@@ -101,12 +101,12 @@ def test_request_header_array_extraction(format_, value):
         },
     )
 
-    response = ResponseFactory(
+    response = RequestFactory(
         url='http://www.example.com/get/',
-        request__headers={'Authorization': value},
+        headers={'Authorization': value},
     )
 
-    validate_api_call(
+    validate_request(
         response,
         paths=schema['paths'],
         base_path=schema.get('base_path', ''),

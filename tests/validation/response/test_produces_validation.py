@@ -1,8 +1,7 @@
 import pytest
 
-from flex.validation.operation import (
-    construct_operation_validators,
-    validate_operation,
+from flex.validation.response import (
+    validate_response,
 )
 
 from tests.factories import (
@@ -28,10 +27,11 @@ def test_produces_validation_valid_mimetype_from_global_definition():
         },
     )
 
-    validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
+    validate_response(
+        response,
+        operation_definition=schema['paths']['/get']['get'],
+        context=schema,
     )
-    validate_operation(response, validators)
 
 
 def test_produces_validation_invalid_mimetype_from_global_definition():
@@ -50,11 +50,13 @@ def test_produces_validation_invalid_mimetype_from_global_definition():
         },
     )
 
-    validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
-    )
     with pytest.raises(ValidationError):
-        validate_operation(response, validators, inner=True)
+        validate_response(
+            response,
+            operation_definition=schema['paths']['/get']['get'],
+            context=schema,
+            inner=True,
+        )
 
 
 def test_produces_validation_for_valid_mimetype_from_operation_definition():
@@ -74,10 +76,11 @@ def test_produces_validation_for_valid_mimetype_from_operation_definition():
         },
     )
 
-    validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
+    validate_response(
+        response,
+        operation_definition=schema['paths']['/get']['get'],
+        context=schema,
     )
-    validate_operation(response, validators)
 
 
 def test_produces_validation_for_invalid_mimetype_from_operation_definition():
@@ -98,9 +101,10 @@ def test_produces_validation_for_invalid_mimetype_from_operation_definition():
         },
     )
 
-    validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
-    )
     with pytest.raises(ValidationError):
-        validate_operation(response, validators, inner=True)
-
+        validate_response(
+            response,
+            operation_definition=schema['paths']['/get']['get'],
+            context=schema,
+            inner=True,
+        )

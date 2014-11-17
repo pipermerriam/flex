@@ -1,8 +1,8 @@
 import pytest
 
 from flex.serializers.core import PathsSerializer
-from flex.validation.response import (
-    validate_api_call,
+from flex.validation.request import (
+    validate_request,
     validate_request_to_path,
 )
 from flex.error_messages import MESSAGES
@@ -14,14 +14,14 @@ from flex.constants import (
 
 from tests.factories import (
     SchemaFactory,
-    ResponseFactory,
+    RequestFactory,
 )
 from tests.utils import assert_error_message_equal
 
 
-def test_response_validation_with_invalid_request_path():
+def test_request_validation_with_invalid_request_path():
     """
-    Test that response validation detects request paths that are not declared
+    Test that request validation detects request paths that are not declared
     in the schema.
     """
     from django.core.exceptions import ValidationError
@@ -29,20 +29,20 @@ def test_response_validation_with_invalid_request_path():
     schema = SchemaFactory()
     assert not schema['paths']
 
-    response = ResponseFactory(url='http://www.example.com/not-an-api-path')
+    request = RequestFactory(url='http://www.example.com/not-an-api-path')
 
     with pytest.raises(ValidationError) as err:
-        validate_api_call(
-            response,
+        validate_request(
+            request,
             paths=schema['paths'],
             base_path=schema.get('base_path', ''),
             context=schema,
             inner=True,
         )
 
-    assert 'request' in err.value.messages[0]
+    assert 'path' in err.value.messages[0]
     assert_error_message_equal(
-        err.value.messages[0]['request'][0],
+        err.value.messages[0]['path'][0],
         MESSAGES['request']['unknown_path'],
     )
 
@@ -55,9 +55,9 @@ def test_basic_request_path_validation():
 
     paths = serializer.object
 
-    response = ResponseFactory(url='http://www.example.com/get')
+    request = RequestFactory(url='http://www.example.com/get')
     path, _ = validate_request_to_path(
-        response,
+        request,
         paths=paths,
         base_path='',
         context={},
@@ -83,11 +83,11 @@ def test_basic_request_path_validation_with_unspecified_paths(request_path):
 
     url = 'http://www.example.com{0}'.format(request_path)
 
-    response = ResponseFactory(url=url)
+    request = RequestFactory(url=url)
 
     with pytest.raises(ValidationError):
         validate_request_to_path(
-            response,
+            request,
             paths=paths,
             base_path='',
             context={},
@@ -107,9 +107,9 @@ def test_parametrized_string_path_validation():
 
     paths = serializer.object
 
-    response = ResponseFactory(url='http://www.example.com/get/25')
+    request = RequestFactory(url='http://www.example.com/get/25')
     path, _ = validate_request_to_path(
-        response,
+        request,
         paths=paths,
         base_path='',
         context={},
@@ -130,9 +130,9 @@ def test_parametrized_integer_path_validation():
 
     paths = serializer.object
 
-    response = ResponseFactory(url='http://www.example.com/get/25')
+    request = RequestFactory(url='http://www.example.com/get/25')
     path, _ = validate_request_to_path(
-        response,
+        request,
         paths=paths,
         base_path='',
         context={},
@@ -154,9 +154,9 @@ def test_parametrized_path_with_multiple_prameters():
 
     paths = serializer.object
 
-    response = ResponseFactory(url='http://www.example.com/users/john-smith/posts/47')
+    request = RequestFactory(url='http://www.example.com/users/john-smith/posts/47')
     path, _ = validate_request_to_path(
-        response,
+        request,
         paths=paths,
         base_path='',
         context={},

@@ -31,7 +31,10 @@ def test_consumes_validation_valid_mimetype_from_global_definition():
     )
 
     validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
+        api_path='/get',
+        path_definition=schema['paths']['/get'],
+        operation_definition=schema['paths']['/get']['get'],
+        context=schema,
     )
     validate_operation(response, validators)
 
@@ -54,7 +57,10 @@ def test_consumes_validation_invalid_mimetype_from_global_definition():
     )
 
     validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
+        api_path='/get',
+        path_definition=schema['paths']['/get'],
+        operation_definition=schema['paths']['/get']['get'],
+        context=schema,
     )
     with pytest.raises(ValidationError):
         validate_operation(response, validators, inner=True)
@@ -79,7 +85,10 @@ def test_consumes_validation_for_valid_mimetype_from_operation_definition():
     )
 
     validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
+        api_path='/get',
+        path_definition=schema['paths']['/get'],
+        operation_definition=schema['paths']['/get']['get'],
+        context=schema,
     )
     validate_operation(response, validators)
 
@@ -104,7 +113,10 @@ def test_consumes_validation_for_invalid_mimetype_from_operation_definition():
     )
 
     validators = construct_operation_validators(
-        '/get', schema['paths']['/get'], 'get', schema,
+        api_path='/get',
+        path_definition=schema['paths']['/get'],
+        operation_definition=schema['paths']['/get']['get'],
+        context=schema,
     )
     with pytest.raises(ValidationError):
         validate_operation(response, validators, inner=True)

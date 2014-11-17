@@ -7,7 +7,6 @@ from flex.utils import chain_reduce_partial
 from flex.context_managers import ErrorCollection
 from flex.http import (
     Request,
-    Response,
 )
 from flex.constants import (
     QUERY,
@@ -59,23 +58,6 @@ def generate_request_content_type_validator(consumes, **kwargs):
     return chain_reduce_partial(
         operator.attrgetter('request'),
         validator,
-    )
-
-
-def validate_response_content_type(response, content_types):
-    assert isinstance(response, Response)
-    if response.content_type not in content_types:
-        raise ValidationError(
-            'Invalid content type `{0}`.  Must be one of `{1}`.'.format(
-                response.content_type, content_types,
-            ),
-        )
-
-
-def generate_response_content_type_validator(produces, **kwargs):
-    return functools.partial(
-        validate_response_content_type,
-        content_types=produces,
     )
 
 
@@ -172,43 +154,34 @@ def generate_parameters_validator(api_path, path_definition, parameters, context
     in_header_parameters = filter_parameters(all_parameters, in_=HEADER)
     validators['headers'] = generate_header_validator(in_header_parameters, context)
 
-    return chain_reduce_partial(
-        operator.attrgetter('request'),
-        functools.partial(validate_request_parameters, validators=validators),
-    )
+    return functools.partial(validate_request_parameters, validators=validators)
 
 
 validator_mapping = {
     'consumes': generate_request_content_type_validator,
-    'produces': generate_response_content_type_validator,
     'parameters': generate_parameters_validator,
     'headers': generate_header_validator,
 }
 
 
-def construct_operation_validators(api_path, path_definition, operation, context):
+def construct_operation_validators(api_path, path_definition, operation_definition, context):
+    """
+    - consumes (did the request conform to the content types this api consumes)
+    - produces (did the response conform to the content types this endpoint produces)
+    - parameters (did the parameters of this request validate)
+      TODO: move path parameter validation to here, because each operation
+            can override any of the path level parameters.
+    - schemes (was the request scheme correct)
+    - security: TODO since security isn't yet implemented.
+    """
     validators = {}
-
-    # - consumes (did the request conform to the content types this api consumes)
-    # - produces (did the response conform to the content types this endpoint produces)
-    # - parameters (did the parameters of this request validate)
-    # - schemes (was the request scheme correct)
-    # - security: TODO since security isn't yet implemented.
-    try:
-        operation_definition = path_definition[operation]
-    except KeyError:
-        raise ValidationError(
-            'Unknown operation `{0}`.  Must be one of `{1}`'.format(
-                operation, path_definition.keys(),
-            ),
-        )
 
     # sanity check
     assert 'context' not in operation_definition
     assert 'api_path' not in operation_definition
     assert 'path_definition' not in operation_definition
 
-    for key, value in operation_definition.items():
+    for key in operation_definition.keys():
         if key not in validator_mapping:
             # TODO: is this the right thing to do?
             continue
@@ -222,8 +195,6 @@ def construct_operation_validators(api_path, path_definition, operation, context
     # Global defaults
     if 'consumes' in context and 'consumes' not in validators:
         validators['consumes'] = validator_mapping['consumes'](**context)
-    if 'produces' in context and 'produces' not in validators:
-        validators['produces'] = validator_mapping['produces'](**context)
     if 'parameters' in path_definition and 'parameters' not in validators:
         validators['parameters'] = validator_mapping['parameters'](
             context=context,
