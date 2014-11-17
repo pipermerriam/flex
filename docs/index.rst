@@ -125,22 +125,34 @@ swagger schema.
    'response':
        - 'Request status code was not found in the known response codes.  Got `301`: Expected one of: `[200]`'
 
+Request validation looks at the following things.
 
-Response validation does the following steps.
+1. Request path.
+2. Parameters in the path.
+3. Query parameters.
+4. Request method.
+5. Headers.
+6. Content Type
 
-1. Matches the request path to the appropriate api path.
-2. Validate the request method.
-3. Validate the request parameters (currently path, query, and header).
-4. Validate the response status code.
-5. Validate the response body.
+Response validation looks at the following things.
 
-The following validation is not yet implemented.
+1. Content-Type
+2. Headers
+3. Status Code
+4. Response body.
 
-- Parameter validation for Form Data, and Body parameters.
-- Response header validation.
 
-Currently, response validation only supports response objects from the
-``requests`` library.
+Request validation supports the following request objects.
+
+* ``requests.Request`` and ``requests.PreparedRequest`` from Kenneth Reitz'
+  ``requests`` library.
+* ``urllib2.Request`` from the ``urllib2`` module of the standard library.
+
+Response valdation supports the following respone objects.
+
+* ``requests.Response`` from Kenneth Reitz' ``requests`` library.
+* The return value of ``urllib.urlopen`` and ``urllib2.urlopen`` from the
+  standard library urllib modules.
 
 
 Formats

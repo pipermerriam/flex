@@ -1,8 +1,10 @@
+import urllib
+import urllib2
+
 import requests
 
 from flex.http import (
     normalize_request,
-    normalize_response,
 )
 
 
@@ -35,14 +37,17 @@ def test_request_normalization_with_content_type(httpbin):
 
 
 #
-#  Test normalizatin of the response object from the requests library
+# Test urllib request object
 #
-def test_response_normalization(httpbin):
-    raw_response = requests.get(httpbin.url + '/get')
+def test_urllib_request_normalization(httpbin):
+    raw_request = urllib2.Request(
+        httpbin.url + '/get',
+        headers={'Content-Type': 'application/json'},
+    )
 
-    response = normalize_response(raw_response)
+    request = normalize_request(raw_request)
 
-    assert response.path == '/get'
-    assert response.content_type == 'application/json'
-    assert response.url == httpbin.url + '/get'
-    assert response.status_code == 200
+    assert request.path == '/get'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/get'
+    assert request.method == 'get'
