@@ -192,15 +192,15 @@ Command line usage
 As well as a python API, ``flex`` also provides a commandline validation tool.
 
 .. code-block:: bash
-    ./flex -s /path/to/swagger.yaml
-    ./flex -s http://spec.example.com/swagger.yaml
+    $ ./flex -s /path/to/swagger.yaml
+    $ ./flex -s http://spec.example.com/swagger.yaml
 
 
-In the event of a validation error, the commandline program will return 0 and 
-print to stdout a list of the validation errors detected.
+In the event of a validation error, the commandline program will return 1 and 
+print to stderr a list of the validation errors detected.
 
 If the file passes validation it will return to stdout "Validation passed" and return
-1 - in line with most *nix commandline tools.
+0 - in line with most *nix commandline tools*.
 
 
 Contents:
