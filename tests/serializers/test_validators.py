@@ -99,7 +99,10 @@ def test_accepts_iterables():
 
 
 def test_accepts_bytes():
-    string_type_validator(six.binary_type('test'))
+    if six.PY2:
+        string_type_validator(six.binary_type('test'))
+    else:
+        string_type_validator(six.binary_type('test', encoding='utf-8'))
 
 
 def test_accepts_unicode():

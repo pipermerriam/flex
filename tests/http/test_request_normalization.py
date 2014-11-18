@@ -1,5 +1,7 @@
+import pytest
 import urllib
-import urllib2
+
+import six
 
 import requests
 
@@ -39,8 +41,26 @@ def test_request_normalization_with_content_type(httpbin):
 #
 # Test urllib request object
 #
-def test_urllib_request_normalization(httpbin):
+@pytest.mark.skipif(six.PY3, reason="No urllib2 in python3")
+def test_python2_urllib_request_normalization(httpbin):
+    import urllib2
+
     raw_request = urllib2.Request(
+        httpbin.url + '/get',
+        headers={'Content-Type': 'application/json'},
+    )
+
+    request = normalize_request(raw_request)
+
+    assert request.path == '/get'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/get'
+    assert request.method == 'get'
+
+
+@pytest.mark.skipif(six.PY2, reason="No urllib3 in python2")
+def test_python3_urllib_request_normalization(httpbin):
+    raw_request = urllib.request.Request(
         httpbin.url + '/get',
         headers={'Content-Type': 'application/json'},
     )

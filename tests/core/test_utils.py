@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 import six
 import pytest
 import collections
+import operator
 import random
 
 from flex.utils import (
@@ -39,6 +42,13 @@ def test_tuple():
 
 def test_not_string():
     assert not is_non_string_iterable('is-a-string')
+
+
+def test_not_bytes():
+    if six.PY2:
+        assert not is_non_string_iterable(six.binary_type('is-a-string'))
+    else:
+        assert not is_non_string_iterable(six.binary_type('is-a-string', encoding='utf-8'))
 
 
 #
@@ -94,7 +104,10 @@ def test_non_number_types():
 
 def test_string_type():
     assert is_value_of_type('', STRING)
-    assert is_value_of_type(six.binary_type('string'), STRING)
+    if six.PY2:
+        assert is_value_of_type(six.binary_type('string'), STRING)
+    else:
+        assert is_value_of_type(six.binary_type('string', encoding='utf-8'), STRING)
     assert is_value_of_type(six.text_type('string'), STRING)
 
 
@@ -129,7 +142,10 @@ def test_non_object_types():
 # format_errors tests
 #
 def test_string():
-    messages = list(format_errors("error"))
+    messages = list(map(
+        operator.methodcaller('replace', "u'", "'"),
+        format_errors("error"),
+    ))
 
     assert messages == ["'error'"]
 
@@ -140,7 +156,10 @@ def test_short_iterable():
         "0. 'error-a'",
         "1. 'error-b'",
     ]
-    actual = list(format_errors(input_))
+    actual = list(map(
+        operator.methodcaller('replace', "u'", "'"),
+        format_errors(input_),
+    ))
 
     assert set(actual) == set(expected)
 
@@ -154,7 +173,10 @@ def test_mapping_with_string_values():
         "'foo': 'bar'",
         "'bar': 'baz'",
     ]
-    actual = list(format_errors(input_))
+    actual = list(map(
+        operator.methodcaller('replace', "u'", "'"),
+        format_errors(input_),
+    ))
 
     assert set(actual) == set(expected)
 
@@ -172,7 +194,10 @@ def test_mapping_with_iterables():
         "    0. 'baz'",
         "    1. 'foo'",
     ]
-    actual = list(format_errors(input_))
+    actual = list(map(
+        operator.methodcaller('replace', "u'", "'"),
+        format_errors(input_),
+    ))
 
     assert set(actual) == set(expected)
 
@@ -196,7 +221,10 @@ def test_mapping_with_mappings():
         "    - 'baz': 'error-c'",
         "    - 'foo': 'error-d'",
     ]
-    actual = list(format_errors(input_))
+    actual = list(map(
+        operator.methodcaller('replace', "u'", "'"),
+        format_errors(input_),
+    ))
 
     assert set(actual) == set(expected)
 
@@ -212,7 +240,10 @@ def test_iterable_of_mappings():
         "    0. 'baz'",
         "    1. 'foo'",
     ]
-    actual = list(format_errors(input_))
+    actual = list(map(
+        operator.methodcaller('replace', "u'", "'"),
+        format_errors(input_),
+    ))
 
     assert set(actual) == set(expected)
 

@@ -1,5 +1,9 @@
+from __future__ import unicode_literals
+
 import tempfile
 import collections
+
+import six
 
 import json
 import yaml
@@ -34,11 +38,12 @@ def test_json_file_object():
     native = {'foo': 'bar'}
     source = json.dumps(native)
 
-    tmp_file = tempfile.NamedTemporaryFile(mode='r+w')
+    tmp_file = tempfile.NamedTemporaryFile(mode='w')
     tmp_file.write(source)
     tmp_file.file.seek(0)
 
-    result = load_source(tmp_file.file)
+    with open(tmp_file.name) as json_file:
+        result = load_source(json_file)
 
     assert result == native
 
@@ -47,9 +52,9 @@ def test_json_file_path():
     native = {'foo': 'bar'}
     source = json.dumps(native)
 
-    tmp_file = tempfile.NamedTemporaryFile(mode='r+w', suffix='.json')
+    tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json')
     tmp_file.write(source)
-    tmp_file.file.seek(0)
+    tmp_file.flush()
 
     result = load_source(tmp_file.name)
 
@@ -60,11 +65,12 @@ def test_yaml_file_object():
     native = {'foo': 'bar'}
     source = yaml.dump(native)
 
-    tmp_file = tempfile.NamedTemporaryFile(mode='r+w')
+    tmp_file = tempfile.NamedTemporaryFile(mode='w')
     tmp_file.write(source)
-    tmp_file.file.seek(0)
+    tmp_file.flush()
 
-    result = load_source(tmp_file.file)
+    with open(tmp_file.name) as yaml_file:
+        result = load_source(yaml_file)
 
     assert result == native
 
@@ -73,9 +79,9 @@ def test_yaml_file_path():
     native = {'foo': 'bar'}
     source = yaml.dump(native)
 
-    tmp_file = tempfile.NamedTemporaryFile(mode='r+w', suffix='.yaml')
+    tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.yaml')
     tmp_file.write(source)
-    tmp_file.file.seek(0)
+    tmp_file.flush()
 
     result = load_source(tmp_file.name)
 

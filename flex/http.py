@@ -1,6 +1,9 @@
+import six
+
+import http
 import urllib
-import urllib2
-import urlparse
+
+from six.moves import urllib_parse as urlparse
 import json
 
 from flex.constants import EMPTY
@@ -60,9 +63,13 @@ def _normalize_requests_request(request):
     )
 
 
-def _normalize_urllib2_request(request):
-    if not isinstance(request, urllib2.Request):
-        raise TypeError("Cannot normalize this request object")
+def _normalize_python2_urllib_request(request):
+    if six.PY2:
+        import urllib2
+        if not isinstance(request, urllib2.Request):
+            raise TypeError("Cannot normalize this request object")
+    else:
+        raise TypeError("Cannot normalize python3 urllib request object")
 
     url = request.get_full_url()
     method = request.get_method().lower()
@@ -78,8 +85,30 @@ def _normalize_urllib2_request(request):
     )
 
 
+def _normalize_python3_urllib_request(request):
+    if six.PY3:
+        if not isinstance(request, urllib.request.Request):
+            raise TypeError("Cannot normalize this request object")
+    else:
+        raise TypeError("Cannot normalize python2 urllib request object")
+
+    url = request.get_full_url()
+    method = request.get_method().lower()
+    content_type = request.headers.get('Content-type')
+    body = request.data
+
+    return Request(
+        url=url,
+        body=body,
+        method=method,
+        content_type=content_type,
+        request=request,
+    )
+
+
 REQUEST_NORMALIZERS = (
-    _normalize_urllib2_request,
+    _normalize_python2_urllib_request,
+    _normalize_python3_urllib_request,
     _normalize_requests_request,
 )
 
@@ -151,8 +180,12 @@ def _normalize_requests_response(response, request=None):
 
 
 def _normalize_urllib_response(response, request=None):
-    if not isinstance(response, urllib.addinfourl):
-        raise TypeError("Cannot normalize this response object")
+    if six.PY2:
+        if not isinstance(response, urllib.addinfourl):
+            raise TypeError("Cannot normalize this response object")
+    else:
+        if not isinstance(response, http.client.HTTPResponse):
+            raise TypeError("Cannot normalize this response object")
 
     url = response.url
     status_code = response.getcode()

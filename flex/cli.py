@@ -24,5 +24,5 @@ def main(source):
         load(source)
         click.echo("Validation passed")
         return 0
-    except ValueError, e:
-        raise click.ClickException(e.message)
+    except ValueError as e:
+        raise click.ClickException(str(e))

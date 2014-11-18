@@ -1,5 +1,7 @@
+import pytest
+import six
+
 import urllib
-import urllib2
 
 import requests
 
@@ -26,7 +28,10 @@ def test_response_normalization(httpbin):
 #  Test normalization of urllib response object
 #
 def test_urllib_response_normalization(httpbin):
-    raw_response = urllib.urlopen(httpbin.url + '/get')
+    if six.PY2:
+        raw_response = urllib.urlopen(httpbin.url + '/get')
+    else:
+        raw_response = urllib.request.urlopen(httpbin.url + '/get')
 
     response = normalize_response(raw_response)
 
@@ -39,7 +44,9 @@ def test_urllib_response_normalization(httpbin):
 #
 #  Test normalization of urllib2 response object
 #
+@pytest.mark.skipif(six.PY3, reason="No urllib2 in python3")
 def test_urllib2_response_normalization(httpbin):
+    import urllib2
     raw_response = urllib2.urlopen(httpbin.url + '/get')
 
     response = normalize_response(raw_response)

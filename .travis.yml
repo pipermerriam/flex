@@ -6,13 +6,14 @@ env:
     - PIP_DOWNLOAD_CACHE=$HOME/.pip_cache
   matrix:
     - TOX_ENV=py27
+    - TOX_ENV=py34
     - TOX_ENV=flake8
 cache:
   directories:
     - $HOME/.pip-cache/
 install:
   - "travis_retry pip install setuptools --upgrade"
-  - "pip install tox"
+  - "travis_retry pip install tox"
 script:
   - tox -e $TOX_ENV
 after_script:

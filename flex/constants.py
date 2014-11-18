@@ -28,9 +28,9 @@ PRIMATIVE_TYPES = {
     None: (type(None),),
     NULL: (type(None),),
     BOOLEAN: (bool,),
-    INTEGER: (int, long),
+    INTEGER: six.integer_types,
     NUMBER: (numbers.Number,),
-    STRING: six.string_types,
+    STRING: (six.binary_type, six.text_type),
     ARRAY: (collections.Sequence,),
     OBJECT: (collections.Mapping,),
 }
