@@ -17,3 +17,4 @@ Validation tooling for [Swagger 2.0](https://github.com/wordnik/swagger-spec/blo
 * Validate swagger schemas.
 * JSON Schema Validation
 * Validation of request/response objects against schema.
+* Command Line interface.
