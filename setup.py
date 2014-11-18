@@ -30,6 +30,9 @@ setup(
     install_requires=requirements,
     license="BSD",
     zip_safe=False,
+    entry_points={
+        'console_scripts': ["flex=flex.cli:main"],
+    },
     keywords='rest swagger',
     packages=find_packages(),
     classifiers=[

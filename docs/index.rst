@@ -197,6 +197,22 @@ can apply to.
    Take note that format validation is skipped if the value is not of one of
    the specified types the format validator is declared for.
 
+Command line usage
+------------------
+
+As well as a python API, ``flex`` also provides a commandline validation tool.
+
+.. code-block:: bash
+    ./flex -s /path/to/swagger.yaml
+    ./flex -s http://spec.example.com/swagger.yaml
+
+
+In the event of a validation error, the commandline program will return 0 and 
+print to stdout a list of the validation errors detected.
+
+If the file passes validation it will return to stdout "Validation passed" and return
+1 - in line with most *nix commandline tools.
+
 
 Contents:
 
