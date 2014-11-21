@@ -20,7 +20,11 @@ from flex.constants import (
 
 
 def is_non_string_iterable(value):
-    return not isinstance(value, six.string_types) and hasattr(value, '__iter__')
+    if six.PY2:
+        string_types = six.string_types
+    else:
+        string_types = (six.binary_type, six.text_type)
+    return not isinstance(value, string_types) and hasattr(value, '__iter__')
 
 
 def is_value_of_type(value, type_):

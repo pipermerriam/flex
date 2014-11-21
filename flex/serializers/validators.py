@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import re
-import urlparse
+from six.moves import urllib_parse as urlparse
 import operator
 
 import six
@@ -84,7 +84,7 @@ def mimetype_validator(value):
 
 @maybe_iterable
 def string_type_validator(value):
-    if not isinstance(value, six.string_types):
+    if not isinstance(value, (six.binary_type, six.text_type)):
         raise serializers.ValidationError("Must be a string")
 
 
@@ -184,7 +184,7 @@ def regex_validator(value):
         re.compile(value)
     except re.error as e:
         raise serializers.ValidationError(
-            "Invalid Regex: {0}".format(e.message)
+            "Invalid Regex: {0}".format(str(e))
         )
 
 

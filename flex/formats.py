@@ -1,9 +1,16 @@
 import re
 import functools
 
+import six
+
 import iso8601
 import rfc3987
-import validate_email
+
+if six.PY2:
+    import validate_email
+else:
+    # TODO: when a new version is released, this can be removed.
+    from flex.compat import validate_email
 
 from django.core.exceptions import ValidationError
 

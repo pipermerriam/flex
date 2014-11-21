@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 TYPE_MESSAGES = {
     'invalid': "Got value `{0}` of type `{1}`.  Value must be of type(s): `{2}`",
     'invalid_header_type': (

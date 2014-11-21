@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import urlparse
+from six.moves import urllib_parse as urlparse
 import os
 import collections
 import requests
@@ -45,7 +45,11 @@ def load_source(source):
     elif isinstance(source, six.string_types):
         parts = urlparse.urlparse(source)
         if parts.scheme and parts.netloc:
-            raw_source = requests.get(source).content
+            response = requests.get(source)
+            if isinstance(response.content, six.binary_type):
+                raw_source = six.text_type(response.content, encoding='utf-8')
+            else:
+                raw_source = response.content
         else:
             raw_source = source
 
@@ -57,7 +61,7 @@ def load_source(source):
 
         try:
             return yaml.load(raw_source)
-        except yaml.scanner.ScannerError:
+        except (yaml.scanner.ScannerError, yaml.parser.ParserError):
             pass
     except NameError:
         pass

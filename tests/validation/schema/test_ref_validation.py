@@ -259,5 +259,5 @@ def test_nested_references_are_validated():
             },
         })
 
-    assert '1234' in e.value.message
-    assert '54321' in e.value.message
+    assert '1234' in str(e.value)
+    assert '54321' in str(e.value)
