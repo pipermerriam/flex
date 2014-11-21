@@ -89,15 +89,15 @@ def path_to_regex(api_path, parameters):
     return re.compile(pattern)
 
 
-def match_request_path_to_api_path(path_definitions, request_path, base_path=''):
+def match_path_to_api_path(path_definitions, path, base_path=''):
     """
-    Given a request_path and a set of api path definitions, return the one that
+    Given a path and a set of api path definitions, return the one that
     matches.
 
     Anything other than exactly one match is an error condition.
     """
-    if request_path.startswith(base_path):
-        request_path = request_path[len(base_path):]
+    if path.startswith(base_path):
+        path = path[len(base_path):]
 
     # Convert all of the api paths into Path instances for easier regex matching.
     paths = {
@@ -105,13 +105,13 @@ def match_request_path_to_api_path(path_definitions, request_path, base_path='')
         for p, v in path_definitions.items()
     }
 
-    matches = [p for p, r in paths.items() if r.match(request_path)]
+    matches = [p for p, r in paths.items() if r.match(path)]
 
     if not matches:
-        raise LookupError('No paths found for {0}'.format(request_path))
+        raise LookupError('No paths found for {0}'.format(path))
     elif len(matches) > 1:
         raise LookupError('Multipue paths found for {0}.  Found `{1}`'.format(
-            request_path, matches,
+            path, matches,
         ))
     else:
         return matches[0]

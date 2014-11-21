@@ -4,11 +4,14 @@ from flex.utils import chain_reduce_partial
 from flex.exceptions import ValidationError
 from flex.context_managers import ErrorCollection
 from flex.paths import (
-    match_request_path_to_api_path,
+    match_path_to_api_path,
 )
 from flex.validation.operation import (
     construct_operation_validators,
     validate_operation,
+)
+from flex.validation.commont import (
+    validate_request_method_to_operation,
 )
 from flex.error_messages import MESSAGES
 from flex.constants import REQUEST_METHODS
@@ -25,9 +28,9 @@ def validate_request_to_path(request, paths, base_path, context):
     If so, return the api path and the path definitions.
     """
     try:
-        api_path = match_request_path_to_api_path(
+        api_path = match_path_to_api_path(
             path_definitions=paths,
-            request_path=request.path,
+            path=request.path,
             base_path=base_path,
         )
     except LookupError:
@@ -35,26 +38,6 @@ def validate_request_to_path(request, paths, base_path, context):
 
     path_definition = paths[api_path] or {}
     return api_path, path_definition
-
-
-def validate_request_method_to_operation(request, path_definition):
-    """
-    Given a request, validate that the request method is valid for the request
-    path.
-
-    If so, return the operation related to this request method.
-    """
-    method = request.method
-    try:
-        operation = path_definition[method]
-    except KeyError:
-        allowed_methods = set(REQUEST_METHODS).intersection(path_definition.keys())
-        raise ValidationError(
-            MESSAGES['request']['invalid_method'].format(
-                method, allowed_methods,
-            ),
-        )
-    return operation
 
 
 def validate_request(request, paths, base_path, context, inner=False):

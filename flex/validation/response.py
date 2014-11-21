@@ -7,6 +7,9 @@ from flex.context_managers import ErrorCollection
 from flex.validation.common import validate_object
 from flex.validation.schema import construct_schema_validators
 from flex.error_messages import MESSAGES
+from flex.paths import (
+    match_path_to_api_path,
+)
 from flex.constants import (
     EMPTY,
 )
@@ -14,6 +17,28 @@ from flex.validation.header import (
     construct_header_validators,
 )
 from flex.http import Response
+
+
+def validate_response_to_path(response, paths, base_path, context):
+    """
+    Given a response, check whether the path of the response matches any if the
+    api paths.  Note that this does not do deep validation on the path
+    parameters themselves, but only matches whether the response path *looks*
+    like an api path.
+
+    If so, return the api path and the path definitions.
+    """
+    try:
+        api_path = match_path_to_api_path(
+            path_definitions=paths,
+            path=request.path,
+            base_path=base_path,
+        )
+    except LookupError:
+        raise ValidationError(MESSAGES['path']['unknown_path'])
+
+    path_definition = paths[api_path] or {}
+    return api_path, path_definition
 
 
 def validate_status_code_to_response_definition(response, operation_definition):
@@ -70,24 +95,6 @@ def generate_response_header_validator(headers, context, **kwargs):
     )
 
 
-validator_mapping = {
-    'schema': generate_response_body_validator,
-    'headers': generate_response_header_validator,
-}
-
-
-def generate_response_validator(response_definition, context):
-    validators = {}
-    for key in validator_mapping:
-        if key in response_definition:
-            validators[key] = validator_mapping[key](context=context, **response_definition)
-
-    return functools.partial(
-        validate_object,
-        validators=validators,
-    )
-
-
 def validate_response_content_type(response, content_types):
     assert isinstance(response, Response)  # TODO: remove this sanity check
     if response.content_type not in content_types:
@@ -105,6 +112,30 @@ def generate_response_content_type_validator(produces, **kwargs):
     )
 
 
+validator_mapping = {
+    'produces': generate_response_content_type_validator,
+    'schema': generate_response_body_validator,
+    'headers': generate_response_header_validator,
+}
+
+
+def generate_response_validator(operation_definition, response_definition, context):
+    validators = {}
+    for key in validator_mapping:
+        if key in response_definition:
+            validators[key] = validator_mapping[key](context=context, **response_definition)
+        elif key in operation_definition:
+            validators[key] = validator_mapping[key](context=context, **operation_definition)
+
+    if 'produces' in context and 'produces' not in validators:
+        validators['produces'] = generate_response_content_type_validator(**context)
+
+    return functools.partial(
+        validate_object,
+        validators=validators,
+    )
+
+
 def validate_response(response, operation_definition, context, inner=False):
     """
     Response validation involves the following steps.
@@ -115,6 +146,18 @@ def validate_response(response, operation_definition, context, inner=False):
        6. headers, content-types, etc..., ???
     """
     with ErrorCollection(inner=inner) as errors:
+        # 1
+        try:
+            api_path, path_definition = validate_response_to_path(
+                response=response,
+                paths=context['paths'],
+                base_path=context.get('basePath', ''),
+                context=context,
+            )
+        except ValidationError as err:
+            errors['path'].extend(list(err.messages))
+            return  # this causes an exception to be raised since errors is no longer falsy.
+
         # 4
         try:
             response_definition = validate_status_code_to_response_definition(
@@ -126,7 +169,8 @@ def validate_response(response, operation_definition, context, inner=False):
         else:
             # 5
             response_validator = generate_response_validator(
-                response_definition,
+                operation_definition=operation_definition,
+                response_definition=response_definition,
                 context=context,
             )
             try:
@@ -143,6 +187,3 @@ def validate_response(response, operation_definition, context, inner=False):
             response_content_type_validator(response)
         except ValidationError as err:
             errors['produces'].add_error(err.detail)
-
-        # 6
-        # TODO

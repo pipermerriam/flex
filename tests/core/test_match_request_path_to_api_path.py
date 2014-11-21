@@ -5,7 +5,7 @@ from flex.serializers.core import ParameterSerializer
 from flex.paths import (
     PARAMETER_REGEX,
     escape_regex_special_chars,
-    match_request_path_to_api_path,
+    match_path_to_api_path,
     path_to_regex,
     path_to_pattern,
 )
@@ -120,15 +120,13 @@ def test_path_to_regex_does_not_overmatch(path, bad_path):
     ),
 )
 def test_match_request_path_to_api_path(path, schema_path):
-    path = '/api/path'
-    schema_path = '/path'
     schema = load('tests/core/path_test_schema.yaml')
     paths = schema['paths']
     base_path = schema['basePath']
 
-    path = match_request_path_to_api_path(
+    path = match_path_to_api_path(
         path_definitions=paths,
-        request_path=path,
+        path=path,
         base_path=base_path,
     )
     assert path == schema_path

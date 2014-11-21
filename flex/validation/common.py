@@ -385,3 +385,22 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
             return value
 
     return processor
+
+
+def validate_request_method_to_operation(request_method, path_definition):
+    """
+    Given a request method, validate that the request method is valid for the
+    api path.
+
+    If so, return the operation definition related to this request method.
+    """
+    try:
+        operation_definition = path_definition[request_method]
+    except KeyError:
+        allowed_methods = set(REQUEST_METHODS).intersection(path_definition.keys())
+        raise ValidationError(
+            MESSAGES['request']['invalid_method'].format(
+                request_method, allowed_methods,
+            ),
+        )
+    return operation_definition
