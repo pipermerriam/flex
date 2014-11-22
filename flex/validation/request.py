@@ -3,41 +3,15 @@ import functools
 from flex.utils import chain_reduce_partial
 from flex.exceptions import ValidationError
 from flex.context_managers import ErrorCollection
-from flex.paths import (
-    match_path_to_api_path,
-)
 from flex.validation.operation import (
     construct_operation_validators,
     validate_operation,
 )
-from flex.validation.commont import (
+from flex.validation.common import (
     validate_request_method_to_operation,
+    validate_path_to_api_path,
 )
-from flex.error_messages import MESSAGES
-from flex.constants import REQUEST_METHODS
 from flex.http import normalize_request
-
-
-def validate_request_to_path(request, paths, base_path, context):
-    """
-    Given a request, check whether the path of the request matches any if the
-    api paths.  Note that this does not do deep validation on the path
-    parameters themselves, but only matches whether the request path *looks*
-    like an api path.
-
-    If so, return the api path and the path definitions.
-    """
-    try:
-        api_path = match_path_to_api_path(
-            path_definitions=paths,
-            path=request.path,
-            base_path=base_path,
-        )
-    except LookupError:
-        raise ValidationError(MESSAGES['request']['unknown_path'])
-
-    path_definition = paths[api_path] or {}
-    return api_path, path_definition
 
 
 def validate_request(request, paths, base_path, context, inner=False):
@@ -52,7 +26,7 @@ def validate_request(request, paths, base_path, context, inner=False):
     with ErrorCollection(inner=inner) as errors:
         # 1
         try:
-            api_path, path_definition = validate_request_to_path(
+            api_path = validate_path_to_api_path(
                 request=request,
                 paths=paths,
                 base_path=base_path,
@@ -62,6 +36,8 @@ def validate_request(request, paths, base_path, context, inner=False):
             errors['path'].add_error(err.detail)
             return  # this causes an exception to be raised since errors is no longer falsy.
 
+        path_definition = paths[api_path] or {}
+
         if not path_definition:
             # TODO: is it valid to not have a definition for a path?
             return
@@ -69,7 +45,7 @@ def validate_request(request, paths, base_path, context, inner=False):
         # 2
         try:
             operation_definition = validate_request_method_to_operation(
-                request=request,
+                request_method=request.method,
                 path_definition=path_definition,
             )
         except ValidationError as err:

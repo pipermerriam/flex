@@ -23,12 +23,16 @@ from flex.utils import (
     chain_reduce_partial,
     cast_value_to_type,
 )
+from flex.paths import (
+    match_path_to_api_path,
+)
 from flex.constants import (
     EMPTY,
     NUMBER,
     STRING,
     ARRAY,
     DELIMETERS,
+    REQUEST_METHODS,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -404,3 +408,19 @@ def validate_request_method_to_operation(request_method, path_definition):
             ),
         )
     return operation_definition
+
+
+def validate_path_to_api_path(path, paths, base_path, context):
+    """
+    Given a path, find the api_path it matches.
+    """
+    try:
+        api_path = match_path_to_api_path(
+            path_definitions=paths,
+            path=path,
+            base_path=base_path,
+        )
+    except LookupError:
+        raise ValidationError(MESSAGES['path']['unknown_path'])
+
+    return api_path

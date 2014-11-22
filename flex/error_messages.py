@@ -73,7 +73,6 @@ ITEMS_MESSAGES = {
 
 
 REQUEST_MESSAGES = {
-    'unknown_path': 'Request path did not match any of the known api paths.',
     'invalid_method': (
         'Request was not one of the allowed request methods.  Got '
         '`{0}`: Expected one of: `{1}`'
@@ -90,6 +89,7 @@ RESPONSE_MESSAGES = {
 
 
 PATH_MESSAGES = {
+    'unknown_path': 'Request path did not match any of the known api paths.',
     'missing_parameter': (
         "The parameter named `{0}` is declared to be a PATH parameter but does "
         "not appear in the api path `{1}`.  All path parameters must exist as a "
