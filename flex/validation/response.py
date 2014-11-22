@@ -7,6 +7,7 @@ from flex.context_managers import ErrorCollection
 from flex.validation.common import (
     validate_object,
     validate_path_to_api_path,
+    validate_request_method_to_operation,
 )
 from flex.validation.schema import construct_schema_validators
 from flex.error_messages import MESSAGES
@@ -57,6 +58,8 @@ def generate_response_body_validator(schema, context, **kwargs):
 def generate_response_header_validator(headers, context, **kwargs):
     validators = {}
     for key, header_definition in headers.items():
+        # TODO: headers need to be type cast to their appropriate values before
+        # being validated.
         header_validator = functools.partial(
             validate_object,
             validators=construct_header_validators(header_definition, context=context),
@@ -94,6 +97,7 @@ def generate_response_content_type_validator(produces, **kwargs):
 
 
 def generate_parameters_validator(api_path, path_definition, context, **kwargs):
+    # TODO: merge this with the function from operation validation.
     path_parameter_validator = functools.partial(
         validate_path_parameters,
         api_path=api_path,
@@ -108,9 +112,11 @@ def generate_parameters_validator(api_path, path_definition, context, **kwargs):
 
 
 validator_mapping = {
+    # TODO: tests for parameters AND figure out how to do parameters.
     'parameters': generate_parameters_validator,
     'produces': generate_response_content_type_validator,
     'schema': generate_response_body_validator,
+    # TODO: roll headers into parameter validation.
     'headers': generate_response_header_validator,
 }
 
@@ -135,7 +141,7 @@ def generate_response_validator(operation_definition, response_definition,
     )
 
 
-def validate_response(response, operation_definition, context, inner=False):
+def validate_response(response, request_method, context, inner=False):
     """
     Response validation involves the following steps.
        4. validate that the response status_code is in the allowed responses for
@@ -146,6 +152,7 @@ def validate_response(response, operation_definition, context, inner=False):
     """
     with ErrorCollection(inner=inner) as errors:
         # 1
+        # TODO: tests
         try:
             api_path = validate_path_to_api_path(
                 response=response.path,
@@ -158,6 +165,16 @@ def validate_response(response, operation_definition, context, inner=False):
             return  # this causes an exception to be raised since errors is no longer falsy.
 
         path_definition = context['paths'][api_path] or {}
+
+        # TODO: tests
+        try:
+            operation_definition = validate_request_method_to_operation(
+                request_method=request_method,
+                path_definition=path_definition,
+            )
+        except ValidationError as err:
+            errors['method'].append(err.message)
+            return
 
         # 4
         try:

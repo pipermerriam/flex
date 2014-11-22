@@ -118,6 +118,8 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     - TODO: request.body against the body parameters.
     - TODO: request.formData against any form data.
     """
+    # TODO: figure out how to merge this with the same code in response
+    # validation.
     validators = {}
     path_level_parameters = path_definition.get('parameters', [])
     operation_level_parameters = parameters
