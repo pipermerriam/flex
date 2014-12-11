@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -26,7 +27,6 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_min_items_on_values_with_too_few_items(min_items, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',
@@ -96,7 +96,6 @@ def test_min_items_on_values_with_valid_array_length(min_items, value):
     ),
 )
 def test_max_items_on_values_with_too_many_items(max_items, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',

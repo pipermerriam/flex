@@ -1,8 +1,9 @@
 import collections
 
-from django.core.exceptions import ValidationError
-
-from flex.exceptions import SafeNestedValidationError
+from flex.exceptions import (
+    ValidationError,
+    ErrorDict,
+)
 from flex.utils import (
     prettify_errors,
 )
@@ -10,9 +11,8 @@ from flex.utils import (
 
 class ErrorCollection(object):
     def __init__(self, inner=False, message='Invalid'):
-        self.inner = inner
         self.message = message
-        self.errors = collections.defaultdict(list)
+        self.errors = ErrorDict()
 
     def __enter__(self):
         return self.errors
@@ -20,11 +20,9 @@ class ErrorCollection(object):
     def __exit__(self, type_, value, traceback):
         if any((type_, value, traceback)):
             if issubclass(type_, ValidationError):
-                self.errors = value.messages
+                import ipdb; ipdb.set_trace()
+                self.errors = value.detail
             else:
                 return False
         if self.errors:
-            if self.inner:
-                raise SafeNestedValidationError(dict(self.errors))
-            else:
-                raise ValueError(self.message + '\n' + prettify_errors(self.errors))
+            raise ValidationError(dict(self.errors))

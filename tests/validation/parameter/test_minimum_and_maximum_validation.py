@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -25,7 +26,6 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_minimum_validation_for_invalid_values(minimum, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',
@@ -65,7 +65,6 @@ def test_minimum_validation_for_invalid_values(minimum, value):
     ),
 )
 def test_exclusive_minimum_validation_for_invalid_values(minimum, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',
@@ -165,7 +164,6 @@ def test_exclusive_minimum_validation_for_valid_values(minimum, value):
     ),
 )
 def test_maximum_validation_for_invalid_values(maximum, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',
@@ -205,7 +203,6 @@ def test_maximum_validation_for_invalid_values(maximum, value):
     ),
 )
 def test_exclusive_maximum_validation_for_invalid_values(maximum, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',

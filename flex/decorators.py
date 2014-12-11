@@ -1,10 +1,13 @@
 import functools
 
+from flex.exceptions import ValidationError
 from flex.utils import (
     is_non_string_iterable,
     is_value_of_any_type,
 )
 from flex.constants import EMPTY
+
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 def maybe_iterable(func):
@@ -62,4 +65,21 @@ def suffix_reserved_words(func):
                 key = "{0}_".format(word)
                 kwargs[key] = kwargs.pop(word)
         return func(*args, **kwargs)
+    return inner
+
+
+def translate_validation_error(func):
+    """
+    Given a function that potentially raises
+    `django.core.exceptions.ValidationError`, reraise the same error as a
+    `flex.exceptions.ValidationError`.
+    """
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except DjangoValidationError as err:
+            if isinstance(err, ValidationError):
+                raise
+            raise ValidationError(err.messages)
     return inner

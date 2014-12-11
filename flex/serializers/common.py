@@ -7,6 +7,10 @@ from django.core.validators import (
 
 from rest_framework import serializers
 
+from flex.exceptions import (
+    ValidationError,
+    ErrorDict,
+)
 from flex.utils import (
     is_value_of_any_type,
 )
@@ -150,12 +154,12 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
                 types = [types]
 
             if not set(types).intersection(declared_types):
-                errors[field_name].append(
+                errors[field_name].add_error(
                     self.error_messages[error_key],
                 )
 
     def validate(self, attrs):
-        errors = collections.defaultdict(list)
+        errors = ErrorDict()
 
         # Minimum
         self.check_type_for_attr(
@@ -167,7 +171,7 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
         )
 
         if 'exclusiveMinimum' in attrs and 'minimum' not in attrs:
-            errors['exclusiveMinimum'].append(
+            errors['exclusiveMinimum'].add_error(
                 self.error_messages['exclusive_minimum_requires_minimum'],
             )
 
@@ -181,7 +185,7 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
         )
 
         if 'exclusiveMaximum' in attrs and 'maximum' not in attrs:
-            errors['exclusiveMaximum'].append(
+            errors['exclusiveMaximum'].add_error(
                 self.error_messages['exclusive_maximum_requires_maximum'],
             )
 
@@ -241,12 +245,12 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
 
         # enum null value special case.
         if 'enum' in attrs and attrs['enum'] is None:
-            errors['enum'].append(
+            errors['enum'].add_error(
                 self.error_messages['enum_must_be_of_array_type'],
             )
 
         if errors:
-            raise serializers.ValidationError(errors)
+            raise ValidationError(errors)
         return super(CommonJSONSchemaSerializer, self).validate(attrs)
 
 
@@ -283,7 +287,7 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
     # discriminator
 
     def validate(self, attrs):
-        errors = collections.defaultdict(list)
+        errors = ErrorDict()
 
         # minProperties
         self.check_type_for_attr(
@@ -304,7 +308,7 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
         )
 
         if errors:
-            raise serializers.ValidationError(errors)
+            raise ValidationError(errors)
         return super(BaseSchemaSerializer, self).validate(attrs)
 
 BaseSchemaSerializer.base_fields['$ref'] = serializers.CharField(required=False)
@@ -327,7 +331,7 @@ class BaseItemsSerializer(BaseSchemaSerializer):
 
     def from_native(self, data, files=None):
         if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
-            raise serializers.ValidationError(
+            raise ValidationError(
                 self.error_messages['invalid_type_for_items']
             )
         return super(BaseItemsSerializer, self).from_native(data, files)
@@ -368,35 +372,35 @@ class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
     default = serializers.WritableField(required=False)
 
     def validate(self, attrs):
-        errors = collections.defaultdict(list)
+        errors = ErrorDict()
 
         if attrs['in'] == PATH and not attrs.get('required'):
-            errors['required'].append(
+            errors['required'].add_error(
                 self.error_messages['path_parameters_are_required'],
             )
         if attrs['in'] == BODY and not attrs.get('schema'):
-            errors['schema'].append(
+            errors['schema'].add_error(
                 self.error_messages['schema_required'],
             )
         if attrs['in'] != BODY:
             if 'type' not in attrs:
-                errors['type'].append(
+                errors['type'].add_error(
                     self.error_messages['type_required'],
                 )
             if attrs.get('collectionFormat') == MULTI:
                 if attrs['in'] not in (QUERY, FORM_DATA):
-                    errors['collectionFormat'].append(
+                    errors['collectionFormat'].add_error(
                         self.error_messages['collection_format_must_be_multi'],
                     )
             self.validate_default_type(attrs, errors)
 
         if attrs.get('type') == ARRAY and not attrs.get('items'):
-            errors['items'].append(
+            errors['items'].add_error(
                 self.error_messages['items_required'],
             )
 
         if errors:
-            raise serializers.ValidationError(errors)
+            raise ValidationError(errors)
 
         return super(BaseParameterSerializer, self).validate(attrs)
 
@@ -419,16 +423,16 @@ class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
     default = serializers.WritableField(required=False)
 
     def validate(self, attrs):
-        errors = collections.defaultdict(list)
+        errors = ErrorDict()
 
         if attrs.get('type') == ARRAY and 'items' not in attrs:
-            errors['items'].append(
+            errors['items'].add_error(
                 self.error_messages['items_required'],
             )
         self.validate_default_type(attrs, errors)
 
         if errors:
-            raise serializers.ValidationError(errors)
+            raise ValidationError(errors)
         return super(BaseHeaderSerializer, self).validate(attrs)
 
 

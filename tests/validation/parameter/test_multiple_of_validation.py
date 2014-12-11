@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -23,7 +24,6 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_multiple_of_validation_for_invalid_values(divisor, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',

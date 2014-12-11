@@ -6,6 +6,7 @@ from flex.serializers.core import (
 from flex.constants import (
     INTEGER,
 )
+from flex.exceptions import ValidationError
 from flex.validation.common import (
     validate_object,
 )
@@ -24,7 +25,6 @@ from tests.utils import assert_error_message_equal
     )
 )
 def test_header_type_validation_for_invalid_values(type_, value):
-    from django.core.exceptions import ValidationError
     serializer = HeaderSerializer(
         data={
             'type': type_,
@@ -37,8 +37,8 @@ def test_header_type_validation_for_invalid_values(type_, value):
     with pytest.raises(ValidationError) as err:
         validate_object(value, validators, inner=True)
 
-    assert 'type' in err.value.messages[0]
+    assert 'type' in err.value.detail
     assert_error_message_equal(
-        err.value.messages[0]['type'][0],
+        err.value.detail['type'][0],
         MESSAGES['type']['invalid'],
     )

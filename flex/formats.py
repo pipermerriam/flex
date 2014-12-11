@@ -12,9 +12,8 @@ else:
     # TODO: when a new version is released, this can be removed.
     from flex.compat import validate_email
 
-from django.core.exceptions import ValidationError
-
 from flex.utils import is_value_of_any_type
+from flex.exceptions import ValidationError
 from flex.constants import (
     STRING,
     INTEGER,

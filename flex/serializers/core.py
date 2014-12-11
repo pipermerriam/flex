@@ -1,13 +1,16 @@
 from __future__ import unicode_literals
 
 import functools
-import collections
 import six
 
 from rest_framework import serializers
 
 from drf_compound_fields.fields import ListField
 
+from flex.exceptions import (
+    ValidationError,
+    ErrorDict,
+)
 from flex.context_managers import ErrorCollection
 from flex.serializers.fields import (
     SecurityRequirementReferenceField,
@@ -69,7 +72,7 @@ class ItemsSerializer(BaseItemsSerializer):
         if isinstance(data, six.string_types):
             definitions = self.context.get('definitions', {})
             if data not in definitions:
-                raise serializers.ValidationError(
+                raise ValidationError(
                     self.error_messages['unknown_reference'].format(data),
                 )
             return data
@@ -93,17 +96,17 @@ class SchemaSerializer(BaseSchemaSerializer):
     }
 
     def validate(self, attrs):
-        errors = collections.defaultdict(list)
+        errors = ErrorDict()
 
         if '$ref' in attrs:
             definitions = self.context.get('definitions', {})
             if attrs['$ref'] not in definitions:
-                errors['$ref'].append(
+                errors['$ref'].add_error(
                     self.error_messages['unknown_reference'].format(attrs['$ref']),
                 )
 
         if errors:
-            raise serializers.ValidationError(errors)
+            raise ValidationError(errors)
         return super(SchemaSerializer, self).validate(attrs)
 
     def save_object(self, obj, **kwargs):
@@ -149,12 +152,12 @@ class ParameterSerializer(BaseParameterSerializer):
         if isinstance(data, six.string_types):
             try:
                 self.validate_reference(data)
-            except serializers.ValidationError as err:
+            except ValidationError as err:
                 assert not self._errors
                 self._errors = {}
                 self._errors['non_field_errors'] = self._errors.get(
                     'non_field_errors', [],
-                ) + list(err.messages)
+                ) + (err.messages or getattr(err, 'detail', None))
                 return
             else:
                 return data
@@ -162,7 +165,7 @@ class ParameterSerializer(BaseParameterSerializer):
 
     def validate_reference(self, reference):
         if reference not in self.context.get('parameters', {}):
-            raise serializers.ValidationError(
+            raise ValidationError(
                 self.error_messages['unknown_reference'].format(reference),
             )
 
@@ -248,7 +251,7 @@ class PathsSerializer(HomogenousDictSerializer):
                 if not path_request_methods:
                     for parameter in api_path_level_parameters:
                         if parameter['name'] not in path_parameter_names:
-                            errors[api_path].append(
+                            errors[api_path].add_error(
                                 MESSAGES["path"]["missing_parameter"].format(
                                     parameter['name'], api_path,
                                 ),
@@ -277,7 +280,7 @@ class PathsSerializer(HomogenousDictSerializer):
                                 method=method.upper(),
                                 api_path=api_path,
                             )
-                            errors[key].append(
+                            errors[key].add_error(
                                 MESSAGES["path"]["missing_parameter"].format(
                                     parameter['name'], api_path,
                                 ),

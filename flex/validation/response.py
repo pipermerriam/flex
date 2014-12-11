@@ -1,8 +1,7 @@
 import functools
 import operator
 
-from django.core.exceptions import ValidationError
-
+from flex.exceptions import ValidationError
 from flex.utils import chain_reduce_partial
 from flex.context_managers import ErrorCollection
 from flex.validation.common import validate_object
@@ -124,7 +123,7 @@ def validate_response(response, operation_definition, context, inner=False):
                 operation_definition=operation_definition,
             )
         except ValidationError as err:
-            errors['status_code'].append(err.message)
+            errors['status_code'].add_error(err.detail)
         else:
             # 5
             response_validator = generate_response_validator(
@@ -134,7 +133,7 @@ def validate_response(response, operation_definition, context, inner=False):
             try:
                 response_validator(response)
             except ValidationError as err:
-                errors['body'].extend(err.messages)
+                errors['body'].add_error(err.detail)
 
         # TODO: this should be merged with `response_body_validator`.
         response_content_type_validator = generate_response_content_type_validator(
@@ -144,7 +143,7 @@ def validate_response(response, operation_definition, context, inner=False):
         try:
             response_content_type_validator(response)
         except ValidationError as err:
-            errors['produces'].append(err.messages)
+            errors['produces'].add_error(err.detail)
 
         # 6
         # TODO

@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -15,7 +16,6 @@ from tests.utils import assert_error_message_equal
 
 
 def test_required_parameters_invalid_when_not_present():
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {'name': 'id', 'in': PATH, 'description': 'id', 'type': STRING, 'required': True},
     ))

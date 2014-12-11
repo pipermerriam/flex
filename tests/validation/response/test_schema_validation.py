@@ -1,6 +1,7 @@
 import json
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.constants import (
     INTEGER,
 )
@@ -17,7 +18,6 @@ from tests.utils import assert_error_message_equal
 
 
 def test_basic_response_body_schema_validation_with_invalid_value():
-    from django.core.exceptions import ValidationError
     schema = SchemaFactory(
         paths={
             '/get': {

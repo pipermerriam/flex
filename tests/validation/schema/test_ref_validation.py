@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.definitions import DefinitionsSerializer
 from flex.constants import (
     STRING,
@@ -176,8 +177,6 @@ def test_required_circular_reference():
     deep.  This test ensures that we can handle that case without ending up in
     an infinite recursion situation.
     """
-    from django.core.exceptions import ValidationError
-
     schema = {
         '$ref': 'Node',
     }

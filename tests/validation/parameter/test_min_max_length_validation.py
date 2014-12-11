@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -22,7 +23,6 @@ from flex.constants import (
     ),
 )
 def test_minimum_length_validation_with_too_short_values(min_length, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',
@@ -87,7 +87,6 @@ def test_minimum_length_validation_with_valid_lengths(min_length, value):
     ),
 )
 def test_maximum_length_validation_with_too_long_values(max_length, value):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',

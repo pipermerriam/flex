@@ -1,8 +1,7 @@
 import functools
 import operator
 
-from django.core.exceptions import ValidationError
-
+from flex.exceptions import ValidationError
 from flex.utils import chain_reduce_partial
 from flex.context_managers import ErrorCollection
 from flex.http import (
@@ -37,7 +36,7 @@ def validate_operation(request, validators, inner=False):
             try:
                 validator(request)
             except ValidationError as err:
-                errors[key].extend(list(err.messages))
+                errors[key].add_error(err.detail)
 
 
 def validate_request_content_type(request, content_types):
@@ -68,7 +67,7 @@ def validate_request_parameters(request, validators):
             try:
                 fn(request)
             except ValidationError as err:
-                errors[key].extend(list(err.messages))
+                errors[key].add_error(err.detail)
 
 
 def generate_path_parameters_validator(api_path, path_parameters, context):

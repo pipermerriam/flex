@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
+from flex.exceptions import ValidationError
 from flex.utils import is_non_string_iterable
+from flex.serializers.mixins import TranslateValidationErrorMixin
 
 
-class MaybeListCharField(serializers.CharField):
+class MaybeListCharField(TranslateValidationErrorMixin, serializers.CharField):
     def from_native(self, value):
         if is_non_string_iterable(value):
             return value
@@ -21,6 +23,6 @@ class SecurityRequirementReferenceField(serializers.CharField):
 
     def validate(self, value):
         if value not in self.context.get('securityDefinitions', {}):
-            raise serializers.ValidationError(
+            raise ValidationError(
                 self.error_messages['unknown_reference'].format(value)
             )

@@ -1,8 +1,7 @@
 import functools
 
-from django.core.exceptions import ValidationError
-
 from flex.utils import is_non_string_iterable
+from flex.exceptions import ValidationError
 from flex.context_managers import ErrorCollection
 from flex.validation.common import (
     generate_type_validator,
@@ -82,7 +81,7 @@ def validate_parameters(parameter_values, parameters, context, inner=False):
             try:
                 validator(parameter_values.get(key, EMPTY))
             except ValidationError as err:
-                errors[key].extend(list(err.messages))
+                errors[key].add_error(err.detail)
 
 
 def construct_parameter_validators(parameter, context):

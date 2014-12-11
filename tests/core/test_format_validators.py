@@ -1,6 +1,7 @@
 import pytest
 import uuid
 
+from flex.exceptions import ValidationError
 from flex.formats import (
     date_time_format_validator,
     uuid_format_validator,
@@ -33,7 +34,6 @@ def test_date_time_format_validator_skips_non_string_types(value):
     )
 )
 def test_date_time_format_validator_detects_invalid_values(value):
-    from django.core.exceptions import ValidationError
     with pytest.raises(ValidationError):
         date_time_format_validator(value)
 
@@ -54,7 +54,6 @@ def test_date_time_format_validator_detects_invalid_values(value):
     )
 )
 def test_date_time_format_validator_with_valid_dateties(value):
-    from django.core.exceptions import ValidationError
     date_time_format_validator(value)
 
 
@@ -102,7 +101,6 @@ def test_int32_with_in_range_number(n):
     (MIN_INT32 - 1, MAX_INT32 + 1),
 )
 def test_int32_with_out_of_range_number(n):
-    from django.core.exceptions import ValidationError
     with pytest.raises(ValidationError):
         int32_validator(n)
 
@@ -120,7 +118,6 @@ def test_int64_with_in_range_number(n):
     (MIN_INT64 - 1, MAX_INT64 + 1),
 )
 def test_int64_with_out_of_range_number(n):
-    from django.core.exceptions import ValidationError
     with pytest.raises(ValidationError):
         int64_validator(n)
 
@@ -148,6 +145,5 @@ def test_email_validation_with_valid_email_addresses(email_address):
     ),
 )
 def test_email_validation_with_invalid_email_addresses(email_address):
-    from django.core.exceptions import ValidationError
     with pytest.raises(ValidationError):
         email_validator(email_address)

@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.constants import (
     ARRAY,
     INTEGER,
@@ -18,8 +19,6 @@ from tests.utils import generate_validator_from_schema
     )
 )
 def test_invalid_values_against_single_schema(items):
-    from django.core.exceptions import ValidationError
-
     schema = {
         'type': ARRAY,
         'items': {
@@ -47,8 +46,6 @@ def test_invalid_values_against_single_schema(items):
     )
 )
 def test_invalid_values_against_schema_reference(items):
-    from django.core.exceptions import ValidationError
-
     schema = {
         'type': ARRAY,
         'items': 'SomeReference',
@@ -73,8 +70,6 @@ def test_invalid_values_against_schema_reference(items):
 
 
 def test_invalid_values_against_list_of_schemas():
-    from django.core.exceptions import ValidationError
-
     schema = {
         'type': ARRAY,
         'items': [
@@ -106,8 +101,6 @@ def test_invalid_values_against_list_of_schemas():
 
 
 def test_items_past_the_number_of_schemas_provided_are_skipped():
-    from django.core.exceptions import ValidationError
-
     schema = {
         'type': ARRAY,
         'items': [

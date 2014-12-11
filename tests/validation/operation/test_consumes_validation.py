@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.validation.operation import (
     construct_operation_validators,
     validate_operation,
@@ -44,8 +45,6 @@ def test_consumes_validation_invalid_mimetype_from_global_definition():
     Test that a request content_type that is in the global api consumes
     definitions is valid.
     """
-    from django.core.exceptions import ValidationError
-
     request = RequestFactory(content_type='application/json')
     response = ResponseFactory(request=request)
 
@@ -98,7 +97,6 @@ def test_consumes_validation_for_invalid_mimetype_from_operation_definition():
     Test the situation when the operation definition has overridden the global
     allowed mimetypes, that that the local value is used for validation.
     """
-    from django.core.exceptions import ValidationError
     request = RequestFactory(content_type='application/xml')
     response = ResponseFactory(request=request)
 

@@ -4,9 +4,10 @@ import functools
 
 import six
 
-from django.core.exceptions import ValidationError
-
-from flex.exceptions import SafeNestedValidationError
+from flex.exceptions import (
+    ValidationError,
+    ErrorList,
+)
 from flex.constants import (
     OBJECT,
     EMPTY,
@@ -77,15 +78,15 @@ def construct_items_validators(items, context):
 
 
 def validate_items(objs, validators):
-    errors = []
+    errors = ErrorList()
     for obj, validator in zip(objs, validators):
         try:
             validate_object(obj, validator, inner=True)
         except ValidationError as e:
-            errors.extend(list(e.messages))
+            errors.add_error(e.detail)
 
     if errors:
-        raise SafeNestedValidationError(errors)
+        raise ValidationError(errors)
 
 
 def generate_items_validator(items, context, **kwargs):

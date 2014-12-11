@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import PathsSerializer
 from flex.validation.request import (
     validate_request,
@@ -24,8 +25,6 @@ def test_request_validation_with_invalid_request_path():
     Test that request validation detects request paths that are not declared
     in the schema.
     """
-    from django.core.exceptions import ValidationError
-
     schema = SchemaFactory()
     assert not schema['paths']
 
@@ -73,7 +72,6 @@ def test_basic_request_path_validation():
     )
 )
 def test_basic_request_path_validation_with_unspecified_paths(request_path):
-    from django.core.exceptions import ValidationError
     serializer = PathsSerializer(data={
         '/get': None,
     })

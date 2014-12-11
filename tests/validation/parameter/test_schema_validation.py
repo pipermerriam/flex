@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -23,7 +24,6 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_parameter_schema_as_reference_validation_for_invalid_value(value, error_key, message_key):
-    from django.core.exceptions import ValidationError
     context = {
         'definitions': {'UUID': {'type': STRING, 'format': 'uuid'}},
     }
@@ -61,7 +61,6 @@ def test_parameter_schema_as_reference_validation_for_invalid_value(value, error
     ),
 )
 def test_parameter_schema_validation_for_invalid_value(value, error_key, message_key):
-    from django.core.exceptions import ValidationError
     serializer = ParameterSerializer(many=True, data=(
         {
             'name': 'id',

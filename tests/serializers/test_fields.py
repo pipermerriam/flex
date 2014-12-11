@@ -5,8 +5,7 @@ from flex.serializers.fields import (
     MaybeListCharField,
     SecurityRequirementReferenceField,
 )
-
-from django.core.exceptions import ValidationError
+from flex.exceptions import ValidationError
 
 from rest_framework import serializers
 

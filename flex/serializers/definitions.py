@@ -4,6 +4,10 @@ import six
 
 from rest_framework import serializers
 
+from flex.exceptions import (
+    ValidationError,
+    ErrorDict,
+)
 from flex.serializers.common import (
     HomogenousDictSerializer,
     BaseResponseSerializer,
@@ -49,7 +53,7 @@ class DefinitionsSerializer(HomogenousDictSerializer):
         deferred_references = self.context.get('deferred_references', set())
         missing_references = deferred_references.difference(attrs.keys())
         if missing_references:
-            raise serializers.ValidationError(
+            raise ValidationError(
                 self.error_messages['unknown_references'].format(
                     list(missing_references),
                 ),
@@ -131,36 +135,36 @@ class SecuritySchemeSerializer(serializers.Serializer):
     scopes = ScopesSerializer(required=False)
 
     def validate(self, attrs):
-        errors = collections.defaultdict(list)
+        errors = ErrorDict()
 
         # apiKey validations
         if attrs['type'] == API_KEY:
             if 'name' not in attrs:
-                errors['name'].append(
+                errors['name'].add_error(
                     self.error_messages['name_required'],
                 )
             if 'in' not in attrs:
-                errors['in'].append(
+                errors['in'].add_error(
                     self.error_messages['in_required'],
                 )
         elif attrs['type'] == OAUTH_2:
             if 'flow' not in attrs:
-                errors['flow'].append(
+                errors['flow'].add_error(
                     self.error_messages['flow_required'],
                 )
             if attrs.get('flow') in (IMPLICIT, ACCESS_CODE):
                 if 'authorizationUrl' not in attrs:
-                    errors['authorizationUrl'].append(
+                    errors['authorizationUrl'].add_error(
                         self.error_messages['authorization_url_required'],
                     )
             if attrs.get('flow') in (PASSWORD, APPLICATION, ACCESS_CODE):
                 if 'tokenUrl' not in attrs:
-                    errors['tokenUrl'].append(
+                    errors['tokenUrl'].add_error(
                         self.error_messages['token_url_required'],
                     )
 
         if errors:
-            raise serializers.ValidationError(errors)
+            raise ValidationError(errors)
         return super(SecuritySchemeSerializer, self).validate(attrs)
 
 
@@ -213,7 +217,7 @@ class SwaggerDefinitionsSerializer(serializers.Serializer):
             else:
                 missing_references.add(deferred_reference)
         if missing_references:
-            raise serializers.ValidationError(
+            raise ValidationError(
                 {'missing_references': list(missing_references)},
             )
         return super(SwaggerDefinitionsSerializer, self).validate(attrs)
