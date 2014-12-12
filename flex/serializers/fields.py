@@ -1,28 +1,17 @@
-from rest_framework import serializers
+import rest_framework
 
-from flex.exceptions import ValidationError
-from flex.utils import is_non_string_iterable
-from flex.serializers.mixins import TranslateValidationErrorMixin
+__all__ = [
+    'SecurityRequirementReferenceField',
+    'MaybeListCharField',
+]
 
-
-class MaybeListCharField(TranslateValidationErrorMixin, serializers.CharField):
-    def from_native(self, value):
-        if is_non_string_iterable(value):
-            return value
-        return super(MaybeListCharField, self).from_native(value)
-
-
-class SecurityRequirementReferenceField(serializers.CharField):
-    """
-    Field that references a defined security scheme declared in the Security
-    Definitions.
-    """
-    default_error_messages = {
-        'unknown_reference': "Unknown Security Scheme reference `{0}`",
-    }
-
-    def validate(self, value):
-        if value not in self.context.get('securityDefinitions', {}):
-            raise ValidationError(
-                self.error_messages['unknown_reference'].format(value)
-            )
+if rest_framework.__version__ >= '3.0.0':
+    from .drf_3.fields import (
+        SecurityRequirementReferenceField,
+        MaybeListCharField,
+    )
+else:
+    from .drf_2.fields import (
+        SecurityRequirementReferenceField,
+        MaybeListCharField,
+    )

@@ -1,6 +1,6 @@
 import pytest
 
-from flex.serializers.definitions import BaseSchemaSerializer
+from flex.serializers.common import BaseSchemaSerializer
 from flex.constants import (
     NULL,
     BOOLEAN,

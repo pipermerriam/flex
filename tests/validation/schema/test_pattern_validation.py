@@ -2,7 +2,7 @@ import re
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.definitions import BaseSchemaSerializer
+from flex.serializers.common import BaseSchemaSerializer
 from flex.constants import (
     STRING,
     EMPTY,
