@@ -1,6 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
+from flex.error_messages import (
+    MESSAGES,
+)
 from flex.serializers.definitions import DefinitionsSerializer
 from flex.constants import (
     STRING,
@@ -63,7 +66,7 @@ def test_reference_with_invalid_values(zipcode):
     }
     validator = generate_validator_from_schema(schema, context=context)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator(zipcode)
 
 
@@ -119,7 +122,7 @@ def test_reference_with_additional_validators_and_invalid_value(name):
     }
     validator = generate_validator_from_schema(schema, context=context)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator(name)
 
 
@@ -242,7 +245,7 @@ def test_nested_references_are_validated():
         context={'definitions': definitions},
     )
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValidationError) as e:
         validator({
             'parent': {
                 'value': 'bar',

@@ -1,11 +1,16 @@
 import pytest
 
+from flex.exceptions import ValidationError
+from flex.error_messages import MESSAGES
 from flex.constants import (
     NUMBER,
     EMPTY,
 )
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_error_message_equal,
+)
 
 
 #
@@ -36,8 +41,14 @@ def test_inclusive_minimum_validation_with_invalid_numbers(width):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(width)
+
+    assert 'minimum' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['minimum'][0],
+        MESSAGES['minimum']['invalid'],
+    )
 
 
 @pytest.mark.parametrize(
@@ -67,8 +78,14 @@ def test_exclusive_minimum_validation_with_invalid_numbers(width):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(width)
+
+    assert 'minimum' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['minimum'][0],
+        MESSAGES['minimum']['invalid'],
+    )
 
 
 def test_minimum_noop_when_not_required_or_present():
@@ -109,8 +126,14 @@ def test_inclusive_maximum_validation_with_invalid_numbers(width):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(width)
+
+    assert 'maximum' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['maximum'][0],
+        MESSAGES['maximum']['invalid'],
+    )
 
 
 @pytest.mark.parametrize(
@@ -140,8 +163,14 @@ def test_exclusive_maximum_validation_with_invalid_numbers(width):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(width)
+
+    assert 'maximum' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['maximum'][0],
+        MESSAGES['maximum']['invalid'],
+    )
 
 
 def test_maximum_noop_when_not_required_or_present():

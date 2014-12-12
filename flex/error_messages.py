@@ -56,6 +56,16 @@ PATTERN_MESSAGES = {
 }
 
 
+MIN_PROPERTIES_MESSAGES = {
+    'invalid': "Object must have more than {0} properties.  It had {1}",
+}
+
+
+MAX_PROPERTIES_MESSAGES = {
+    'invalid': "Object must have less than {0} properties.  It had {1}",
+}
+
+
 REQUEST_MESSAGES = {
     'unknown_path': 'Request path did not match any of the known api paths.',
     'invalid_method': (
@@ -91,6 +101,8 @@ MESSAGES = {
     'maximum': MINIMUM_AND_MAXIMUM_MESSAGES,
     'min_items': MIN_ITEMS_MESSAGES,
     'max_items': MAX_ITEMS_MESSAGES,
+    'min_properties': MIN_PROPERTIES_MESSAGES,
+    'max_properties': MAX_PROPERTIES_MESSAGES,
     'unique_items': UNIQUE_ITEMS_MESSAGES,
     'enum': ENUM_MESSAGES,
     'pattern': PATTERN_MESSAGES,

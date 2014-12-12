@@ -1,12 +1,17 @@
 import pytest
 
+from flex.exceptions import ValidationError
+from flex.error_messages import MESSAGES
 from flex.constants import (
     INTEGER,
     NUMBER,
     EMPTY,
 )
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_error_message_equal,
+)
 
 #
 # Integration style tests for PropertiesSerializer type validation.
@@ -36,8 +41,14 @@ def test_integer_not_multiple_of(count):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(count)
+
+    assert 'multipleOf' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['multipleOf'][0],
+        MESSAGES['multiple_of']['invalid'],
+    )
 
 
 
@@ -66,8 +77,14 @@ def test_float_not_multiple_of(count):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(count)
+
+    assert 'multipleOf' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['multipleOf'][0],
+        MESSAGES['multiple_of']['invalid'],
+    )
 
 
 def test_multiple_of_is_noop_if_not_required_and_not_present():
