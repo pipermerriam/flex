@@ -34,6 +34,7 @@ class ErrorDict(collections.defaultdict):
 
 class ValidationError(DRFValidationError):
     def __init__(self, error):
+        import ipdb; ipdb.set_trace()
         if not isinstance(error, collections.Mapping) and \
            is_non_string_iterable(error) and \
            len(error) == 1:

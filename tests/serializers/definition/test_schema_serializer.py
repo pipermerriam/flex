@@ -1,5 +1,6 @@
 import pytest
 
+from flex.error_messages import MESSAGES
 from flex.serializers.definitions import (
     SchemaSerializer,
     ItemsSerializer,
@@ -68,7 +69,7 @@ def test_items_invalid_when_not_array_or_object_or_reference(items):
     assert 'items' in serializer.errors
     assert_error_message_equal(
         serializer.errors['items'][0],
-        ItemsSerializer.default_error_messages['invalid_type_for_items'],
+        MESSAGES['items']['invalid_type'],
     )
 
 

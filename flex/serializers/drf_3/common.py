@@ -9,6 +9,7 @@ from django.core.validators import (
 from rest_framework import serializers
 from rest_framework.utils import representation
 
+from flex.error_messages import MESSAGES
 from flex.exceptions import (
     ValidationError,
     ErrorDict,
@@ -361,10 +362,6 @@ BaseSchemaSerializer._declared_fields['$ref'] = serializers.CharField(allow_null
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):
-    default_error_messages = {
-        'invalid_type_for_items': '`items` must be a referenc, a schema, or an array of schemas.',
-    }
-
     def __init__(self, *args, **kwargs):
         if 'data' in kwargs:
             data = kwargs['data']
@@ -375,11 +372,9 @@ class BaseItemsSerializer(BaseSchemaSerializer):
 
         super(BaseItemsSerializer, self).__init__(*args, **kwargs)
 
-    def to_internal_value(self, data):
+    def run_validation(self, data):
         if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
-            raise ValidationError(
-                self.error_messages['invalid_type_for_items']
-            )
+            raise ValidationError(MESSAGES['items']['invalid_type'])
         return super(BaseItemsSerializer, self).to_internal_value(data)
 
 

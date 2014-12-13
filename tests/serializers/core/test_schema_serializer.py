@@ -1,6 +1,6 @@
 import pytest
 
-from flex.serializers.common import BaseItemsSerializer
+from flex.error_messages import MESSAGES
 from flex.serializers.core import (
     SchemaSerializer,
 )
@@ -70,9 +70,10 @@ def test_items_invalid_when_not_array_or_object_or_reference(items):
 
     assert not serializer.is_valid()
     assert 'items' in serializer.errors
+    print serializer.errors
     assert_error_message_equal(
         serializer.errors['items'][0],
-        BaseItemsSerializer.default_error_messages['invalid_type_for_items'],
+        MESSAGES['items']['invalid_type'],
     )
 
 
@@ -85,6 +86,7 @@ def test_items_as_missing_reference():
         data=schema,
     )
     assert not serializer.is_valid()
+    print serializer.errors
     assert 'items' in serializer.errors
     assert_error_message_equal(
         serializer.errors['items'][0],

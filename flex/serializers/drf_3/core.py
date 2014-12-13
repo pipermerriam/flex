@@ -63,16 +63,18 @@ class InfoSerializer(serializers.Serializer):
 
 
 class ItemsSerializer(BaseItemsSerializer):
-    default_error_messages = {
-        'unknown_reference': 'Unknown definition reference `{0}`',
-    }
+    def run_validation(self, data):
+        if isinstance(data, six.string_types):
+            value = self.to_internal_value(data)
+            return value
+        return super(ItemsSerializer, self).run_validation(data)
 
     def to_internal_value(self, data):
         if isinstance(data, six.string_types):
             definitions = self.context.get('definitions', {})
             if data not in definitions:
                 raise ValidationError(
-                    self.error_messages['unknown_reference'].format(data),
+                    MESSAGES['unknown_reference']['definition'].format(data),
                 )
             return data
         return super(ItemsSerializer, self).to_internal_value(data)

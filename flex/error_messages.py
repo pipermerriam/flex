@@ -66,6 +66,11 @@ MAX_PROPERTIES_MESSAGES = {
 }
 
 
+ITEMS_MESSAGES = {
+    'invalid_type': '`items` must be a reference, a schema, or an array of schemas.',
+}
+
+
 REQUEST_MESSAGES = {
     'unknown_path': 'Request path did not match any of the known api paths.',
     'invalid_method': (
@@ -95,6 +100,7 @@ PATH_MESSAGES = {
 UNKNOWN_REFERENCE_MESSAGES = {
     'security': "Unknown SecurityScheme reference `{0}`",
     'parameter': "Unknown Parameter reference `{0}`",
+    'definition': 'Unknown definition reference `{0}`',
 }
 
 
@@ -112,6 +118,7 @@ MESSAGES = {
     'unique_items': UNIQUE_ITEMS_MESSAGES,
     'enum': ENUM_MESSAGES,
     'pattern': PATTERN_MESSAGES,
+    'items': ITEMS_MESSAGES,
     'request': REQUEST_MESSAGES,
     'response': RESPONSE_MESSAGES,
     'path': PATH_MESSAGES,

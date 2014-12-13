@@ -74,7 +74,7 @@ class ItemsSerializer(BaseItemsSerializer):
             definitions = self.context.get('definitions', {})
             if data not in definitions:
                 raise ValidationError(
-                    self.error_messages['unknown_reference'].format(data),
+                    MESSAGES['unknown_reference']['definition'].format(data),
                 )
             return data
         return super(ItemsSerializer, self).from_native(data, files)
@@ -134,10 +134,6 @@ class SecuritySerializer(HomogenousDictSerializer):
 
 
 class ParameterSerializer(BaseParameterSerializer):
-    default_error_messages = {
-        'unknown_reference': "Unknown reference `{0}`",
-    }
-
     schema = SchemaSerializer(required=False)
     items = ItemsSerializer(required=False, many=True)
 
@@ -155,10 +151,7 @@ class ParameterSerializer(BaseParameterSerializer):
                 self.validate_reference(data)
             except ValidationError as err:
                 assert not self._errors
-                self._errors = {}
-                self._errors['non_field_errors'] = self._errors.get(
-                    'non_field_errors', [],
-                ) + (err.messages or getattr(err, 'detail', None))
+                self._errors = err.messages
                 return
             else:
                 return data
@@ -167,7 +160,7 @@ class ParameterSerializer(BaseParameterSerializer):
     def validate_reference(self, reference):
         if reference not in self.context.get('parameters', {}):
             raise ValidationError(
-                self.error_messages['unknown_reference'].format(reference),
+                MESSAGES['unknown_reference']['parameter'].format(reference),
             )
 
     def save(self):

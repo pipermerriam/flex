@@ -7,6 +7,7 @@ from django.core.validators import (
 
 from rest_framework import serializers
 
+from flex.error_messages import MESSAGES
 from flex.exceptions import (
     ValidationError,
     ErrorDict,
@@ -319,10 +320,6 @@ BaseSchemaSerializer.base_fields['$ref'] = serializers.CharField(required=False)
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):
-    default_error_messages = {
-        'invalid_type_for_items': '`items` must be a referenc, a schema, or an array of schemas.',
-    }
-
     def __init__(self, *args, **kwargs):
         if 'data' in kwargs:
             data = kwargs['data']
@@ -335,9 +332,7 @@ class BaseItemsSerializer(BaseSchemaSerializer):
 
     def from_native(self, data, files=None):
         if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
-            raise ValidationError(
-                self.error_messages['invalid_type_for_items']
-            )
+            raise ValidationError(MESSAGES['items']['invalid_type'])
         return super(BaseItemsSerializer, self).from_native(data, files)
 
 

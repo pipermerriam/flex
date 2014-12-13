@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
 from flex.exceptions import ValidationError
+from flex.error_messages import MESSAGES
 from flex.utils import is_non_string_iterable
+
 from .mixins import TranslateValidationErrorMixin
 
 
@@ -24,5 +26,5 @@ class SecurityRequirementReferenceField(serializers.CharField):
     def validate(self, value):
         if value not in self.context.get('securityDefinitions', {}):
             raise ValidationError(
-                self.error_messages['unknown_reference'].format(value)
+                MESSAGES['unknown_reference']['security'].format(value),
             )
