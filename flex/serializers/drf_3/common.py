@@ -1,4 +1,5 @@
 import collections
+import copy
 import six
 
 from django.core.validators import (
@@ -6,6 +7,7 @@ from django.core.validators import (
 )
 
 from rest_framework import serializers
+from rest_framework.utils import representation
 
 from flex.exceptions import (
     ValidationError,
@@ -43,6 +45,44 @@ from .mixins import (
 )
 
 
+def make_serializer_repr_safe(serializer):
+    """
+    Since some of the serializers have recursive fields on them
+    (`SchemaSerializer`), we need to avoid infinite recursion while
+    trying to repr them.
+    """
+    serializer_copy = copy.deepcopy(serializer)
+
+    for field_name in serializer_copy.fields.keys():
+        field = serializer_copy.fields[field_name]
+        if hasattr(field, 'child'):
+            field = field.child
+        if getattr(field, '_is_unsafe_to_repr', False):
+            serializer_copy.fields.pop(field_name)
+    return serializer_copy
+
+
+class ReprSafeListSerializer(serializers.ListSerializer):
+    def __repr__(self):
+        return representation.serializer_repr(
+            make_serializer_repr_safe(self.child),
+            indent=1,
+        )
+
+
+class ReprSafeSerializer(object):
+    def __repr__(self):
+        """
+        Since some of the serializers have recursive fields on them
+        (`SchemaSerializer`), we need to avoid infinite recursion while
+        trying to repr them.
+        """
+        return representation.serializer_repr(
+            make_serializer_repr_safe(self),
+            indent=1,
+        )
+
+
 class BaseResponseSerializer(serializers.Serializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#responseObject
@@ -50,7 +90,7 @@ class BaseResponseSerializer(serializers.Serializer):
     description = serializers.CharField()
 
 
-class HomogenousDictSerializer(serializers.Serializer):
+class HomogenousDictSerializer(ReprSafeSerializer, serializers.Serializer):
     """
     Serializes and object for which all of it's values should be valid against
     a specified serializer class.
@@ -60,7 +100,10 @@ class HomogenousDictSerializer(serializers.Serializer):
     allow_empty = False
 
     def __init__(self, *args, **kwargs):
-        self.value_serializer_kwargs = {}
+        self.value_serializer_kwargs = kwargs.pop(
+            'value_serializer_kwargs',
+            self.value_serializer_kwargs or {},
+        )
         if self.value_serializer_class is None:
             raise ValueError(
                 "Property `value_serializer_class` not declared on {0}".format(
@@ -71,17 +114,23 @@ class HomogenousDictSerializer(serializers.Serializer):
         # populate fields for all of the keys in the object to be validated.
         data = kwargs.get('data')
         super(HomogenousDictSerializer, self).__init__(*args, **kwargs)
+        self.create_fields_from_data(data)
+
+    def create_fields_from_data(self, data):
         if data:
             fields = [
                 key for key, value in data.items() if (value is not None or self.allow_empty)
             ]
             for field_name in fields:
                 field = self.value_serializer_class(**self.value_serializer_kwargs)
-                field.initialize(parent=self, field_name=field_name)
                 self.fields.setdefault(
                     field_name,
                     field,
                 )
+
+    def get_value(self, data):
+        self.create_fields_from_data(data.get(self.field_name))
+        return super(HomogenousDictSerializer, self).get_value(data)
 
     def field_from_native(self, data, files, field_name, into):
         # populate fields for all of the keys in the object to be validated.
@@ -96,7 +145,7 @@ class HomogenousDictSerializer(serializers.Serializer):
         )
 
 
-class CommonJSONSchemaSerializer(serializers.Serializer):
+class CommonJSONSchemaSerializer(ReprSafeSerializer, serializers.Serializer):
     default_error_messages = {
         'invalid_type_for_minimum': '`minimum` can only be used for json number types',
         'invalid_type_for_maximum': '`maximum` can only be used for json number types',
@@ -116,29 +165,32 @@ class CommonJSONSchemaSerializer(serializers.Serializer):
     }
 
     multipleOf = serializers.FloatField(
-        required=False, validators=[MinValueValidator(0)],
+        allow_null=True, required=False, validators=[MinValueValidator(0)],
     )
 
-    maximum = serializers.FloatField(required=False)
-    exclusiveMaximum = serializers.BooleanField(required=False)
+    maximum = serializers.FloatField(allow_null=True, required=False)
+    exclusiveMaximum = serializers.NullBooleanField(required=False)
 
-    minimum = serializers.FloatField(required=False)
-    exclusiveMinimum = serializers.BooleanField(required=False)
+    minimum = serializers.FloatField(allow_null=True, required=False)
+    exclusiveMinimum = serializers.NullBooleanField(required=False)
 
     maxLength = serializers.IntegerField(
-        required=False, validators=[MinValueValidator(0)],
+        allow_null=True, required=False, validators=[MinValueValidator(0)],
     )
     minLength = serializers.IntegerField(
-        required=False, validators=[MinValueValidator(0)],
+        allow_null=True, required=False, validators=[MinValueValidator(0)],
     )
 
-    pattern = serializers.CharField(required=False, validators=[regex_validator])
+    pattern = serializers.CharField(allow_null=True, required=False, validators=[regex_validator])
 
-    maxItems = serializers.IntegerField(required=False)
-    minItems = serializers.IntegerField(required=False)
-    uniqueItems = serializers.BooleanField(required=False)
+    maxItems = serializers.IntegerField(allow_null=True, required=False)
+    minItems = serializers.IntegerField(allow_null=True, required=False)
+    uniqueItems = serializers.NullBooleanField(required=False)
 
-    enum = serializers.Field(required=False, validators=[is_array_validator])
+    enum = serializers.Field(allow_null=True, required=False, validators=[is_array_validator])
+
+    class Meta:
+        list_serializer_class = ReprSafeListSerializer
 
     def check_type_for_attr(self, attrs, field_name, types, errors, error_key):
         """
@@ -259,27 +311,29 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#schemaObject
     """
+    _is_unsafe_to_repr = True
+
     default_error_messages = {
         'invalid_type_for_min_properties': 'minProperties can only be used for `object` types',
         'invalid_type_for_max_properties': 'maxProperties can only be used for `object` types',
     }
 
-    format = serializers.CharField(validators=[format_validator], required=False)
-    title = serializers.CharField(required=False)
-    default = serializers.Field(required=False)
+    format = serializers.CharField(validators=[format_validator], allow_null=True, required=False)
+    title = serializers.CharField(allow_null=True, required=False)
+    default = serializers.Field(allow_null=True, required=False)
 
     minProperties = serializers.IntegerField(
-        required=False, validators=[MinValueValidator(0)]
+        allow_null=True, required=False, validators=[MinValueValidator(0)]
     )
     maxProperties = serializers.IntegerField(
-        required=False, validators=[MinValueValidator(0)],
+        allow_null=True, required=False, validators=[MinValueValidator(0)],
     )
 
-    required = serializers.BooleanField(required=False)
-    type = MaybeListCharField(required=False, validators=[type_validator])
+    required = serializers.NullBooleanField(required=False)
+    type = MaybeListCharField(allow_null=True, required=False, validators=[type_validator])
 
-    readOnly = serializers.BooleanField(required=False)
-    externalDocs = serializers.CharField(required=False)
+    readOnly = serializers.NullBooleanField(required=False)
+    externalDocs = serializers.CharField(allow_null=True, required=False)
     # TODO: how do we do example
     # example =
 
@@ -312,7 +366,7 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
             raise ValidationError(errors)
         return super(BaseSchemaSerializer, self).validate(attrs)
 
-BaseSchemaSerializer._declared_fields['$ref'] = serializers.CharField(required=False)
+BaseSchemaSerializer._declared_fields['$ref'] = serializers.CharField(allow_null=True, required=False)
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):
@@ -330,12 +384,12 @@ class BaseItemsSerializer(BaseSchemaSerializer):
 
         super(BaseItemsSerializer, self).__init__(*args, **kwargs)
 
-    def from_native(self, data, files=None):
+    def to_internal_value(self, data):
         if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
             raise ValidationError(
                 self.error_messages['invalid_type_for_items']
             )
-        return super(BaseItemsSerializer, self).from_native(data, files)
+        return super(BaseItemsSerializer, self).to_internal_value(data)
 
 
 class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
@@ -362,15 +416,15 @@ class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
     }
 
     name = serializers.CharField()
-    description = serializers.CharField(required=False)
-    required = serializers.BooleanField(required=False)
+    description = serializers.CharField(allow_null=True, required=False)
+    required = serializers.NullBooleanField(required=False)
 
-    type = MaybeListCharField(required=False, validators=[type_validator])
-    format = serializers.CharField(validators=[format_validator], required=False)
+    type = MaybeListCharField(allow_null=True, required=False, validators=[type_validator])
+    format = serializers.CharField(validators=[format_validator], allow_null=True, required=False)
     collectionFormat = serializers.CharField(
-        required=False, validators=[collection_format_validator], default=CSV,
+        allow_null=True, required=False, validators=[collection_format_validator], default=CSV,
     )
-    default = serializers.Field(required=False)
+    default = serializers.Field(allow_null=True, required=False)
 
     def validate(self, attrs):
         errors = ErrorDict()
@@ -405,6 +459,9 @@ class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
 
         return super(BaseParameterSerializer, self).validate(attrs)
 
+    def create(self, validated_data):
+        return validated_data
+
 
 class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
     """
@@ -415,13 +472,13 @@ class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
             "When type is \"array\" the \"items\" is required"
         ),
     }
-    description = serializers.CharField(required=False)
+    description = serializers.CharField(allow_null=True, required=False)
     type = serializers.CharField(validators=[header_type_validator])
-    format = serializers.CharField(validators=[format_validator], required=False)
+    format = serializers.CharField(validators=[format_validator], allow_null=True, required=False)
     collectionFormat = serializers.CharField(
-        required=False, validators=[collection_format_validator], default=CSV,
+        allow_null=True, required=False, validators=[collection_format_validator], default=CSV,
     )
-    default = serializers.Field(required=False)
+    default = serializers.Field(allow_null=True, required=False)
 
     def validate(self, attrs):
         errors = ErrorDict()
@@ -439,5 +496,5 @@ class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
 
 # Cannot declare this as a property on the class because `in` is a reserved word.
 BaseParameterSerializer._declared_fields['in'] = serializers.CharField(
-    source='in', validators=[parameter_in_validator],
+    validators=[parameter_in_validator],
 )

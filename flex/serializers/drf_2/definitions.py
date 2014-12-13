@@ -220,3 +220,6 @@ class SwaggerDefinitionsSerializer(serializers.Serializer):
                 {'missing_references': list(missing_references)},
             )
         return super(SwaggerDefinitionsSerializer, self).validate(attrs)
+
+    def save_object(self, obj, **kwargs):
+        self.object = obj

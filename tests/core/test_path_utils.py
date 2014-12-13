@@ -47,6 +47,6 @@ def test_undeclared_api_path_parameters_are_skipped():
         ID_IN_PATH,
     ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     pattern = path_to_pattern(path, parameters)
     assert pattern == '^/get/\{username\}/posts/(?P<id>.+)/$'

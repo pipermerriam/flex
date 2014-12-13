@@ -31,13 +31,13 @@ from .common import (
 
 
 class SchemaSerializer(BaseSchemaSerializer):
-    def from_native(self, data, files=None):
+    def to_internal_value(self, data):
         if isinstance(data, six.string_types):
             self.context['deferred_references'].add(data)
             return data
         elif '$ref' in data:
             self.context['deferred_references'].add(data['$ref'])
-        return super(SchemaSerializer, self).from_native(data, files)
+        return super(SchemaSerializer, self).to_internal_value(data)
 
 
 class DefinitionsSerializer(HomogenousDictSerializer):
@@ -48,7 +48,6 @@ class DefinitionsSerializer(HomogenousDictSerializer):
     value_serializer_class = SchemaSerializer
 
     def validate(self, attrs):
-
         deferred_references = self.context.get('deferred_references', set())
         missing_references = deferred_references.difference(attrs.keys())
         if missing_references:
@@ -220,3 +219,6 @@ class SwaggerDefinitionsSerializer(serializers.Serializer):
                 {'missing_references': list(missing_references)},
             )
         return super(SwaggerDefinitionsSerializer, self).validate(attrs)
+
+    def create(self, validated_data):
+        return validated_data

@@ -55,11 +55,11 @@ class InfoSerializer(serializers.Serializer):
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#infoObject
     """
     title = serializers.CharField()
-    description = serializers.CharField(required=False)
-    termsOfService = serializers.CharField(required=False)
-    contact = serializers.CharField(required=False)
-    license = serializers.CharField(required=False)
-    version = serializers.CharField(required=False)
+    description = serializers.CharField(allow_null=True, required=False)
+    termsOfService = serializers.CharField(allow_null=True, required=False)
+    contact = serializers.CharField(allow_null=True, required=False)
+    license = serializers.CharField(allow_null=True, required=False)
+    version = serializers.CharField(allow_null=True, required=False)
 
 
 class ItemsSerializer(BaseItemsSerializer):
@@ -67,7 +67,7 @@ class ItemsSerializer(BaseItemsSerializer):
         'unknown_reference': 'Unknown definition reference `{0}`',
     }
 
-    def from_native(self, data, files):
+    def to_internal_value(self, data):
         if isinstance(data, six.string_types):
             definitions = self.context.get('definitions', {})
             if data not in definitions:
@@ -75,11 +75,11 @@ class ItemsSerializer(BaseItemsSerializer):
                     self.error_messages['unknown_reference'].format(data),
                 )
             return data
-        return super(ItemsSerializer, self).from_native(data, files)
+        return super(ItemsSerializer, self).to_internal_value(data)
 
 
 class HeaderSerializer(BaseHeaderSerializer):
-    items = ItemsSerializer(required=False, many=True)
+    items = ItemsSerializer(allow_null=True, required=False, many=True)
 
 
 class HeadersSerializer(HomogenousDictSerializer):
@@ -108,17 +108,17 @@ class SchemaSerializer(BaseSchemaSerializer):
             raise ValidationError(errors)
         return super(SchemaSerializer, self).validate(attrs)
 
-    def save_object(self, obj, **kwargs):
-        validators = construct_schema_validators(obj, self.context)
-        self.object = functools.partial(validate_object, validators=validators)
+    def create(self, validated_data):
+        validators = construct_schema_validators(validated_data, self.context)
+        return functools.partial(validate_object, validators=validators)
 
 
 class ResponseSerializer(BaseResponseSerializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#responseObject
     """
-    schema = SchemaSerializer(required=False)
-    headers = HeadersSerializer(required=False)
+    schema = SchemaSerializer(allow_null=True, required=False)
+    headers = HeadersSerializer(allow_null=True, required=False)
     # TODO: how do we do examples
     # examples =
 
@@ -136,8 +136,8 @@ class ParameterSerializer(BaseParameterSerializer):
         'unknown_reference': "Unknown reference `{0}`",
     }
 
-    schema = SchemaSerializer(required=False)
-    items = ItemsSerializer(required=False, many=True)
+    schema = SchemaSerializer(allow_null=True, required=False)
+    items = ItemsSerializer(allow_null=True, required=False, many=True)
 
     @property
     def many(self):
@@ -147,11 +147,12 @@ class ParameterSerializer(BaseParameterSerializer):
     def many(self, value):
         pass
 
-    def from_native(self, data, files=None):
+    def to_internal_value(self, data):
         if isinstance(data, six.string_types):
             try:
                 self.validate_reference(data)
             except ValidationError as err:
+                # TODO: this logic is borked and hard to follow.
                 assert not self._errors
                 self._errors = {}
                 self._errors['non_field_errors'] = self._errors.get(
@@ -160,7 +161,7 @@ class ParameterSerializer(BaseParameterSerializer):
                 return
             else:
                 return data
-        return super(ParameterSerializer, self).from_native(data, files)
+        return super(ParameterSerializer, self).to_internal_value(data)
 
     def validate_reference(self, reference):
         if reference not in self.context.get('parameters', {}):
@@ -174,25 +175,25 @@ class OperationSerializer(serializers.Serializer):
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#operationObject
     """
     tags = serializers.ListField(
-        child=serializers.CharField(required=False, validators=[string_type_validator]),
+        child=serializers.CharField(allow_null=True, required=False, validators=[string_type_validator]),
     )
-    summary = serializers.CharField(required=False)
-    description = serializers.CharField(required=False)
-    externalDocs = serializers.CharField(required=False)
-    operationId = serializers.CharField(required=False)
+    summary = serializers.CharField(allow_null=True, required=False)
+    description = serializers.CharField(allow_null=True, required=False)
+    externalDocs = serializers.CharField(allow_null=True, required=False)
+    operationId = serializers.CharField(allow_null=True, required=False)
     consumes = serializers.ListField(
-        child=serializers.CharField(required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
     produces = serializers.ListField(
-        child=serializers.CharField(required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
-    parameters = ParameterSerializer(required=False, many=True)
+    parameters = ParameterSerializer(allow_null=True, required=False, many=True)
     responses = ResponsesSerializer()
     schemes = serializers.ListField(
-        child=serializers.CharField(required=False, validators=[scheme_validator]),
+        child=serializers.CharField(allow_null=True, required=False, validators=[scheme_validator]),
     )
-    deprecated = serializers.BooleanField(required=False)
-    security = SecuritySerializer(required=False)
+    deprecated = serializers.NullBooleanField(required=False)
+    security = SecuritySerializer(allow_null=True, required=False)
 
 
 class PathItemSerializer(serializers.Serializer):
@@ -203,15 +204,15 @@ class PathItemSerializer(serializers.Serializer):
     # TODO. how is this supposted to work.  The swagger spec doesn't account
     # for a definitions location for PathItem definitions?
     # _ref = serializers.CharField(source='$ref')
-    get = OperationSerializer(required=False)
-    put = OperationSerializer(required=False)
-    post = OperationSerializer(required=False)
-    delete = OperationSerializer(required=False)
-    options = OperationSerializer(required=False)
-    head = OperationSerializer(required=False)
-    patch = OperationSerializer(required=False)
+    get = OperationSerializer(allow_null=True, required=False)
+    put = OperationSerializer(allow_null=True, required=False)
+    post = OperationSerializer(allow_null=True, required=False)
+    delete = OperationSerializer(allow_null=True, required=False)
+    options = OperationSerializer(allow_null=True, required=False)
+    head = OperationSerializer(allow_null=True, required=False)
+    patch = OperationSerializer(allow_null=True, required=False)
     # TODO: these can be a parameters reference object.
-    parameters = ParameterSerializer(required=False, many=True)
+    parameters = ParameterSerializer(allow_null=True, required=False, many=True)
 
 
 class TagSerializer(serializers.Serializer):
@@ -219,8 +220,8 @@ class TagSerializer(serializers.Serializer):
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#tagObject
     """
     name = serializers.CharField()
-    description = serializers.CharField(required=False)
-    externalDocs = serializers.CharField(required=False)
+    description = serializers.CharField(allow_null=True, required=False)
+    externalDocs = serializers.CharField(allow_null=True, required=False)
 
 
 class PropertiesSerializer(HomogenousDictSerializer):
@@ -229,13 +230,14 @@ class PropertiesSerializer(HomogenousDictSerializer):
 
 # These fields include recursive use of the `SchemaSerializer` so they have to
 # be attached after the `SchemaSerializer` class has been created.
-SchemaSerializer._declared_fields['properties'] = PropertiesSerializer(required=False)
-SchemaSerializer._declared_fields['items'] = ItemsSerializer(required=False, many=True)
-SchemaSerializer._declared_fields['allOf'] = SchemaSerializer(required=False, many=True)
+SchemaSerializer._declared_fields['properties'] = PropertiesSerializer(allow_null=True, required=False)
+SchemaSerializer._declared_fields['items'] = ItemsSerializer(allow_null=True, required=False, many=True)
+SchemaSerializer._declared_fields['allOf'] = SchemaSerializer(allow_null=True, required=False, many=True)
 
 
 class PathsSerializer(HomogenousDictSerializer):
     value_serializer_class = PathItemSerializer
+    value_serializer_kwargs = {'allow_null': True}
     allow_empty = True
 
     def validate(self, attrs):
@@ -307,26 +309,30 @@ class SwaggerSerializer(serializers.Serializer):
     )
     info = InfoSerializer()
     host = serializers.CharField(
-        required=False,
+        allow_null=True, required=False,
         validators=[host_validator],
     )
     basePath = serializers.CharField(
-        required=False,
+        allow_null=True, required=False,
         validators=[path_validator],
     )
     schemes = serializers.ListField(
-        child=serializers.CharField(required=False, validators=[scheme_validator]),
+        child=serializers.CharField(allow_null=True, required=False, validators=[scheme_validator]),
     )
     consumes = serializers.ListField(
-        child=serializers.CharField(required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
     produces = serializers.ListField(
-        child=serializers.CharField(required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
 
     paths = PathsSerializer()
 
-    security = SecuritySerializer(required=False)
+    security = SecuritySerializer(allow_null=True, required=False)
 
-    tags = TagSerializer(required=False, many=True)
-    externalDocs = serializers.CharField(required=False)
+    tags = TagSerializer(allow_null=True, required=False, many=True)
+    externalDocs = serializers.CharField(allow_null=True, required=False)
+
+    def update(self, instance, validated_data):
+        instance.update(validated_data)
+        return instance

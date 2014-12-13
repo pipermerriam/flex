@@ -60,7 +60,10 @@ class HomogenousDictSerializer(serializers.Serializer):
     allow_empty = False
 
     def __init__(self, *args, **kwargs):
-        self.value_serializer_kwargs = {}
+        self.value_serializer_kwargs = kwargs.pop(
+            'value_serializer_kwargs',
+            self.value_serializer_kwargs or {},
+        )
         if self.value_serializer_class is None:
             raise ValueError(
                 "Property `value_serializer_class` not declared on {0}".format(
@@ -404,6 +407,9 @@ class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
             raise ValidationError(errors)
 
         return super(BaseParameterSerializer, self).validate(attrs)
+
+    def save_object(self, obj, **kwargs):
+        self.object = obj
 
 
 class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):

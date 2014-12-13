@@ -80,7 +80,7 @@ def parse(raw_schema):
         message += prettify_errors(definitions_serializer.errors)
         raise ValueError(message)
 
-    swagger_definitions = definitions_serializer.object
+    swagger_definitions = definitions_serializer.save()
 
     swagger_serializer = SwaggerSerializer(
         swagger_definitions,
@@ -93,7 +93,7 @@ def parse(raw_schema):
         message += prettify_errors(swagger_serializer.errors)
         raise ValueError(message)
 
-    return swagger_serializer.object
+    return swagger_serializer.save()
 
 
 def load(target):
@@ -115,7 +115,7 @@ def validate(schema, target=None, **kwargs):
     if not schema_serializer.is_valid():
         message = "JSON Schema did not validate:\n\n"
         message += prettify_errors(schema_serializer.errors)
-        raise ValueError(message)
+        raise ValidationError(message)
 
     if target is not None:
         validator = schema_serializer.save()

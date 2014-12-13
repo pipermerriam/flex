@@ -6,10 +6,10 @@ from .mixins import TranslateValidationErrorMixin
 
 
 class MaybeListCharField(TranslateValidationErrorMixin, serializers.CharField):
-    def from_native(self, value):
+    def to_internal_value(self, value):
         if is_non_string_iterable(value):
             return value
-        return super(MaybeListCharField, self).from_native(value)
+        return super(MaybeListCharField, self).to_internal_value(value)
 
 
 class SecurityRequirementReferenceField(serializers.CharField):

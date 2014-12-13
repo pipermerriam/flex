@@ -48,7 +48,7 @@ def test_filtering_parameters(lookup_kwargs, expected):
         PAGE_SIZE_IN_QUERY,
     ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
 
     results = filter_parameters(parameters, **lookup_kwargs)
 
@@ -77,7 +77,7 @@ def test_find_parameter(lookup_kwargs, expected):
         PAGE_SIZE_IN_QUERY,
     ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
 
     actual = find_parameter(parameters, **lookup_kwargs)
     for key in lookup_kwargs:
@@ -92,7 +92,7 @@ def test_find_parameter_errors_when_multiple_found():
         PAGE_SIZE_IN_QUERY,
     ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
 
     #sanity check
     sanity = filter_parameters(parameters, in_=PATH)
@@ -110,7 +110,7 @@ def test_find_parameter_errors_when_no_match_found():
         PAGE_SIZE_IN_QUERY,
     ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
 
     #sanity check
     assert not filter_parameters(parameters, name='not-in-parameters')
@@ -141,14 +141,14 @@ def test_merge_parameters_uses_last_write_wins():
         PAGE_IN_QUERY,
     ])
     assert main_serializer.is_valid(), main_serializer.errors
-    main_parameters = main_serializer.object
+    main_parameters = main_serializer.save()
 
     sub_serializer = ParameterSerializer(many=True, data=[
         duplicate_b,
         PAGE_SIZE_IN_QUERY,
     ])
     assert sub_serializer.is_valid(), sub_serializer.errors
-    sub_parameters = sub_serializer.object
+    sub_parameters = sub_serializer.save()
 
     merged_parameters = merge_parameter_lists(main_parameters, sub_parameters)
 
