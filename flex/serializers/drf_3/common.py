@@ -39,7 +39,10 @@ from flex.constants import (
     OBJECT,
 )
 
-from .fields import MaybeListCharField
+from .fields import (
+    MaybeListCharField,
+    DefaultField,
+)
 from .mixins import (
     TypedDefaultMixin,
 )
@@ -132,18 +135,6 @@ class HomogenousDictSerializer(ReprSafeSerializer, serializers.Serializer):
         self.create_fields_from_data(data.get(self.field_name))
         return super(HomogenousDictSerializer, self).get_value(data)
 
-    def field_from_native(self, data, files, field_name, into):
-        # populate fields for all of the keys in the object to be validated.
-        if data.get(field_name):
-            for key in data[field_name]:
-                self.fields.setdefault(
-                    key,
-                    self.value_serializer_class(**self.value_serializer_kwargs),
-                )
-        return super(HomogenousDictSerializer, self).field_from_native(
-            data, files, field_name, into,
-        )
-
 
 class CommonJSONSchemaSerializer(ReprSafeSerializer, serializers.Serializer):
     default_error_messages = {
@@ -187,7 +178,7 @@ class CommonJSONSchemaSerializer(ReprSafeSerializer, serializers.Serializer):
     minItems = serializers.IntegerField(allow_null=True, required=False)
     uniqueItems = serializers.NullBooleanField(required=False)
 
-    enum = serializers.Field(allow_null=True, required=False, validators=[is_array_validator])
+    enum = DefaultField(required=False, validators=[is_array_validator])
 
     class Meta:
         list_serializer_class = ReprSafeListSerializer
@@ -320,7 +311,7 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
 
     format = serializers.CharField(validators=[format_validator], allow_null=True, required=False)
     title = serializers.CharField(allow_null=True, required=False)
-    default = serializers.Field(allow_null=True, required=False)
+    default = DefaultField(allow_null=True, required=False)
 
     minProperties = serializers.IntegerField(
         allow_null=True, required=False, validators=[MinValueValidator(0)]
@@ -424,7 +415,7 @@ class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
     collectionFormat = serializers.CharField(
         allow_null=True, required=False, validators=[collection_format_validator], default=CSV,
     )
-    default = serializers.Field(allow_null=True, required=False)
+    default = DefaultField(allow_null=True, required=False)
 
     def validate(self, attrs):
         errors = ErrorDict()
@@ -478,7 +469,7 @@ class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
     collectionFormat = serializers.CharField(
         allow_null=True, required=False, validators=[collection_format_validator], default=CSV,
     )
-    default = serializers.Field(allow_null=True, required=False)
+    default = DefaultField(allow_null=True, required=False)
 
     def validate(self, attrs):
         errors = ErrorDict()

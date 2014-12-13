@@ -132,41 +132,25 @@ class SecuritySerializer(HomogenousDictSerializer):
 
 
 class ParameterSerializer(BaseParameterSerializer):
-    default_error_messages = {
-        'unknown_reference': "Unknown reference `{0}`",
-    }
-
     schema = SchemaSerializer(allow_null=True, required=False)
     items = ItemsSerializer(allow_null=True, required=False, many=True)
 
-    @property
-    def many(self):
-        return True
-
-    @many.setter
-    def many(self, value):
-        pass
+    def run_validation(self, data):
+        if isinstance(data, six.string_types):
+            value = self.to_internal_value(data)
+            return value
+        return super(ParameterSerializer, self).run_validation(data)
 
     def to_internal_value(self, data):
         if isinstance(data, six.string_types):
-            try:
-                self.validate_reference(data)
-            except ValidationError as err:
-                # TODO: this logic is borked and hard to follow.
-                assert not self._errors
-                self._errors = {}
-                self._errors['non_field_errors'] = self._errors.get(
-                    'non_field_errors', [],
-                ) + (err.messages or getattr(err, 'detail', None))
-                return
-            else:
-                return data
+            self.validate_reference(data)
+            return data
         return super(ParameterSerializer, self).to_internal_value(data)
 
     def validate_reference(self, reference):
         if reference not in self.context.get('parameters', {}):
             raise ValidationError(
-                self.error_messages['unknown_reference'].format(reference),
+                MESSAGES['unknown_reference']['parameter'].format(reference),
             )
 
 
@@ -296,6 +280,9 @@ class PathsSerializer(HomogenousDictSerializer):
                             )
 
         return super(PathsSerializer, self).validate(attrs)
+
+    def create(self, validated_data):
+        return validated_data
 
 
 class SwaggerSerializer(serializers.Serializer):

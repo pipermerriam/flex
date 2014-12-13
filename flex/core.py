@@ -35,7 +35,6 @@ def load_source(source):
     """
     if isinstance(source, collections.Mapping):
         return source
-
     elif hasattr(source, 'read') and callable(source.read):
         raw_source = source.read()
     elif os.path.exists(os.path.expanduser(str(source))):
@@ -75,7 +74,6 @@ def parse(raw_schema):
         data=raw_schema,
     )
     if not definitions_serializer.is_valid():
-
         message = "Swagger definitions did not validate:\n\n"
         message += prettify_errors(definitions_serializer.errors)
         raise ValueError(message)

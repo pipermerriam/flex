@@ -56,6 +56,10 @@ class ValidationError(DRFValidationError):
 
     @property
     def detail(self):
+        if isinstance(self._error, six.string_types):
+            return [self._error]
+        elif isinstance(self._error, collections.Mapping):
+            return self._error
         return self._error
 
     @property

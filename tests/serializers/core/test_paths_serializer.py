@@ -7,6 +7,7 @@ from flex.constants import (
 
 from tests.utils import assert_error_message_equal
 
+
 def test_paths_serializers_preserves_empty_paths():
     """
     Ensure that paths that are defined bare without any additional information
@@ -18,9 +19,10 @@ def test_paths_serializers_preserves_empty_paths():
     }
     serializer = PathsSerializer(data=paths)
 
-    assert serializer.is_valid()
-    assert '/get' in serializer.object
-    assert '/post' in serializer.object
+    assert serializer.is_valid(), serializer.errors
+    actual = serializer.save()
+    assert '/get' in actual
+    assert '/post' in actual
 
 
 def test_path_serializer_allows_parameters_that_are_not_defined():

@@ -170,6 +170,9 @@ class ParameterSerializer(BaseParameterSerializer):
                 self.error_messages['unknown_reference'].format(reference),
             )
 
+    def save(self):
+        return self.object
+
 
 class OperationSerializer(serializers.Serializer):
     """
@@ -289,6 +292,9 @@ class PathsSerializer(HomogenousDictSerializer):
 
         return super(PathsSerializer, self).validate(attrs)
 
+    def save_object(self, obj, **kwargs):
+        self.object = obj
+
 
 class SwaggerSerializer(serializers.Serializer):
     """
@@ -318,3 +324,6 @@ class SwaggerSerializer(serializers.Serializer):
 
     tags = TagSerializer(required=False, many=True)
     externalDocs = serializers.CharField(required=False)
+
+    def save_object(self, obj, **kwargs):
+        self.object = obj

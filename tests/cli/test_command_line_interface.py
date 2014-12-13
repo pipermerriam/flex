@@ -6,7 +6,7 @@ from click.testing import CliRunner
 from flex.cli import main
 
 
-DIR = os.path.dirname(os.path.abspath(__file__))
+DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def test_flex_cli_schema_validation():
@@ -19,7 +19,7 @@ def test_flex_cli_schema_validation():
         ]
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     assert result.output == 'Validation passed\n'
 
 

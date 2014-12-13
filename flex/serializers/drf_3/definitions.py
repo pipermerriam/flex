@@ -64,11 +64,11 @@ class PropertiesSerializer(HomogenousDictSerializer):
 
 
 class ItemsSerializer(BaseItemsSerializer):
-    def from_native(self, data, files=None):
+    def to_internal_value(self, data):
         if isinstance(data, six.string_types):
             self.context['deferred_references'].add(data)
             return [data]
-        return super(ItemsSerializer, self).from_native(data, files)
+        return super(ItemsSerializer, self).to_internal_value(data)
 
 
 # These fields include recursive use of the `SchemaSerializer` so they have to
