@@ -29,7 +29,7 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_unique_items_validation_with_duplicates(value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -39,9 +39,9 @@ def test_unique_items_validation_with_duplicates(value):
             'uniqueItems': True,
             'items': {'type': [STRING, NUMBER, BOOLEAN]},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -67,7 +67,7 @@ def test_unique_items_validation_with_duplicates(value):
     ),
 )
 def test_unique_items_validation_with_no_duplicates(value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -77,9 +77,9 @@ def test_unique_items_validation_with_no_duplicates(value):
             'uniqueItems': True,
             'items': {'type': [STRING, NUMBER, BOOLEAN]},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

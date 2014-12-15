@@ -137,6 +137,7 @@ class HomogenousDictSerializer(ReprSafeSerializer, serializers.Serializer):
                 key for key, value in data.items() if (value is not None or self.allow_empty)
             ]
             for field_name in fields:
+                field_name = str(field_name)
                 field = self.value_serializer_class(**self.value_serializer_kwargs)
                 self.fields.setdefault(
                     field_name,
@@ -376,7 +377,7 @@ class BaseItemsSerializer(BaseSchemaSerializer):
     def run_validation(self, data):
         if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
             raise ValidationError([[{'non_field_errors': MESSAGES['items']['invalid_type']}]])
-        return super(BaseItemsSerializer, self).to_internal_value(data)
+        return super(BaseItemsSerializer, self).run_validation(data)
 
     class Meta:
         list_serializer_class = MaybeListSerializer
@@ -482,6 +483,9 @@ class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
         if errors:
             raise ValidationError(errors)
         return super(BaseHeaderSerializer, self).validate(attrs)
+
+    def create(self, validated_data):
+        return validated_data
 
 
 # Cannot declare this as a property on the class because `in` is a reserved word.

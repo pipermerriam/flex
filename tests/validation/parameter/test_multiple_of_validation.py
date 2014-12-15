@@ -24,7 +24,7 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_multiple_of_validation_for_invalid_values(divisor, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -33,9 +33,9 @@ def test_multiple_of_validation_for_invalid_values(divisor, value):
             'required': True,
             'multipleOf': divisor,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -60,7 +60,7 @@ def test_multiple_of_validation_for_invalid_values(divisor, value):
     ),
 )
 def test_multiple_of_validation_for_valid_multiples(divisor, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -69,9 +69,9 @@ def test_multiple_of_validation_for_valid_multiples(divisor, value):
             'required': True,
             'multipleOf': divisor,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

@@ -16,11 +16,11 @@ from tests.utils import assert_error_message_equal
 
 
 def test_required_parameters_invalid_when_not_present():
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {'name': 'id', 'in': PATH, 'description': 'id', 'type': STRING, 'required': True},
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {}
 
     with pytest.raises(ValidationError) as err:
@@ -35,7 +35,7 @@ def test_required_parameters_invalid_when_not_present():
 
 
 def test_parameters_allowed_missing_when_not_required():
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': BODY,
@@ -46,9 +46,9 @@ def test_parameters_allowed_missing_when_not_required():
                 'type': STRING,
             },
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {}
 
     validate_parameters(parameter_values, parameters, {}, inner=True)

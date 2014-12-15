@@ -36,7 +36,7 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_enum_validation_with_invalid_values(enum, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -45,9 +45,9 @@ def test_enum_validation_with_invalid_values(enum, value):
             'required': True,
             'enum': enum,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -76,7 +76,7 @@ def test_enum_validation_with_invalid_values(enum, value):
     ),
 )
 def test_enum_validation_with_allowed_values(enum, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -85,9 +85,9 @@ def test_enum_validation_with_allowed_values(enum, value):
             'required': True,
             'enum': enum,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

@@ -443,6 +443,9 @@ class BaseHeaderSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):
             raise ValidationError(errors)
         return super(BaseHeaderSerializer, self).validate(attrs)
 
+    def save_object(self, obj, **kwargs):
+        self.object = obj
+
 
 # Cannot declare this as a property on the class because `in` is a reserved word.
 BaseParameterSerializer.base_fields['in'] = serializers.CharField(

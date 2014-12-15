@@ -26,7 +26,7 @@ from tests.utils import assert_error_message_equal
     )
 )
 def test_parameter_format_validation_on_invalid_values(format_, value, error_key):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -35,9 +35,9 @@ def test_parameter_format_validation_on_invalid_values(format_, value, error_key
             'required': True,
             'format': format_,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -61,7 +61,7 @@ def test_parameter_format_validation_on_invalid_values(format_, value, error_key
     ),
 )
 def test_parameter_format_validation_succeeds_on_valid_values(format_, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -70,9 +70,9 @@ def test_parameter_format_validation_succeeds_on_valid_values(format_, value):
             'required': True,
             'format': format_,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

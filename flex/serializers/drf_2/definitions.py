@@ -59,6 +59,9 @@ class DefinitionsSerializer(HomogenousDictSerializer):
             )
         return super(DefinitionsSerializer, self).validate(attrs)
 
+    def save_object(self, obj, **kwargs):
+        self.object = obj
+
 
 class PropertiesSerializer(HomogenousDictSerializer):
     value_serializer_class = SchemaSerializer

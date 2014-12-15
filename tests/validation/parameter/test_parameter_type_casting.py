@@ -21,7 +21,7 @@ from flex.validation.parameter import (
 # type_cast_parameters tests
 #
 def test_integer_type_casting():
-    serializer = ParameterSerializer(data=[{
+    serializer = ParameterSerializer(many=True, data=[{
         'type': INTEGER,
         'in': QUERY,
         'description': 'id',
@@ -29,12 +29,12 @@ def test_integer_type_casting():
     }])
     assert serializer.is_valid(), serializer.errors
     parameters = {'id': '123'}
-    actual = type_cast_parameters(parameters, serializer.object, {})
+    actual = type_cast_parameters(parameters, serializer.save(), {})
     assert actual['id'] == 123
 
 
 def test_number_type_casting():
-    serializer = ParameterSerializer(data=[{
+    serializer = ParameterSerializer(many=True, data=[{
         'type': NUMBER,
         'in': QUERY,
         'description': 'id',
@@ -42,7 +42,7 @@ def test_number_type_casting():
     }])
     assert serializer.is_valid(), serializer.errors
     parameters = {'id': '12.5'}
-    actual = type_cast_parameters(parameters, serializer.object, {})
+    actual = type_cast_parameters(parameters, serializer.save(), {})
     assert actual['id'] == 12.5
 
 
@@ -59,7 +59,7 @@ def test_number_type_casting():
     )
 )
 def test_boolean_type_casting(input_, expected):
-    serializer = ParameterSerializer(data=[{
+    serializer = ParameterSerializer(many=True, data=[{
         'type': BOOLEAN,
         'in': QUERY,
         'description': 'id',
@@ -67,7 +67,7 @@ def test_boolean_type_casting(input_, expected):
     }])
     assert serializer.is_valid(), serializer.errors
     parameters = {'id': input_}
-    actual = type_cast_parameters(parameters, serializer.object, {})
+    actual = type_cast_parameters(parameters, serializer.save(), {})
     assert actual['id'] == expected
 
 
@@ -85,7 +85,7 @@ def test_boolean_type_casting(input_, expected):
     )
 )
 def test_array_type_casting(format_, value):
-    serializer = ParameterSerializer(data=[{
+    serializer = ParameterSerializer(many=True, data=[{
         'type': ARRAY,
         'collectionFormat': format_,
         'in': QUERY,
@@ -95,5 +95,5 @@ def test_array_type_casting(format_, value):
     }])
     assert serializer.is_valid(), serializer.errors
     parameters = {'id': value}
-    actual = type_cast_parameters(parameters, serializer.object, {})
+    actual = type_cast_parameters(parameters, serializer.save(), {})
     assert actual['id'] == [1, 2, 3]

@@ -165,7 +165,7 @@ def test_non_required_circular_reference():
         context={'deferred_references': set()},
     )
     assert serializer.is_valid(), serializer.errors
-    definitions = serializer.object
+    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,
@@ -194,7 +194,7 @@ def test_required_circular_reference():
         context={'deferred_references': set()},
     )
     assert serializer.is_valid(), serializer.errors
-    definitions = serializer.object
+    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,
@@ -238,7 +238,7 @@ def test_nested_references_are_validated():
         context={'deferred_references': set()},
     )
     assert serializer.is_valid(), serializer.errors
-    definitions = serializer.object
+    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,

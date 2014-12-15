@@ -58,6 +58,9 @@ class DefinitionsSerializer(HomogenousDictSerializer):
             )
         return super(DefinitionsSerializer, self).validate(attrs)
 
+    def create(self, validated_data):
+        return validated_data
+
 
 class PropertiesSerializer(HomogenousDictSerializer):
     value_serializer_class = SchemaSerializer
@@ -228,3 +231,7 @@ class SwaggerDefinitionsSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return validated_data
+
+    def update(self, instance, validated_data):
+        instance.update(validated_data)
+        return instance

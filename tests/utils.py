@@ -104,6 +104,35 @@ def assert_message_in_errors(message, errors, target_path=None):
             ))
 
 
+def _enumerate_error_paths(errors, namespace=''):
+    if isinstance(errors, six.string_types):
+        yield namespace
+    elif isinstance(errors, collections.Mapping):
+        for key, value in errors.items():
+            for path in _enumerate_error_paths(
+                value,
+                '.'.join((namespace, key)).strip('.'),
+            ):
+                yield path
+    elif isinstance(errors, list):
+        for index, error in enumerate(errors):
+            for path in _enumerate_error_paths(
+                error,
+                '.'.join((namespace, six.text_type(index))).strip('.'),
+            ):
+                yield path
+    else:
+        raise ValueError("Unsupported Type")
+
+
+def enumerate_error_paths(*args, **kwargs):
+    return tuple(_enumerate_error_paths(*args, **kwargs))
+
+
+def assert_path_not_in_errors(path, errors):
+    assert not find_matching_paths(path, errors)
+
+
 def generate_validator_from_schema(schema, **kwargs):
     from flex.serializers.core import SchemaSerializer
 

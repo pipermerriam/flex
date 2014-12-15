@@ -23,7 +23,7 @@ from flex.constants import (
     ),
 )
 def test_minimum_length_validation_with_too_short_values(min_length, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -32,9 +32,9 @@ def test_minimum_length_validation_with_too_short_values(min_length, value):
             'required': True,
             'minLength': min_length,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -57,7 +57,7 @@ def test_minimum_length_validation_with_too_short_values(min_length, value):
     ),
 )
 def test_minimum_length_validation_with_valid_lengths(min_length, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -66,9 +66,9 @@ def test_minimum_length_validation_with_valid_lengths(min_length, value):
             'required': True,
             'minLength': min_length,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -87,7 +87,7 @@ def test_minimum_length_validation_with_valid_lengths(min_length, value):
     ),
 )
 def test_maximum_length_validation_with_too_long_values(max_length, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -96,9 +96,9 @@ def test_maximum_length_validation_with_too_long_values(max_length, value):
             'required': True,
             'maxLength': max_length,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -121,7 +121,7 @@ def test_maximum_length_validation_with_too_long_values(max_length, value):
     ),
 )
 def test_maximum_length_validation_with_valid_lengths(max_length, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -130,9 +130,9 @@ def test_maximum_length_validation_with_valid_lengths(max_length, value):
             'required': True,
             'maxLength': max_length,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

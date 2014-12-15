@@ -31,7 +31,7 @@ def test_header_type_validation_for_invalid_values(type_, value):
         }
     )
     assert serializer.is_valid()
-    header_definition = serializer.object
+    header_definition = serializer.save()
     validators = construct_header_validators(header_definition=header_definition, context={})
 
     with pytest.raises(ValidationError) as err:

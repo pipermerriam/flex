@@ -13,7 +13,10 @@ from flex.constants import (
     ACCESS_CODE,
 )
 
-from tests.utils import assert_error_message_equal
+from tests.utils import (
+    assert_error_message_equal,
+    assert_path_not_in_errors,
+)
 
 
 #
@@ -37,6 +40,7 @@ def test_type_as_api_key_with_name_value():
         data={'type': API_KEY, 'name': 'TestName'},
     )
 
+    serializer.is_valid()
     assert 'name' not in serializer.errors
 
 
@@ -48,9 +52,11 @@ def test_type_as_api_key_with_name_value():
     ),
 )
 def test_name_optional_for_non_api_key_types(type_):
-    assert 'name' not in SecuritySchemeSerializer(
+    serializer = SecuritySchemeSerializer(
         data={'type': type_},
-    ).errors
+    )
+    serializer.is_valid()
+    assert 'name' not in serializer.errors
 
 
 #
@@ -81,7 +87,8 @@ def test_type_as_api_key_with_in_value(in_):
         data={'type': API_KEY, 'in': in_},
     )
 
-    assert 'in' not in serializer.errors
+    serializer.is_valid()
+    assert_path_not_in_errors('in', serializer.errors)
 
 
 @pytest.mark.parametrize(
@@ -92,9 +99,11 @@ def test_type_as_api_key_with_in_value(in_):
     ),
 )
 def test_in_optional_for_non_api_key_types(type_):
-    assert 'in' not in SecuritySchemeSerializer(
+    serializer = SecuritySchemeSerializer(
         data={'type': type_},
-    ).errors
+    )
+    serializer.is_valid()
+    assert_path_not_in_errors('in', serializer.errors)
 
 
 #
@@ -117,17 +126,21 @@ def test_type_as_oath2_with_flow_value():
     serializer = SecuritySchemeSerializer(
         data={'type': OAUTH_2, 'flow': IMPLICIT},
     )
+    serializer.is_valid()
 
-    assert 'flow' not in serializer.errors
+    assert_path_not_in_errors('flow', serializer.errors)
 
 
-def test_flow_optional_for_non_oath_types():
-    assert 'flow' not in SecuritySchemeSerializer(
-        data={'type': BASIC},
-    ).errors
-    assert 'flow' not in SecuritySchemeSerializer(
-        data={'type': API_KEY},
-    ).errors
+@pytest.mark.parametrize(
+    'type_',
+    (BASIC, API_KEY),
+)
+def test_flow_optional_for_non_oath_types(type_):
+    serializer = SecuritySchemeSerializer(
+        data={'type': type_},
+    )
+    serializer.is_valid()
+    assert_path_not_in_errors('flow', serializer.errors)
 
 
 #
@@ -163,6 +176,7 @@ def test_type_as_oath2_with_authorization_url_value(flow):
         },
     )
 
+    serializer.is_valid()
     assert 'authorizationUrl' not in serializer.errors
 
 
@@ -171,9 +185,11 @@ def test_type_as_oath2_with_authorization_url_value(flow):
     (BASIC, API_KEY)
 )
 def test_authorization_url_optional_for_non_oath_types(type_):
-    assert 'authorizationUrl' not in SecuritySchemeSerializer(
+    serializer = SecuritySchemeSerializer(
         data={'type': type_},
-    ).errors
+    )
+    serializer.is_valid()
+    assert_path_not_in_errors('authorizationUrl', serializer.errors)
 
 
 @pytest.mark.parametrize(
@@ -181,9 +197,11 @@ def test_authorization_url_optional_for_non_oath_types(type_):
     (PASSWORD, APPLICATION)
 )
 def test_authorization_url_optional_for_invalid_flows(flow):
-    assert 'authorizationUrl' not in SecuritySchemeSerializer(
+    serializer = SecuritySchemeSerializer(
         data={'type': OAUTH_2, 'flow': flow},
-    ).errors
+    )
+    serializer.is_valid()
+    assert_path_not_in_errors('authorizationUrl', serializer.errors)
 
 
 #
@@ -219,7 +237,8 @@ def test_type_as_oath2_with_token_url_value(flow):
         },
     )
 
-    assert 'tokenUrl' not in serializer.errors
+    serializer.is_valid()
+    assert_path_not_in_errors('tokenUrl', serializer.errors)
 
 
 @pytest.mark.parametrize(
@@ -227,9 +246,11 @@ def test_type_as_oath2_with_token_url_value(flow):
     (BASIC, API_KEY)
 )
 def test_token_url_optional_for_non_oath_types(type_):
-    assert 'tokenUrl' not in SecuritySchemeSerializer(
+    serializer = SecuritySchemeSerializer(
         data={'type': type_},
-    ).errors
+    )
+    serializer.is_valid()
+    assert_path_not_in_errors('tokenUrl', serializer.errors)
 
 
 @pytest.mark.parametrize(
@@ -237,6 +258,8 @@ def test_token_url_optional_for_non_oath_types(type_):
     (IMPLICIT,)
 )
 def test_token_url_optional_for_invalid_flows(flow):
-    assert 'tokenUrl' not in SecuritySchemeSerializer(
+    serializer = SecuritySchemeSerializer(
         data={'type': OAUTH_2, 'flow': flow},
-    ).errors
+    )
+    serializer.is_valid()
+    assert_path_not_in_errors('tokenUrl', serializer.errors)

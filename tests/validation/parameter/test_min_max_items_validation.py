@@ -27,7 +27,7 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_min_items_on_values_with_too_few_items(min_items, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -37,9 +37,9 @@ def test_min_items_on_values_with_too_few_items(min_items, value):
             'minItems': min_items,
             'items': {'type': STRING},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -64,7 +64,7 @@ def test_min_items_on_values_with_too_few_items(min_items, value):
     ),
 )
 def test_min_items_on_values_with_valid_array_length(min_items, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -74,9 +74,9 @@ def test_min_items_on_values_with_valid_array_length(min_items, value):
             'minItems': min_items,
             'items': {'type': STRING},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -96,7 +96,7 @@ def test_min_items_on_values_with_valid_array_length(min_items, value):
     ),
 )
 def test_max_items_on_values_with_too_many_items(max_items, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -106,9 +106,9 @@ def test_max_items_on_values_with_too_many_items(max_items, value):
             'maxItems': max_items,
             'items': {'type': STRING},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -134,7 +134,7 @@ def test_max_items_on_values_with_too_many_items(max_items, value):
     ),
 )
 def test_max_items_on_values_with_valid_array_length(max_items, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -144,9 +144,9 @@ def test_max_items_on_values_with_valid_array_length(max_items, value):
             'maxItems': max_items,
             'items': {'type': STRING},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

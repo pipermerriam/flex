@@ -28,7 +28,7 @@ def test_getting_parameter_values_from_path():
         USERNAME_IN_PATH,
     ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
 
     values = get_path_parameter_values(
         request_path='/get/fernando/posts/1234/',

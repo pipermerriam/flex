@@ -89,11 +89,10 @@ def test_items_detects_invalid_single_schema():
     )
 
     assert not serializer.is_valid()
-    assert 'items' in serializer.errors
-    assert 'minLength' in serializer.errors['items'][0]
-    assert_error_message_equal(
-        serializer.errors['items'][0]['minLength'][0],
+    assert_message_in_errors(
         serializer.error_messages['invalid_type_for_min_length'],
+        serializer.errors,
+        'items.minLength',
     )
 
 
@@ -110,6 +109,7 @@ def test_items_with_valid_singular_schema():
         data=schema,
     )
 
+    serializer.is_valid()
     assert 'items' not in serializer.errors
 
 
@@ -165,6 +165,7 @@ def test_items_with_array_of_valid_schemas():
         data=schema,
     )
 
+    serializer.is_valid()
     assert 'items' not in serializer.errors
 
 
@@ -189,4 +190,5 @@ def test_items_with_mixed_array_of_references_and_schemas():
         context={'deferred_references': set()}
     )
 
+    serializer.is_valid()
     assert 'items' not in serializer.errors

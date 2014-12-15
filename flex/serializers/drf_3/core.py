@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import functools
 import six
 
+from rest_framework.fields import empty
 from rest_framework import serializers
 
 from flex.exceptions import (
@@ -10,6 +11,7 @@ from flex.exceptions import (
     ErrorDict,
 )
 from flex.context_managers import ErrorCollection
+from flex.serializers.datastructures import IntKeyedDict
 from flex.serializers.validators import (
     host_validator,
     path_validator,
@@ -124,9 +126,17 @@ class ResponseSerializer(BaseResponseSerializer):
     # TODO: how do we do examples
     # examples =
 
+    def get_value(self, data):
+        return data.get(int(self.field_name), empty)
+
 
 class ResponsesSerializer(HomogenousDictSerializer):
     value_serializer_class = ResponseSerializer
+    value_serializer_kwargs = {'allow_null': True, 'required': False}
+
+    def to_internal_value(self, data):
+        value = super(ResponsesSerializer, self).to_internal_value(data)
+        return IntKeyedDict(value)
 
 
 class SecuritySerializer(HomogenousDictSerializer):
@@ -161,6 +171,7 @@ class OperationSerializer(serializers.Serializer):
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#operationObject
     """
     tags = serializers.ListField(
+        allow_null=True, required=False,
         child=serializers.CharField(allow_null=True, required=False, validators=[string_type_validator]),
     )
     summary = serializers.CharField(allow_null=True, required=False)
@@ -168,14 +179,17 @@ class OperationSerializer(serializers.Serializer):
     externalDocs = serializers.CharField(allow_null=True, required=False)
     operationId = serializers.CharField(allow_null=True, required=False)
     consumes = serializers.ListField(
+        allow_null=True, required=False,
         child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
     produces = serializers.ListField(
+        allow_null=True, required=False,
         child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
     parameters = ParameterSerializer(allow_null=True, required=False, many=True)
     responses = ResponsesSerializer()
     schemes = serializers.ListField(
+        allow_null=True, required=False,
         child=serializers.CharField(allow_null=True, required=False, validators=[scheme_validator]),
     )
     deprecated = serializers.NullBooleanField(required=False)
@@ -306,12 +320,15 @@ class SwaggerSerializer(serializers.Serializer):
         validators=[path_validator],
     )
     schemes = serializers.ListField(
+        allow_null=True, required=False,
         child=serializers.CharField(allow_null=True, required=False, validators=[scheme_validator]),
     )
     consumes = serializers.ListField(
+        allow_null=True, required=False,
         child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
     produces = serializers.ListField(
+        allow_null=True, required=False,
         child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
     )
 
