@@ -87,6 +87,17 @@ class ReprSafeSerializer(object):
         )
 
 
+class MaybeListSerializer(ReprSafeListSerializer):
+    """
+    For serializer fields that are allowed to be a reference, an object, or an
+    iterable of objects.
+    """
+    def to_internal_value(self, data):
+        if isinstance(data, list):
+            return super(MaybeListSerializer, self).to_internal_value(data)
+        return self.child.run_validation(data)
+
+
 class BaseResponseSerializer(serializers.Serializer):
     """
     https://github.com/wordnik/swagger-spec/blob/master/versions/2.0.md#responseObject
@@ -362,20 +373,13 @@ BaseSchemaSerializer._declared_fields['$ref'] = serializers.CharField(allow_null
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):
-    def __init__(self, *args, **kwargs):
-        if 'data' in kwargs:
-            data = kwargs['data']
-            if isinstance(data, collections.Mapping):
-                kwargs['many'] = False
-            elif isinstance(data, six.string_types):
-                kwargs['many'] = False
-
-        super(BaseItemsSerializer, self).__init__(*args, **kwargs)
-
     def run_validation(self, data):
         if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
-            raise ValidationError(MESSAGES['items']['invalid_type'])
+            raise ValidationError([[{'non_field_errors': MESSAGES['items']['invalid_type']}]])
         return super(BaseItemsSerializer, self).to_internal_value(data)
+
+    class Meta:
+        list_serializer_class = MaybeListSerializer
 
 
 class BaseParameterSerializer(TypedDefaultMixin, CommonJSONSchemaSerializer):

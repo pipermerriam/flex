@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 
 TYPE_MESSAGES = {
+    'unknown': 'Unknown type: {0}',
     'invalid': "Got value `{0}` of type `{1}`.  Value must be of type(s): `{2}`",
     'invalid_header_type': (
         "Invalid type for header: `{0}`.  Must be one of 'string', 'number', "

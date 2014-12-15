@@ -12,7 +12,10 @@ from flex.constants import (
     STRING,
 )
 
-from tests.utils import assert_error_message_equal
+from tests.utils import (
+    assert_error_message_equal,
+    assert_message_in_errors,
+)
 
 
 def test_empty_schema_is_valid():
@@ -66,10 +69,9 @@ def test_items_invalid_when_not_array_or_object_or_reference(items):
     )
 
     assert not serializer.is_valid()
-    assert 'items' in serializer.errors
-    assert_error_message_equal(
-        serializer.errors['items'][0],
+    assert_message_in_errors(
         MESSAGES['items']['invalid_type'],
+        serializer.errors,
     )
 
 

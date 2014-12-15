@@ -332,7 +332,13 @@ class BaseItemsSerializer(BaseSchemaSerializer):
 
     def from_native(self, data, files=None):
         if not is_value_of_any_type(data, (ARRAY, OBJECT, STRING)):
-            raise ValidationError(MESSAGES['items']['invalid_type'])
+            if self.many:
+                self._errors = getattr(self, '_errors') or []
+                self._errors.append({'non_field_errors': MESSAGES['items']['invalid_type']})
+            else:
+                self._errors = getattr(self, '_errors') or ErrorDict()
+                self._errors.add_error('non_field_errors', MESSAGES['items']['invalid_type'])
+            return
         return super(BaseItemsSerializer, self).from_native(data, files)
 
 

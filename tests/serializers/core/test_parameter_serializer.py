@@ -12,7 +12,6 @@ def test_unknown_parameter_reference():
     )
 
     assert not serializer.is_valid()
-    print serializer.errors
     assert_error_message_equal(
         serializer.errors[0][0],
         MESSAGES['unknown_reference']['parameter'],

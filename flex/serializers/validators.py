@@ -100,7 +100,7 @@ def format_validator(value):
 @maybe_iterable
 def type_validator(value):
     if value not in PRIMATIVE_TYPES:
-        raise ValidationError('Unknown type: {0}'.format(value))
+        raise ValidationError(MESSAGES['type']['unknown'].format(value))
 
 
 def header_type_validator(value):

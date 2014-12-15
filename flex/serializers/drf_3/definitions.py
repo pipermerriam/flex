@@ -64,10 +64,16 @@ class PropertiesSerializer(HomogenousDictSerializer):
 
 
 class ItemsSerializer(BaseItemsSerializer):
+    def run_validation(self, data):
+        if isinstance(data, six.string_types):
+            value = self.to_internal_value(data)
+            return value
+        return super(ItemsSerializer, self).run_validation(data)
+
     def to_internal_value(self, data):
         if isinstance(data, six.string_types):
             self.context['deferred_references'].add(data)
-            return [data]
+            return data
         return super(ItemsSerializer, self).to_internal_value(data)
 
 
