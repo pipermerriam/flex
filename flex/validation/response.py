@@ -85,7 +85,6 @@ def generate_response_validator(response_definition, context):
     return functools.partial(
         validate_object,
         validators=validators,
-        inner=True,
     )
 
 

@@ -123,12 +123,12 @@ def validate(schema, target=None, **kwargs):
 def validate_api_call(schema, request, response):
     with ErrorCollection() as errors:
         try:
-            operation_definition = generate_request_validator(schema, inner=True)(request)
+            operation_definition = generate_request_validator(schema)(request)
         except ValidationError as err:
             errors['request'].add_error(err.messages or getattr(err, 'detail'))
             return
 
         try:
-            generate_response_validator(operation_definition, schema, inner=True)(response)
+            generate_response_validator(operation_definition, schema)(response)
         except ValidationError as err:
             errors['response'].add_error(err.messages or getattr(err, 'detail'))

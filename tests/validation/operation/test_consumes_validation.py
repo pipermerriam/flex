@@ -37,7 +37,7 @@ def test_consumes_validation_valid_mimetype_from_global_definition():
         operation_definition=schema['paths']['/get']['get'],
         context=schema,
     )
-    validate_operation(response, validators)
+    validate_operation(response.request, validators)
 
 
 def test_consumes_validation_invalid_mimetype_from_global_definition():
@@ -62,7 +62,7 @@ def test_consumes_validation_invalid_mimetype_from_global_definition():
         context=schema,
     )
     with pytest.raises(ValidationError):
-        validate_operation(response, validators, inner=True)
+        validate_operation(response.request, validators, inner=True)
 
 
 def test_consumes_validation_for_valid_mimetype_from_operation_definition():
@@ -89,7 +89,7 @@ def test_consumes_validation_for_valid_mimetype_from_operation_definition():
         operation_definition=schema['paths']['/get']['get'],
         context=schema,
     )
-    validate_operation(response, validators)
+    validate_operation(response.request, validators)
 
 
 def test_consumes_validation_for_invalid_mimetype_from_operation_definition():
@@ -117,4 +117,4 @@ def test_consumes_validation_for_invalid_mimetype_from_operation_definition():
         context=schema,
     )
     with pytest.raises(ValidationError):
-        validate_operation(response, validators, inner=True)
+        validate_operation(response.request, validators, inner=True)
