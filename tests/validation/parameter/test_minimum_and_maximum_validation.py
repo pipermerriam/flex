@@ -11,7 +11,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 #
@@ -43,13 +43,12 @@ def test_minimum_validation_for_invalid_values(minimum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'minimum' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['minimum'][0],
+    assert_message_in_errors(
         MESSAGES['minimum']['invalid'],
+        err.value.detail,
+        'id.minimum',
     )
 
 
@@ -83,13 +82,12 @@ def test_exclusive_minimum_validation_for_invalid_values(minimum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'minimum' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['minimum'][0],
+    assert_message_in_errors(
         MESSAGES['minimum']['invalid'],
+        err.value.detail,
+        'id.minimum',
     )
 
 
@@ -120,7 +118,7 @@ def test_minimum_validation_for_valid_values(minimum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})
 
 
 @pytest.mark.parametrize(
@@ -149,7 +147,7 @@ def test_exclusive_minimum_validation_for_valid_values(minimum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})
 
 
 #
@@ -181,13 +179,12 @@ def test_maximum_validation_for_invalid_values(maximum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'maximum' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['maximum'][0],
+    assert_message_in_errors(
         MESSAGES['maximum']['invalid'],
+        err.value.detail,
+        'id.maximum',
     )
 
 
@@ -221,13 +218,12 @@ def test_exclusive_maximum_validation_for_invalid_values(maximum, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'maximum' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['maximum'][0],
+    assert_message_in_errors(
         MESSAGES['maximum']['invalid'],
+        err.value.detail,
+        'id.maximum',
     )
 
 
@@ -258,7 +254,7 @@ def test_maximum_validation_for_valid_values(maximum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})
 
 
 @pytest.mark.parametrize(
@@ -287,4 +283,4 @@ def test_exclusive_maximum_validation_for_valid_values(maximum, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})

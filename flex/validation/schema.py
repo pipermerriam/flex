@@ -82,7 +82,7 @@ def validate_items(objs, validators):
     errors = ErrorList()
     for obj, validator in zip(objs, validators):
         try:
-            validate_object(obj, validator, inner=True)
+            validate_object(obj, validator)
         except ValidationError as e:
             errors.add_error(e.detail)
 
@@ -139,7 +139,7 @@ validator_mapping = {
 def validate_properties(obj, key, validators):
     if obj is EMPTY:
         return
-    validate_object(obj.get(key, EMPTY), validators, inner=True)
+    validate_object(obj.get(key, EMPTY), validators)
 
 
 class LazyReferenceValidator(object):
@@ -158,7 +158,7 @@ class LazyReferenceValidator(object):
         self.context = context
 
     def __call__(self, value):
-        return validate_object(value, self.validators, inner=True)
+        return validate_object(value, self.validators)
 
     @property
     def validators(self):

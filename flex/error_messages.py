@@ -105,6 +105,11 @@ UNKNOWN_REFERENCE_MESSAGES = {
 }
 
 
+CONTENT_TYPE_MESSAGES = {
+    'invalid': 'Invalid content type `{0}`.  Must be one of `{1}`.',
+}
+
+
 MESSAGES = {
     'type': TYPE_MESSAGES,
     'format': FORMAT_MESSAGES,
@@ -124,4 +129,5 @@ MESSAGES = {
     'response': RESPONSE_MESSAGES,
     'path': PATH_MESSAGES,
     'unknown_reference': UNKNOWN_REFERENCE_MESSAGES,
+    'content_type': CONTENT_TYPE_MESSAGES,
 }

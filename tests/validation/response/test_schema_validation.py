@@ -42,10 +42,9 @@ def test_basic_response_body_schema_validation_with_invalid_value():
 
     with pytest.raises(ValidationError) as err:
         validate_response(
-            response,
-            schema['paths']['/get']['get'],
+            response=response,
+            request_method='get',
             context=schema,
-            inner=True,
         )
 
     assert 'body' in err.value.messages[0]

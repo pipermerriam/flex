@@ -50,30 +50,30 @@ def get_path_parameter_values(request_path, api_path, path_parameters, context):
     return type_cast_parameters(raw_values, path_parameters, context=context)
 
 
-def validate_path_parameters(request_path, api_path, path_parameters, context, inner=False):
+def validate_path_parameters(request_path, api_path, path_parameters, context):
     """
     Helper function for validating a request path
     """
     parameter_values = get_path_parameter_values(
         request_path, api_path, path_parameters, context,
     )
-    validate_parameters(parameter_values, path_parameters, context=context, inner=inner)
+    validate_parameters(parameter_values, path_parameters, context=context)
 
 
-def validate_query_parameters(raw_query_data, query_parameters, context, inner=False):
+def validate_query_parameters(raw_query_data, query_parameters, context):
     query_data = {}
     for key, value in raw_query_data.items():
         if is_non_string_iterable(value) and len(value) == 1:
             query_data[key] = value[0]
         else:
             query_data[key] = value
-    validate_parameters(query_data, query_parameters, context, inner=inner)
+    validate_parameters(query_data, query_parameters, context)
 
 
-def validate_parameters(parameter_values, parameters, context, inner=False):
+def validate_parameters(parameter_values, parameters, context):
     validators = construct_multi_parameter_validators(parameters, context=context)
 
-    with ErrorCollection(inner=inner) as errors:
+    with ErrorCollection() as errors:
         # we should have a validator for every parameter value
         assert not set(parameter_values.keys()).difference(validators.keys())
 
@@ -131,7 +131,6 @@ def construct_multi_parameter_validators(parameters, context):
         validators[key] = functools.partial(
             validate_object,
             validators=parameter_validators,
-            inner=True,
         )
 
     return validators

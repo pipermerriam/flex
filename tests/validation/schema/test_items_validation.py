@@ -7,7 +7,10 @@ from flex.constants import (
     STRING,
 )
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_path_in_errors,
+)
 
 
 @pytest.mark.parametrize(
@@ -31,10 +34,9 @@ def test_invalid_values_against_single_schema(items):
     validator = generate_validator_from_schema(schema)
 
     with pytest.raises(ValidationError) as err:
-        validator(items, inner=True)
+        validator(items)
 
-    assert 'items' in err.value.messages[0]
-    assert len(err.value.messages[0]['items']) == 2
+    assert_path_in_errors('items', err.value.detail)
 
 
 @pytest.mark.parametrize(
@@ -63,10 +65,9 @@ def test_invalid_values_against_schema_reference(items):
     validator = generate_validator_from_schema(schema, context=context)
 
     with pytest.raises(ValidationError) as err:
-        validator(items, inner=True)
+        validator(items)
 
-    assert 'items' in err.value.messages[0]
-    assert len(err.value.messages[0]['items']) == 2
+    assert_path_in_errors('items', err.value.detail)
 
 
 def test_invalid_values_against_list_of_schemas():
@@ -86,18 +87,13 @@ def test_invalid_values_against_list_of_schemas():
     with pytest.raises(ValidationError) as err:
         validator(
             [11, 'abc-abc', -5, 'ab', 'wrong-type'],
-            inner=True,
         )
 
-    assert 'items' in err.value.messages[0]
-    assert len(err.value.messages[0]['items']) == 5
-    _1, _2, _3, _4, _5 = err.value.messages[0]['items']
-
-    assert 'maximum' in _1
-    assert 'maxLength' in _2
-    assert 'minimum' in _3
-    assert 'minLength' in _4
-    assert 'type' in _5
+    assert_path_in_errors('items.0.maximum', err.value.detail)
+    assert_path_in_errors('items.1.maxLength', err.value.detail)
+    assert_path_in_errors('items.2.minimum', err.value.detail)
+    assert_path_in_errors('items.3.minLength', err.value.detail)
+    assert_path_in_errors('items.4.type', err.value.detail)
 
 
 def test_items_past_the_number_of_schemas_provided_are_skipped():
@@ -115,5 +111,4 @@ def test_items_past_the_number_of_schemas_provided_are_skipped():
     validator(
         [0, 5, 10, 20, 30, 40],
         # 20, 30, and 40 don't conform, but are beyond the declared number of schemas.
-        inner=True,
     )

@@ -12,7 +12,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 #
@@ -45,13 +45,12 @@ def test_min_items_on_values_with_too_few_items(min_items, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'minItems' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['minItems'][0],
+    assert_message_in_errors(
         MESSAGES['min_items']['invalid'],
+        err.value.detail,
+        'id.minItems',
     )
 
 
@@ -81,7 +80,7 @@ def test_min_items_on_values_with_valid_array_length(min_items, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})
 
 
 #
@@ -114,13 +113,12 @@ def test_max_items_on_values_with_too_many_items(max_items, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'maxItems' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['maxItems'][0],
+    assert_message_in_errors(
         MESSAGES['max_items']['invalid'],
+        err.value.detail,
+        'id.maxItems',
     )
 
 
@@ -151,4 +149,4 @@ def test_max_items_on_values_with_valid_array_length(max_items, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})

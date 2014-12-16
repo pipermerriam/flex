@@ -14,7 +14,7 @@ from flex.validation.common import (
 from flex.http import normalize_request
 
 
-def validate_request(request, paths, base_path, context, inner=False):
+def validate_request(request, paths, base_path, context):
     """
     Request validation does the following steps.
 
@@ -23,14 +23,12 @@ def validate_request(request, paths, base_path, context, inner=False):
        3. validate that the request parameters conform to the parameter
           definitions for the operation definition.
     """
-    with ErrorCollection(inner=inner) as errors:
+    with ErrorCollection() as errors:
         # 1
         try:
             api_path = validate_path_to_api_path(
-                request=request,
-                paths=paths,
-                base_path=base_path,
-                context=context,
+                path=request.path,
+                **context
             )
         except ValidationError as err:
             errors['path'].add_error(err.detail)
@@ -65,7 +63,7 @@ def validate_request(request, paths, base_path, context, inner=False):
             context=context,
         )
         try:
-            validate_operation(request, operation_validators, inner=True)
+            validate_operation(request, operation_validators)
         except ValidationError as err:
             errors['method'].add_error(err.detail)
 

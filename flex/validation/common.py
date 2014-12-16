@@ -314,12 +314,12 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
-def validate_object(obj, validators, inner=False):
+def validate_object(obj, validators):
     """
     Takes a mapping and applies a mapping of validator functions to it
     collecting and reraising any validation errors that occur.
     """
-    with ErrorCollection(inner=inner) as errors:
+    with ErrorCollection() as errors:
         if '$ref' in validators:
             ref_ = validators.pop('$ref')
             for k, v in ref_.validators.items():
@@ -410,15 +410,18 @@ def validate_request_method_to_operation(request_method, path_definition):
     return operation_definition
 
 
-def validate_path_to_api_path(path, paths, base_path, context):
+def validate_path_to_api_path(path, paths, basePath='', parameters=None, **kwargs):
     """
     Given a path, find the api_path it matches.
     """
+    if parameters is None:
+        parameters = {}
     try:
         api_path = match_path_to_api_path(
             path_definitions=paths,
-            path=path,
-            base_path=base_path,
+            target_path=path,
+            base_path=basePath,
+            global_parameters=parameters,
         )
     except LookupError:
         raise ValidationError(MESSAGES['path']['unknown_path'])

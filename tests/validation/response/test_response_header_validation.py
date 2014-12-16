@@ -16,7 +16,7 @@ from tests.factories import (
     SchemaFactory,
     ResponseFactory,
 )
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 def test_response_header_validation():
@@ -45,19 +45,15 @@ def test_response_header_validation():
 
     with pytest.raises(ValidationError) as err:
         validate_response(
-            response,
-            operation_definition=schema['paths']['/get']['get'],
+            response=response,
+            request_method='get',
             context=schema,
-            inner=True,
         )
 
-    assert 'body' in err.value.messages[0]
-    assert 'headers' in err.value.messages[0]['body'][0]
-    assert 'Foo' in err.value.messages[0]['body'][0]['headers'][0]
-    assert 'type' in err.value.messages[0]['body'][0]['headers'][0]['Foo'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['body'][0]['headers'][0]['Foo'][0]['type'][0],
+    assert_message_in_errors(
         MESSAGES['type']['invalid'],
+        err.value.detail,
+        'body.headers.Foo.type',
     )
 
 
@@ -97,8 +93,7 @@ def test_response_header_validation_for_non_strings(type_, value):
     )
 
     validate_response(
-        response,
-        operation_definition=schema['paths']['/get']['get'],
+        response=response,
+        request_method='get',
         context=schema,
-        inner=True,
     )

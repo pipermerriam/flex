@@ -35,7 +35,7 @@ def test_header_type_validation_for_invalid_values(type_, value):
     validators = construct_header_validators(header_definition=header_definition, context={})
 
     with pytest.raises(ValidationError) as err:
-        validate_object(value, validators, inner=True)
+        validate_object(value, validators)
 
     assert 'type' in err.value.detail
     assert_error_message_equal(

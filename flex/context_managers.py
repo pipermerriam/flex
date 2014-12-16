@@ -5,7 +5,7 @@ from flex.exceptions import (
 
 
 class ErrorCollection(object):
-    def __init__(self, inner=False, message='Invalid'):
+    def __init__(self, message='Invalid'):
         self.message = message
         self.errors = ErrorDict()
 

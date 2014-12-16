@@ -126,7 +126,7 @@ def test_match_request_path_to_api_path(path, schema_path):
 
     path = match_path_to_api_path(
         path_definitions=paths,
-        path=path,
+        target_path=path,
         base_path=base_path,
     )
     assert path == schema_path

@@ -13,7 +13,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 @pytest.mark.parametrize(
@@ -36,13 +36,12 @@ def test_parameter_validation_enforces_type(type_, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'type' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['type'][0],
+    assert_message_in_errors(
         MESSAGES['type']['invalid'],
+        err.value.detail,
+        'id.type',
     )
 
 
@@ -72,4 +71,4 @@ def test_parameter_validation_with_correct_type(type_, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})

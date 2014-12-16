@@ -16,7 +16,7 @@ from tests.factories import (
     SchemaFactory,
     RequestFactory,
 )
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 def test_request_parameter_validation():
@@ -58,23 +58,16 @@ def test_request_parameter_validation():
             paths=schema['paths'],
             base_path=schema.get('base_path', ''),
             context=schema,
-            inner=True,
         )
 
-    assert 'method' in err.value.messages[0]
-    assert 'parameters' in err.value.messages[0]['method'][0]
-    assert 'path' in err.value.messages[0]['method'][0]['parameters'][0]
-    assert 'id' in err.value.messages[0]['method'][0]['parameters'][0]['path'][0]
-    assert 'format' in err.value.messages[0]['method'][0]['parameters'][0]['path'][0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['method'][0]['parameters'][0]['path'][0]['id'][0]['format'][0],
+    assert_message_in_errors(
         MESSAGES['format']['invalid_uuid'],
+        err.value.detail,
+        'method.parameters.path.id.format',
     )
 
-    assert 'query' in err.value.messages[0]['method'][0]['parameters'][0]
-    assert 'page' in err.value.messages[0]['method'][0]['parameters'][0]['query'][0]
-    assert 'type' in err.value.messages[0]['method'][0]['parameters'][0]['query'][0]['page'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['method'][0]['parameters'][0]['query'][0]['page'][0]['type'][0],
+    assert_message_in_errors(
         MESSAGES['type']['invalid'],
+        err.value.detail,
+        'query.page.type',
     )

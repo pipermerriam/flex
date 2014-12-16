@@ -10,7 +10,7 @@ from tests.factories import (
     SchemaFactory,
     RequestFactory,
 )
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 def test_request_validation_with_invalid_operation_on_path():
@@ -34,12 +34,11 @@ def test_request_validation_with_invalid_operation_on_path():
             paths=schema['paths'],
             base_path=schema.get('base_path', ''),
             context=schema,
-            inner=True,
         )
 
-    assert 'method' in err.value.messages[0]
-    assert_error_message_equal(
-        err.value.messages[0]['method'][0],
+    assert_message_in_errors(
         MESSAGES['request']['invalid_method'],
+        err.value.detail,
+        'method',
     )
 

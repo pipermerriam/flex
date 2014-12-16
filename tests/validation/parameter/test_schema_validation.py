@@ -13,7 +13,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 @pytest.mark.parametrize(
@@ -43,13 +43,12 @@ def test_parameter_schema_as_reference_validation_for_invalid_value(value, error
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, context=context, inner=True)
+        validate_parameters(parameter_values, parameters, context=context)
 
-    assert 'id' in err.value.messages[0]
-    assert error_key in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0][error_key][0],
+    assert_message_in_errors(
         MESSAGES[error_key][message_key],
+        err.value.messages,
+        'id.{0}'.format(error_key),
     )
 
 
@@ -77,13 +76,12 @@ def test_parameter_schema_validation_for_invalid_value(value, error_key, message
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, context={}, inner=True)
+        validate_parameters(parameter_values, parameters, context={})
 
-    assert 'id' in err.value.messages[0]
-    assert error_key in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0][error_key][0],
+    assert_message_in_errors(
         MESSAGES[error_key][message_key],
+        err.value.messages,
+        'id.{0}'.format(error_key),
     )
 
 
@@ -112,7 +110,7 @@ def test_local_parameter_values_override_schema(value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, context={}, inner=True)
+    validate_parameters(parameter_values, parameters, context={})
 
 
 @pytest.mark.parametrize(
@@ -142,4 +140,4 @@ def test_parameter_schema_validation_on_valid_values(value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, context={}, inner=True)
+    validate_parameters(parameter_values, parameters, context={})

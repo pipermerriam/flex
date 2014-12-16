@@ -33,10 +33,9 @@ def test_response_parameter_validation():
 
     with pytest.raises(ValidationError) as err:
         validate_response(
-            response,
-            operation_definition=schema['paths']['/get']['get'],
+            response=response,
+            request_method='get',
             context=schema,
-            inner=True,
         )
 
     assert 'status_code' in err.value.messages[0]

@@ -229,7 +229,7 @@ class PathsSerializer(HomogenousDictSerializer):
     allow_empty = True
 
     def validate(self, attrs):
-        with ErrorCollection(inner=True) as errors:
+        with ErrorCollection() as errors:
             for api_path, path_definition in attrs.items():
                 path_parameter_names = set(get_parameter_names_from_path(api_path))
 
