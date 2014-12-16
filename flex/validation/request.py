@@ -1,6 +1,3 @@
-import functools
-
-from flex.utils import chain_reduce_partial
 from flex.exceptions import ValidationError
 from flex.context_managers import ErrorCollection
 from flex.validation.operation import (
@@ -11,7 +8,6 @@ from flex.validation.common import (
     validate_request_method_to_operation,
     validate_path_to_api_path,
 )
-from flex.http import normalize_request
 
 
 def validate_request(request, schema):
