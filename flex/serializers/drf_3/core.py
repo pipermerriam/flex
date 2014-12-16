@@ -222,6 +222,18 @@ class PathItemSerializer(serializers.Serializer):
     # TODO: these can be a parameters reference object.
     parameters = ParameterSerializer(allow_null=True, required=False, many=True)
 
+    """
+    DRF3 splits `source` to populate source attrs which causes problems with
+    any dotted paths, as `source.split('.')` is called.
+    """
+    @property
+    def source_attrs(self):
+        return [self.source]
+
+    @source_attrs.setter
+    def source_attrs(self, value):
+        pass
+
 
 class TagSerializer(serializers.Serializer):
     """
