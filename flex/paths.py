@@ -1,3 +1,4 @@
+import collections
 import functools
 import re
 
@@ -6,6 +7,8 @@ from flex.constants import (
 )
 from flex.parameters import (
     find_parameter,
+    merge_parameter_lists,
+    dereference_parameter_list,
 )
 
 
@@ -84,34 +87,48 @@ def path_to_pattern(api_path, parameters):
     return pattern
 
 
-def path_to_regex(api_path, parameters):
-    pattern = path_to_pattern(api_path, parameters)
+def path_to_regex(api_path, path_parameters, global_parameters=None):
+    if global_parameters is None:
+        global_parameters = {}
+    pattern = path_to_pattern(
+        api_path=api_path,
+        parameters=merge_parameter_lists(
+            global_parameters.values(),
+            dereference_parameter_list(path_parameters, global_parameters),
+        ),
+    )
     return re.compile(pattern)
 
 
-def match_request_path_to_api_path(path_definitions, request_path, base_path=''):
+def match_path_to_api_path(path_definitions, target_path, base_path='', global_parameters=None):
     """
-    Given a request_path and a set of api path definitions, return the one that
-    matches.
+    Match a request or response path to one of the api paths.
 
     Anything other than exactly one match is an error condition.
     """
-    if request_path.startswith(base_path):
-        request_path = request_path[len(base_path):]
+    if global_parameters is None:
+        global_parameters = {}
+    assert isinstance(global_parameters, collections.Mapping)
+    if target_path.startswith(base_path):
+        target_path = target_path[len(base_path):]
 
     # Convert all of the api paths into Path instances for easier regex matching.
     paths = {
-        p: path_to_regex(p, (v or {}).get('parameters', {}))
+        p: path_to_regex(
+            api_path=p,
+            path_parameters=(v or {}).get('parameters', []),
+            global_parameters=global_parameters,
+        )
         for p, v in path_definitions.items()
     }
 
-    matches = [p for p, r in paths.items() if r.match(request_path)]
+    matches = [p for p, r in paths.items() if r.match(target_path)]
 
     if not matches:
-        raise LookupError('No paths found for {0}'.format(request_path))
+        raise LookupError('No paths found for {0}'.format(target_path))
     elif len(matches) > 1:
         raise LookupError('Multipue paths found for {0}.  Found `{1}`'.format(
-            request_path, matches,
+            target_path, matches,
         ))
     else:
         return matches[0]

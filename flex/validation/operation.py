@@ -18,11 +18,13 @@ from flex.parameters import (
     merge_parameter_lists,
 )
 from flex.validation.parameter import (
-    validate_path_parameters,
     validate_query_parameters,
 )
 from flex.validation.header import (
     construct_header_validators,
+)
+from flex.validation.path import (
+    generate_path_parameters_validator,
 )
 from flex.validation.common import (
     validate_object,
@@ -30,8 +32,8 @@ from flex.validation.common import (
 )
 
 
-def validate_operation(request, validators, inner=False):
-    with ErrorCollection(inner=inner) as errors:
+def validate_operation(request, validators):
+    with ErrorCollection() as errors:
         for key, validator in validators.items():
             try:
                 validator(request)
@@ -57,36 +59,11 @@ def generate_request_content_type_validator(consumes, **kwargs):
     return validator
 
 
-def validate_request_parameters(request, validators):
-    with ErrorCollection(inner=True) as errors:
-
-        for key, fn in validators.items():
-            try:
-                fn(request)
-            except ValidationError as err:
-                errors[key].add_error(err.detail)
-
-
-def generate_path_parameters_validator(api_path, path_parameters, context):
-    path_parameter_validator = functools.partial(
-        validate_path_parameters,
-        api_path=api_path,
-        path_parameters=path_parameters,
-        context=context,
-        inner=True,
-    )
-    return chain_reduce_partial(
-        operator.attrgetter('path'),
-        path_parameter_validator,
-    )
-
-
 def generate_query_parameters_validator(query_parameters, context):
     query_parameter_validator = functools.partial(
         validate_query_parameters,
         query_parameters=query_parameters,
         context=context,
-        inner=True,
     )
     return chain_reduce_partial(
         operator.attrgetter('query_data'),
@@ -95,6 +72,9 @@ def generate_query_parameters_validator(query_parameters, context):
 
 
 def generate_header_validator(headers, context, **kwargs):
+    """
+    Generates a validation function that will validate a dictionary of headers.
+    """
     validators = {}
     for header_definition in headers:
         header_processor = generate_value_processor(
@@ -104,20 +84,17 @@ def generate_header_validator(headers, context, **kwargs):
         header_validator = functools.partial(
             validate_object,
             validators=construct_header_validators(header_definition, context=context),
-            inner=True,
         )
         validators[header_definition['name']] = chain_reduce_partial(
             operator.methodcaller('get', header_definition['name'], EMPTY),
             header_processor,
             header_validator,
         )
-    return chain_reduce_partial(
-        operator.attrgetter('headers'),
-        functools.partial(validate_object, validators=validators, inner=True),
-    )
+    return functools.partial(validate_object, validators=validators)
 
 
-def generate_parameters_validator(api_path, path_definition, parameters, context, **kwargs):
+def generate_parameters_validator(api_path, path_definition, parameters,
+                                  context, **kwargs):
     """
     Generates a validator function to validate.
 
@@ -127,6 +104,8 @@ def generate_parameters_validator(api_path, path_definition, parameters, context
     - TODO: request.body against the body parameters.
     - TODO: request.formData against any form data.
     """
+    # TODO: figure out how to merge this with the same code in response
+    # validation.
     validators = {}
     path_level_parameters = path_definition.get('parameters', [])
     operation_level_parameters = parameters
@@ -138,8 +117,9 @@ def generate_parameters_validator(api_path, path_definition, parameters, context
 
     # PATH
     in_path_parameters = filter_parameters(all_parameters, in_=PATH)
-    validators['path'] = generate_path_parameters_validator(
-        api_path, in_path_parameters, context,
+    validators['path'] = chain_reduce_partial(
+        operator.attrgetter('path'),
+        generate_path_parameters_validator(api_path, in_path_parameters, context),
     )
 
     # QUERY
@@ -148,9 +128,12 @@ def generate_parameters_validator(api_path, path_definition, parameters, context
 
     # HEADERS
     in_header_parameters = filter_parameters(all_parameters, in_=HEADER)
-    validators['headers'] = generate_header_validator(in_header_parameters, context)
+    validators['headers'] = chain_reduce_partial(
+        operator.attrgetter('headers'),
+        generate_header_validator(in_header_parameters, context),
+    )
 
-    return functools.partial(validate_request_parameters, validators=validators)
+    return functools.partial(validate_object, validators=validators)
 
 
 validator_mapping = {

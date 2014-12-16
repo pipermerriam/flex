@@ -11,7 +11,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 @pytest.mark.parametrize(
@@ -41,13 +41,12 @@ def test_multiple_of_validation_for_invalid_values(divisor, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'multipleOf' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['multipleOf'][0],
+    assert_message_in_errors(
         MESSAGES['multiple_of']['invalid'],
+        err.value.detail,
+        'id.multipleOf',
     )
 
 
@@ -76,4 +75,4 @@ def test_multiple_of_validation_for_valid_multiples(divisor, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})

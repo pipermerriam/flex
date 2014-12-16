@@ -12,7 +12,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 def test_required_parameters_invalid_when_not_present():
@@ -24,13 +24,12 @@ def test_required_parameters_invalid_when_not_present():
     parameter_values = {}
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'required' in err.value.messages[0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['required'][0],
+    assert_message_in_errors(
         MESSAGES['required']['required'],
+        err.value.detail,
+        'id.required',
     )
 
 
@@ -51,4 +50,4 @@ def test_parameters_allowed_missing_when_not_required():
     parameters = serializer.save()
     parameter_values = {}
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})

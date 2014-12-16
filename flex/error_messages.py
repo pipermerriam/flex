@@ -73,7 +73,6 @@ ITEMS_MESSAGES = {
 
 
 REQUEST_MESSAGES = {
-    'unknown_path': 'Request path did not match any of the known api paths.',
     'invalid_method': (
         'Request was not one of the allowed request methods.  Got '
         '`{0}`: Expected one of: `{1}`'
@@ -90,6 +89,7 @@ RESPONSE_MESSAGES = {
 
 
 PATH_MESSAGES = {
+    'unknown_path': 'Request path did not match any of the known api paths.',
     'missing_parameter': (
         "The parameter named `{0}` is declared to be a PATH parameter but does "
         "not appear in the api path `{1}`.  All path parameters must exist as a "
@@ -102,6 +102,11 @@ UNKNOWN_REFERENCE_MESSAGES = {
     'security': "Unknown SecurityScheme reference `{0}`",
     'parameter': "Unknown Parameter reference `{0}`",
     'definition': 'Unknown definition reference `{0}`',
+}
+
+
+CONTENT_TYPE_MESSAGES = {
+    'invalid': 'Invalid content type `{0}`.  Must be one of `{1}`.',
 }
 
 
@@ -124,4 +129,5 @@ MESSAGES = {
     'response': RESPONSE_MESSAGES,
     'path': PATH_MESSAGES,
     'unknown_reference': UNKNOWN_REFERENCE_MESSAGES,
+    'content_type': CONTENT_TYPE_MESSAGES,
 }

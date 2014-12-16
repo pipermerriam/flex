@@ -10,6 +10,8 @@ from flex.constants import (
     STRING,
 )
 
+from tests.utils import assert_path_in_errors
+
 
 #
 # minimum validation tests
@@ -40,10 +42,12 @@ def test_minimum_length_validation_with_too_short_values(min_length, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'minLength' in err.value.messages[0]['id'][0]
+    assert_path_in_errors(
+        'id.minLength',
+        err.value.detail,
+    )
 
 
 
@@ -73,7 +77,7 @@ def test_minimum_length_validation_with_valid_lengths(min_length, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})
 
 
 #
@@ -104,10 +108,12 @@ def test_maximum_length_validation_with_too_long_values(max_length, value):
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, {}, inner=True)
+        validate_parameters(parameter_values, parameters, {})
 
-    assert 'id' in err.value.messages[0]
-    assert 'maxLength' in err.value.messages[0]['id'][0]
+    assert_path_in_errors(
+        'id.maxLength',
+        err.value.detail,
+    )
 
 
 
@@ -137,4 +143,4 @@ def test_maximum_length_validation_with_valid_lengths(max_length, value):
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, {}, inner=True)
+    validate_parameters(parameter_values, parameters, {})

@@ -4,14 +4,30 @@ import operator
 from flex.exceptions import ValidationError
 from flex.utils import chain_reduce_partial
 from flex.context_managers import ErrorCollection
-from flex.validation.common import validate_object
+from flex.validation.common import (
+    validate_object,
+    validate_path_to_api_path,
+    validate_request_method_to_operation,
+)
 from flex.validation.schema import construct_schema_validators
 from flex.error_messages import MESSAGES
 from flex.constants import (
     EMPTY,
+    PATH,
+)
+from flex.parameters import (
+    filter_parameters,
+    merge_parameter_lists,
+    dereference_parameter_list,
 )
 from flex.validation.header import (
     construct_header_validators,
+)
+from flex.validation.path import (
+    generate_path_parameters_validator,
+)
+from flex.validation.common import (
+    generate_value_processor,
 )
 from flex.http import Response
 
@@ -43,7 +59,6 @@ def generate_response_body_validator(schema, context, **kwargs):
         functools.partial(
             validate_object,
             validators=validators,
-            inner=True,
         ),
     )
 
@@ -51,40 +66,29 @@ def generate_response_body_validator(schema, context, **kwargs):
 def generate_response_header_validator(headers, context, **kwargs):
     validators = {}
     for key, header_definition in headers.items():
+        # generate a function that will attempt to cast the header to the
+        # appropriate type.
+        header_processor = generate_value_processor(
+            context=context,
+            **header_definition
+        )
+        # generate a function that will validate the header.
         header_validator = functools.partial(
             validate_object,
             validators=construct_header_validators(header_definition, context=context),
-            inner=True,
         )
-        # Chain the individual header validation function with a methodcaller
-        # that will fetch the header with
-        # `response.headers.get(header_name, EMPTY)`
-        # and then feed that into the validation function.
+        # Chain the type casting function, the individual header validation
+        # function with a methodcaller that will fetch the header with
+        # `response.headers.get(header_name, EMPTY)` and then feed that into
+        # the type casting function and then into the validation function.
         validators[key] = chain_reduce_partial(
             operator.methodcaller('get', key, EMPTY),
+            header_processor,
             header_validator,
         )
     return chain_reduce_partial(
         operator.attrgetter('headers'),
-        functools.partial(validate_object, validators=validators, inner=True),
-    )
-
-
-validator_mapping = {
-    'schema': generate_response_body_validator,
-    'headers': generate_response_header_validator,
-}
-
-
-def generate_response_validator(response_definition, context):
-    validators = {}
-    for key in validator_mapping:
-        if key in response_definition:
-            validators[key] = validator_mapping[key](context=context, **response_definition)
-
-    return functools.partial(
-        validate_object,
-        validators=validators,
+        functools.partial(validate_object, validators=validators),
     )
 
 
@@ -92,7 +96,7 @@ def validate_response_content_type(response, content_types):
     assert isinstance(response, Response)  # TODO: remove this sanity check
     if response.content_type not in content_types:
         raise ValidationError(
-            'Invalid content type `{0}`.  Must be one of `{1}`.'.format(
+            MESSAGES['content_type']['invalid'].format(
                 response.content_type, content_types,
             ),
         )
@@ -105,7 +109,73 @@ def generate_response_content_type_validator(produces, **kwargs):
     )
 
 
-def validate_response(response, operation_definition, context, inner=False):
+def generate_path_validator(api_path, path_definition, parameters,
+                            context, **kwargs):
+    """
+    Generates a callable for validating the parameters in a response object.
+    """
+    global_parameters = context.get('parameters', {})
+    path_level_parameters = dereference_parameter_list(
+        path_definition.get('parameters', []),
+        global_parameters,
+    )
+    operation_level_parameters = dereference_parameter_list(
+        parameters,
+        global_parameters,
+    )
+
+    all_parameters = merge_parameter_lists(
+        path_level_parameters,
+        operation_level_parameters,
+    )
+
+    # PATH
+    in_path_parameters = filter_parameters(all_parameters, in_=PATH)
+    return chain_reduce_partial(
+        operator.attrgetter('path'),
+        generate_path_parameters_validator(api_path, in_path_parameters, context),
+    )
+
+
+validator_mapping = {
+    # TODO: tests for parameters AND figure out how to do parameters.
+    'headers': generate_response_header_validator,
+    'produces': generate_response_content_type_validator,
+    'schema': generate_response_body_validator,
+}
+
+
+def generate_response_validator(api_path, operation_definition, response_definition,
+                                path_definition, context):
+    validators = {}
+
+    # Parameters is special cause it needs data from both the
+    # `operation_definition` and the `path_definition`
+    validators['path'] = generate_path_validator(
+        api_path=api_path,
+        path_definition=path_definition,
+        parameters=operation_definition.get('parameters', []),
+        context=context,
+    )
+
+    for key in validator_mapping:
+        if key in response_definition:
+            validators[key] = validator_mapping[key](context=context, **response_definition)
+        elif key in operation_definition:
+            validators[key] = validator_mapping[key](context=context, **operation_definition)
+        elif key in path_definition:
+            validators[key] = validator_mapping[key](context=context, **path_definition)
+
+    if 'produces' in context and 'produces' not in validators:
+        validators['produces'] = generate_response_content_type_validator(**context)
+
+    return functools.partial(
+        validate_object,
+        validators=validators,
+    )
+
+
+def validate_response(response, request_method, schema):
     """
     Response validation involves the following steps.
        4. validate that the response status_code is in the allowed responses for
@@ -114,7 +184,30 @@ def validate_response(response, operation_definition, context, inner=False):
           schemas for the responses.
        6. headers, content-types, etc..., ???
     """
-    with ErrorCollection(inner=inner) as errors:
+    with ErrorCollection() as errors:
+        # 1
+        # TODO: tests
+        try:
+            api_path = validate_path_to_api_path(
+                path=response.path,
+                **schema
+            )
+        except ValidationError as err:
+            errors['path'].extend(list(err.messages))
+            return  # this causes an exception to be raised since errors is no longer falsy.
+
+        path_definition = schema['paths'][api_path] or {}
+
+        # TODO: tests
+        try:
+            operation_definition = validate_request_method_to_operation(
+                request_method=request_method,
+                path_definition=path_definition,
+            )
+        except ValidationError as err:
+            errors['method'].append(err.message)
+            return
+
         # 4
         try:
             response_definition = validate_status_code_to_response_definition(
@@ -126,23 +219,13 @@ def validate_response(response, operation_definition, context, inner=False):
         else:
             # 5
             response_validator = generate_response_validator(
-                response_definition,
-                context=context,
+                api_path,
+                operation_definition=operation_definition,
+                path_definition=path_definition,
+                response_definition=response_definition,
+                context=schema,
             )
             try:
                 response_validator(response)
             except ValidationError as err:
                 errors['body'].add_error(err.detail)
-
-        # TODO: this should be merged with `response_body_validator`.
-        response_content_type_validator = generate_response_content_type_validator(
-            # TODO: this is a messy way to default to the global produces.
-            produces=operation_definition.get('produces', context.get('produces', [])),
-        )
-        try:
-            response_content_type_validator(response)
-        except ValidationError as err:
-            errors['produces'].add_error(err.detail)
-
-        # 6
-        # TODO

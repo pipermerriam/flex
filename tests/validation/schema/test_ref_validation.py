@@ -11,7 +11,10 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_message_in_errors,
+)
 
 
 #
@@ -201,7 +204,7 @@ def test_required_circular_reference():
         context={'definitions': definitions},
     )
 
-    with pytest.raises(ValidationError) as e:
+    with pytest.raises(ValidationError) as err:
         validator({
             'parent': {
                 'parent': {
@@ -211,15 +214,13 @@ def test_required_circular_reference():
                     },
                 },
             },
-        }, inner=True)
+        })
 
-    assert 'parent' in e.value.messages[0]
-    assert 'parent' in e.value.messages[0]['parent'][0]
-    assert 'parent' in e.value.messages[0]['parent'][0]['parent'][0]
-    assert 'parent' in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]
-    assert 'parent' in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]
-    assert 'required' in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]
-    assert MESSAGES['required']['required'] in e.value.messages[0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['parent'][0]['required']
+    assert_message_in_errors(
+        MESSAGES['required']['required'],
+        err.value.detail,
+        'parent.parent.parent.parent.parent.required',
+    )
 
 
 def test_nested_references_are_validated():
@@ -245,7 +246,7 @@ def test_nested_references_are_validated():
         context={'definitions': definitions},
     )
 
-    with pytest.raises(ValidationError) as e:
+    with pytest.raises(ValidationError) as err:
         validator({
             'parent': {
                 'value': 'bar',
@@ -261,5 +262,13 @@ def test_nested_references_are_validated():
             },
         })
 
-    assert '1234' in str(e.value)
-    assert '54321' in str(e.value)
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'parent.parent.value',
+    )
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'parent.parent.parent.parent.value',
+    )

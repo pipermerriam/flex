@@ -13,7 +13,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 from tests.factories import (
     RequestFactory,
     SchemaFactory,
@@ -90,13 +90,10 @@ def test_operation_parameter_validation_uses_correct_parameter_definitions():
     )
 
     with pytest.raises(ValidationError) as err:
-        validate_operation(request, validators, inner=True)
+        validate_operation(request, validators)
 
-    assert 'parameters' in err.value.messages[0]
-    assert 'path' in err.value.messages[0]['parameters'][0]
-    assert 'id' in err.value.messages[0]['parameters'][0]['path'][0]
-    assert 'format' in err.value.messages[0]['parameters'][0]['path'][0]['id'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['parameters'][0]['path'][0]['id'][0]['format'][0],
+    assert_message_in_errors(
         MESSAGES['format']['invalid_uuid'],
+        err.value.detail,
+        'parameters.path.id.format',
     )

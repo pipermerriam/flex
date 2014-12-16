@@ -12,7 +12,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 def test_parameter_items_validation_on_invalid_array():
@@ -36,19 +36,17 @@ def test_parameter_items_validation_on_invalid_array():
     }
 
     with pytest.raises(ValidationError) as err:
-        validate_parameters(parameter_values, parameters, context={}, inner=True)
+        validate_parameters(parameter_values, parameters, context={})
 
-    assert 'id' in err.value.messages[0]
-    assert 'items' in err.value.messages[0]['id'][0]
-    assert 'type' in err.value.messages[0]['id'][0]['items'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['items'][0]['type'][0],
-        MESSAGES['type']['invalid'],
-    )
-    assert 'minimum' in err.value.messages[0]['id'][0]['items'][1]
-    assert_error_message_equal(
-        err.value.messages[0]['id'][0]['items'][1]['minimum'][0],
+    assert_message_in_errors(
         MESSAGES['minimum']['invalid'],
+        err.value.detail,
+        'id.items.type',
+    )
+    assert_message_in_errors(
+        MESSAGES['minimum']['invalid'],
+        err.value.detail,
+        'id.items.minimum',
     )
 
 
@@ -72,4 +70,4 @@ def test_parameter_items_validation_on_valid_value():
         'id': value,
     }
 
-    validate_parameters(parameter_values, parameters, context={}, inner=True)
+    validate_parameters(parameter_values, parameters, context={})

@@ -40,8 +40,6 @@ def assert_error_message_equal(formatted_msg, unformatted_msg):
 
 
 def _find_message_in_errors(message, errors, namespace=''):
-    results = []
-
     if isinstance(errors, six.string_types):
         if check_if_error_message_equal(errors, message):
             yield namespace
@@ -68,6 +66,31 @@ def _find_message_in_errors(message, errors, namespace=''):
 def find_message_in_errors(*args, **kwargs):
     paths = tuple(_find_message_in_errors(*args, **kwargs))
     return paths
+
+
+def _enumerate_error_paths(errors, namespace=''):
+    if isinstance(errors, six.string_types):
+        yield namespace
+    elif isinstance(errors, collections.Mapping):
+        for key, error in errors.items():
+            for match in _enumerate_error_paths(
+                error,
+                '.'.join((namespace, key)).strip('.'),
+            ):
+                yield match
+    elif isinstance(errors, list):
+        for index, error in enumerate(errors):
+            for match in _enumerate_error_paths(
+                error,
+                '.'.join((namespace, six.text_type(index))).strip('.'),
+            ):
+                yield match
+    else:
+        raise ValueError("Unsupported type")
+
+
+def enumerate_error_paths(*args, **kwargs):
+    return tuple(_enumerate_error_paths(*args, **kwargs))
 
 
 def _find_matching_paths(target_path, paths):
@@ -127,6 +150,11 @@ def _enumerate_error_paths(errors, namespace=''):
 
 def enumerate_error_paths(*args, **kwargs):
     return tuple(_enumerate_error_paths(*args, **kwargs))
+
+
+def assert_path_in_errors(path, errors):
+    paths = find_matching_paths(path, enumerate_error_paths(errors))
+    assert find_matching_paths(path, paths)
 
 
 def assert_path_not_in_errors(path, errors):

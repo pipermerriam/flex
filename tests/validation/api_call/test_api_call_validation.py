@@ -13,4 +13,4 @@ def test_validate_api_call(httpbin):
 
     response = requests.get(urlparse.urljoin(httpbin.url, '/get'))
 
-    validate_api_call(schema, request=response.request, response=response)
+    validate_api_call(schema, raw_request=response.request, raw_response=response)

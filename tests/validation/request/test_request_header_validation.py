@@ -19,7 +19,7 @@ from tests.factories import (
     SchemaFactory,
     RequestFactory,
 )
-from tests.utils import assert_error_message_equal
+from tests.utils import assert_message_in_errors
 
 
 def test_request_header_validation():
@@ -47,21 +47,14 @@ def test_request_header_validation():
 
     with pytest.raises(ValidationError) as err:
         validate_request(
-            request,
-            paths=schema['paths'],
-            base_path=schema.get('base_path', ''),
-            context=schema,
-            inner=True,
+            request=request,
+            schema=schema,
         )
 
-    assert 'method' in err.value.messages[0]
-    assert 'parameters' in err.value.messages[0]['method'][0]
-    assert 'headers' in err.value.messages[0]['method'][0]['parameters'][0]
-    assert 'Authorization' in err.value.messages[0]['method'][0]['parameters'][0]['headers'][0]
-    assert 'type' in err.value.messages[0]['method'][0]['parameters'][0]['headers'][0]['Authorization'][0]
-    assert_error_message_equal(
-        err.value.messages[0]['method'][0]['parameters'][0]['headers'][0]['Authorization'][0]['type'][0],
+    assert_message_in_errors(
         MESSAGES['type']['invalid'],
+        err.value.detail,
+        'method.parameters.headers.Authorization.type',
     )
 
 
@@ -100,14 +93,12 @@ def test_request_header_array_extraction(format_, value):
         },
     )
 
-    response = RequestFactory(
+    request = RequestFactory(
         url='http://www.example.com/get/',
         headers={'Authorization': value},
     )
 
     validate_request(
-        response,
-        paths=schema['paths'],
-        base_path=schema.get('base_path', ''),
-        context=schema,
+        request=request,
+        schema=schema,
     )

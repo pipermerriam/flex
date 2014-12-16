@@ -34,7 +34,7 @@ setup(
         'console_scripts': ["flex=flex.cli:main"],
     },
     keywords='rest swagger',
-    packages=find_packages(),
+    packages=find_packages(exclude="tests"),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

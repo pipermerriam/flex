@@ -23,12 +23,16 @@ from flex.utils import (
     chain_reduce_partial,
     cast_value_to_type,
 )
+from flex.paths import (
+    match_path_to_api_path,
+)
 from flex.constants import (
     EMPTY,
     NUMBER,
     STRING,
     ARRAY,
     DELIMETERS,
+    REQUEST_METHODS,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -310,12 +314,12 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
-def validate_object(obj, validators, inner=False):
+def validate_object(obj, validators):
     """
     Takes a mapping and applies a mapping of validator functions to it
     collecting and reraising any validation errors that occur.
     """
-    with ErrorCollection(inner=inner) as errors:
+    with ErrorCollection() as errors:
         if '$ref' in validators:
             ref_ = validators.pop('$ref')
             for k, v in ref_.validators.items():
@@ -385,3 +389,41 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
             return value
 
     return processor
+
+
+def validate_request_method_to_operation(request_method, path_definition):
+    """
+    Given a request method, validate that the request method is valid for the
+    api path.
+
+    If so, return the operation definition related to this request method.
+    """
+    try:
+        operation_definition = path_definition[request_method]
+    except KeyError:
+        allowed_methods = set(REQUEST_METHODS).intersection(path_definition.keys())
+        raise ValidationError(
+            MESSAGES['request']['invalid_method'].format(
+                request_method, allowed_methods,
+            ),
+        )
+    return operation_definition
+
+
+def validate_path_to_api_path(path, paths, basePath='', parameters=None, **kwargs):
+    """
+    Given a path, find the api_path it matches.
+    """
+    if parameters is None:
+        parameters = {}
+    try:
+        api_path = match_path_to_api_path(
+            path_definitions=paths,
+            target_path=path,
+            base_path=basePath,
+            global_parameters=parameters,
+        )
+    except LookupError:
+        raise ValidationError(MESSAGES['path']['unknown_path'])
+
+    return api_path
