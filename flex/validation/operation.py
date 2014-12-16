@@ -18,7 +18,6 @@ from flex.parameters import (
     merge_parameter_lists,
 )
 from flex.validation.parameter import (
-    validate_path_parameters,
     validate_query_parameters,
 )
 from flex.validation.header import (
@@ -129,7 +128,7 @@ def generate_parameters_validator(api_path, path_definition, parameters,
 
     # HEADERS
     in_header_parameters = filter_parameters(all_parameters, in_=HEADER)
-    validators['headers'] =  chain_reduce_partial(
+    validators['headers'] = chain_reduce_partial(
         operator.attrgetter('headers'),
         generate_header_validator(in_header_parameters, context),
     )

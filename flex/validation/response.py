@@ -13,16 +13,15 @@ from flex.validation.schema import construct_schema_validators
 from flex.error_messages import MESSAGES
 from flex.constants import (
     EMPTY,
+    PATH,
 )
 from flex.parameters import (
     filter_parameters,
     merge_parameter_lists,
+    dereference_parameter_list,
 )
 from flex.validation.header import (
     construct_header_validators,
-)
-from flex.validation.parameter import (
-    validate_path_parameters,
 )
 from flex.validation.path import (
     generate_path_parameters_validator,
@@ -110,13 +109,20 @@ def generate_response_content_type_validator(produces, **kwargs):
     )
 
 
-def generate_response_path_validator(api_path, path_definition, parameters,
-                                     context, **kwargs):
+def generate_path_validator(api_path, path_definition, parameters,
+                            context, **kwargs):
     """
     Generates a callable for validating the parameters in a response object.
     """
-    path_level_parameters = path_definition.get('parameters', [])
-    operation_level_parameters = parameters
+    global_parameters = context.get('parameters', {})
+    path_level_parameters = dereference_parameter_list(
+        path_definition.get('parameters', []),
+        global_parameters,
+    )
+    operation_level_parameters = dereference_parameter_list(
+        parameters,
+        global_parameters,
+    )
 
     all_parameters = merge_parameter_lists(
         path_level_parameters,
@@ -134,7 +140,6 @@ def generate_response_path_validator(api_path, path_definition, parameters,
 validator_mapping = {
     # TODO: tests for parameters AND figure out how to do parameters.
     'headers': generate_response_header_validator,
-    'path': generate_response_path_validator,
     'produces': generate_response_content_type_validator,
     'schema': generate_response_body_validator,
 }
@@ -146,13 +151,12 @@ def generate_response_validator(api_path, operation_definition, response_definit
 
     # Parameters is special cause it needs data from both the
     # `operation_definition` and the `path_definition`
-    if 'parameters' in operation_definition or 'parameters' in path_definition:
-        validators['parameters'] = generate_parameters_validator(
-            api_path=api_path,
-            path_definition=path_definition,
-            parameters=operation_definition.get('parameters', []),
-            context=context,
-        )
+    validators['path'] = generate_path_validator(
+        api_path=api_path,
+        path_definition=path_definition,
+        parameters=operation_definition.get('parameters', []),
+        context=context,
+    )
 
     for key in validator_mapping:
         if key in response_definition:
