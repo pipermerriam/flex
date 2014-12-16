@@ -1,3 +1,9 @@
+2.5.0
+-----
+
+- Implement response url validation
+- Implement response header validation
+
 2.4.0
 -----
 
