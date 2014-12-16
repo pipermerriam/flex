@@ -1,11 +1,16 @@
 import pytest
 
+from flex.exceptions import ValidationError
+from flex.error_messages import MESSAGES
 from flex.constants import (
     OBJECT,
     EMPTY,
 )
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_error_message_equal,
+)
 
 
 #
@@ -25,8 +30,14 @@ def test_min_properties_with_too_few_properties(element):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(element)
+
+    assert 'minProperties' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['minProperties'][0],
+        MESSAGES['min_properties']['invalid'],
+    )
 
 
 @pytest.mark.parametrize(
@@ -73,8 +84,14 @@ def test_max_properties_with_too_many_properties(element):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(element)
+
+    assert 'maxProperties' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['maxProperties'][0],
+        MESSAGES['max_properties']['invalid'],
+    )
 
 
 @pytest.mark.parametrize(

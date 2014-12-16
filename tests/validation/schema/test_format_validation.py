@@ -1,8 +1,13 @@
 import pytest
 
+from flex.exceptions import ValidationError
+from flex.error_messages import MESSAGES
 from flex.constants import EMPTY
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_error_message_equal,
+)
 
 
 #
@@ -42,8 +47,14 @@ def test_date_time_with_invalid_dates_strings(when):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(when)
+
+    assert 'format' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['format'][0],
+        MESSAGES['format']['invalid_datetime'],
+    )
 
 
 def test_date_time_is_noop_when_not_present_or_required():

@@ -1,7 +1,8 @@
 import re
 import pytest
 
-from flex.serializers.definitions import BaseSchemaSerializer
+from flex.exceptions import ValidationError
+from flex.serializers.common import BaseSchemaSerializer
 from flex.constants import (
     STRING,
     EMPTY,
@@ -64,7 +65,7 @@ def test_pattern_on_non_matching_strings(zipcode):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator(zipcode)
 
 

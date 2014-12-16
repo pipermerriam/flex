@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.validation.request import (
     validate_request,
 )
@@ -24,8 +25,6 @@ def test_request_parameter_validation():
     smoke test to ensure that parameter validation is wired into request
     validation correctly.
     """
-    from django.core.exceptions import ValidationError
-
     schema = SchemaFactory(
         paths={
             '/get/{id}/': {
@@ -63,19 +62,19 @@ def test_request_parameter_validation():
         )
 
     assert 'method' in err.value.messages[0]
-    assert 'parameters' in err.value.messages[0]['method'][0][0]
-    assert 'path' in err.value.messages[0]['method'][0][0]['parameters'][0]
-    assert 'id' in err.value.messages[0]['method'][0][0]['parameters'][0]['path'][0]
-    assert 'format' in err.value.messages[0]['method'][0][0]['parameters'][0]['path'][0]['id'][0]
+    assert 'parameters' in err.value.messages[0]['method'][0]
+    assert 'path' in err.value.messages[0]['method'][0]['parameters'][0]
+    assert 'id' in err.value.messages[0]['method'][0]['parameters'][0]['path'][0]
+    assert 'format' in err.value.messages[0]['method'][0]['parameters'][0]['path'][0]['id'][0]
     assert_error_message_equal(
-        err.value.messages[0]['method'][0][0]['parameters'][0]['path'][0]['id'][0]['format'][0],
+        err.value.messages[0]['method'][0]['parameters'][0]['path'][0]['id'][0]['format'][0],
         MESSAGES['format']['invalid_uuid'],
     )
 
-    assert 'query' in err.value.messages[0]['method'][0][0]['parameters'][0]
-    assert 'page' in err.value.messages[0]['method'][0][0]['parameters'][0]['query'][0]
-    assert 'type' in err.value.messages[0]['method'][0][0]['parameters'][0]['query'][0]['page'][0]
+    assert 'query' in err.value.messages[0]['method'][0]['parameters'][0]
+    assert 'page' in err.value.messages[0]['method'][0]['parameters'][0]['query'][0]
+    assert 'type' in err.value.messages[0]['method'][0]['parameters'][0]['query'][0]['page'][0]
     assert_error_message_equal(
-        err.value.messages[0]['method'][0][0]['parameters'][0]['query'][0]['page'][0]['type'][0],
+        err.value.messages[0]['method'][0]['parameters'][0]['query'][0]['page'][0]['type'][0],
         MESSAGES['type']['invalid'],
     )

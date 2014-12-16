@@ -1,35 +1,45 @@
 import pytest
 
+from flex.error_messages import MESSAGES
 from flex.utils import is_non_string_iterable
 from flex.serializers.fields import (
     MaybeListCharField,
     SecurityRequirementReferenceField,
 )
-
-from django.core.exceptions import ValidationError
+from flex.exceptions import ValidationError
 
 from rest_framework import serializers
 
 from tests.utils import assert_error_message_equal
 
 
+class TestSerializer(serializers.Serializer):
+    test_field = MaybeListCharField()
+
+def get_validated_data(serializer):
+    assert serializer.is_valid(), serializer.errors
+
+    try:
+        return serializer.validated_data
+    except AttributeError:
+        return serializer.object
+
+
 #
 # MaybeListCharField tests
 #
 def test_maybe_list_char_field_accepts_strings():
-    field = MaybeListCharField()
-    data = {'foo': 'a-string'}
-    into = {}
-    field.field_from_native(data, {}, 'foo', into)
-    assert data['foo'] == into.get('foo')
+    data = {'test_field': 'a-string'}
+    serializer = TestSerializer(data=data)
+    actual = get_validated_data(serializer)
+    assert actual['test_field'] == 'a-string'
 
 
 def test_maybe_list_char_field_accepts_lists():
-    field = MaybeListCharField()
-    data = {'foo': ['a-string', 'another-string']}
-    into = {}
-    field.field_from_native(data, {}, 'foo', into)
-    assert data['foo'] == into.get('foo')
+    data = {'test_field': ['a-string', 'another-string']}
+    serializer = TestSerializer(data=data)
+    actual = get_validated_data(serializer)
+    assert actual['test_field'] == ['a-string', 'another-string']
 
 
 def test_maybe_list_char_field_runs_validators_on_singular_strings():
@@ -41,11 +51,13 @@ def test_maybe_list_char_field_runs_validators_on_singular_strings():
             if not value.startswith('bar'):
                 raise ValidationError('error')
 
-    field = MaybeListCharField(validators=[validator])
-    data = {'foo': 'not-bar'}
-    into = {}
-    with pytest.raises(ValidationError):
-        field.field_from_native(data, {}, 'foo', into)
+    class WithValidatorSerializer(serializers.Serializer):
+        test_field = MaybeListCharField(validators=[validator])
+
+    data = {'test_field': 'not-bar'}
+    serializer = WithValidatorSerializer(data=data)
+    with pytest.raises(AssertionError):
+        get_validated_data(serializer)
 
 
 def test_maybe_list_char_field_runs_validators_on_lists():
@@ -57,11 +69,13 @@ def test_maybe_list_char_field_runs_validators_on_lists():
             if not value.startswith('bar'):
                 raise ValidationError('error')
 
-    field = MaybeListCharField(validators=[validator])
-    data = {'foo': ['a-string', 'another-string']}
-    into = {}
-    with pytest.raises(ValidationError):
-        field.field_from_native(data, {}, 'foo', into)
+    class WithValidatorSerializer(serializers.Serializer):
+        test_field = MaybeListCharField(validators=[validator])
+
+    data = {'test_field': ['a-string', 'another-string']}
+    serializer = WithValidatorSerializer(data=data)
+    with pytest.raises(AssertionError):
+        get_validated_data(serializer)
 
 
 #
@@ -82,7 +96,7 @@ def test_invalid_with_unknown_reference():
     assert 'foo' in serializer.errors
     assert_error_message_equal(
         serializer.errors['foo'][0],
-        SecurityRequirementReferenceField.default_error_messages['unknown_reference'],
+        MESSAGES['unknown_reference']['security'],
     )
 
 
@@ -97,4 +111,4 @@ def test_valid_with_known_reference():
         },
     )
 
-    assert serializer.is_valid()
+    assert serializer.is_valid(), serializer.errors

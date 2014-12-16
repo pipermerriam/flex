@@ -1,11 +1,14 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.constants import (
     STRING,
     EMPTY,
 )
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+)
 
 
 #
@@ -36,7 +39,7 @@ def test_minimum_length_with_too_short_string(zipcode):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator(zipcode)
 
 
@@ -78,7 +81,7 @@ def test_maximum_length_with_too_long_string(zipcode):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator(zipcode)
 
 

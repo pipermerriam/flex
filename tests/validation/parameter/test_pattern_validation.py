@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -24,8 +25,7 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_pattern_validation_with_invalid_values(pattern, value):
-    from django.core.exceptions import ValidationError
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -34,9 +34,9 @@ def test_pattern_validation_with_invalid_values(pattern, value):
             'required': True,
             'pattern': pattern,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -60,7 +60,7 @@ def test_pattern_validation_with_invalid_values(pattern, value):
     ),
 )
 def test_pattern_validation_with_matching_values(pattern, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': PATH,
@@ -69,9 +69,9 @@ def test_pattern_validation_with_matching_values(pattern, value):
             'required': True,
             'pattern': pattern,
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

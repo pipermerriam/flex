@@ -1,6 +1,6 @@
 import pytest
 
-from flex.serializers.definitions import BaseSchemaSerializer
+from flex.serializers.common import BaseSchemaSerializer
 from flex.constants import (
     NULL,
     BOOLEAN,
@@ -47,6 +47,7 @@ def test_minimum_is_valid_with_numeric_types(type_):
             'minimum': 0,
         },
     )
+    serializer.is_valid()
     assert 'minimum' not in serializer.errors
 
 
@@ -65,6 +66,7 @@ def test_minimum_is_valid_if_at_least_one_type_is_numeric(types):
             'minimum': 0,
         },
     )
+    serializer.is_valid()
     assert 'minimum' not in serializer.errors
 
 
@@ -101,6 +103,7 @@ def test_maximum_is_valid_with_numeric_types(type_):
             'maximum': 0,
         },
     )
+    serializer.is_valid()
     assert 'maximum' not in serializer.errors
 
 
@@ -119,6 +122,7 @@ def test_maximum_is_valid_if_at_least_one_type_is_numeric(types):
             'maximum': 0,
         },
     )
+    serializer.is_valid()
     assert 'maximum' not in serializer.errors
 
 
@@ -147,6 +151,7 @@ def test_exclusive_minimum_with_minimum_is_valid():
             'exclusiveMinimum': True
         },
     )
+    serializer.is_valid()
     assert 'exclusiveMinimum' not in serializer.errors
 
 
@@ -175,6 +180,7 @@ def test_exclusive_maximum_with_maximum_is_valid():
             'exclusiveMaximum': True
         },
     )
+    serializer.is_valid()
     assert 'exclusiveMaximum' not in serializer.errors
 
 
@@ -217,6 +223,7 @@ def test_multiple_of_valid_for_json_number_types(type_):
             'multipleOf': 10,
         },
     )
+    serializer.is_valid()
     assert 'multipleOf' not in serializer.errors
 
 
@@ -235,6 +242,7 @@ def test_multiple_of_valid_if_any_of_declared_types_are_numeric(types):
             'multipleOf': 10,
         },
     )
+    serializer.is_valid()
     assert 'multipleOf' not in serializer.errors
 
 
@@ -274,6 +282,7 @@ def test_min_length_valid_with_string_type():
             'minLength': 10,
         },
     )
+    serializer.is_valid()
     assert 'minLength' not in serializer.errors
 
 
@@ -292,6 +301,7 @@ def test_min_length_valid_if_any_declared_type_is_string(types):
             'minLength': 10,
         },
     )
+    serializer.is_valid()
     assert 'minLength' not in serializer.errors
 
 
@@ -331,6 +341,7 @@ def test_max_length_valid_with_string_type():
             'maxLength': 10,
         },
     )
+    serializer.is_valid()
     assert 'maxLength' not in serializer.errors
 
 
@@ -349,6 +360,7 @@ def test_max_length_valid_if_any_declared_type_is_string(types):
             'maxLength': 10,
         },
     )
+    serializer.is_valid()
     assert 'maxLength' not in serializer.errors
 
 
@@ -396,6 +408,7 @@ def test_max_items_valid_with_array_type(types):
             'maxItems': 5,
         },
     )
+    serializer.is_valid()
     assert 'maxItems' not in serializer.errors
 
 
@@ -444,6 +457,7 @@ def test_min_items_valid_with_array_type(types):
             'minItems': 5,
         },
     )
+    serializer.is_valid()
     assert 'minItems' not in serializer.errors
 
 
@@ -492,6 +506,7 @@ def test_unique_items_valid_with_array_type(types):
             'uniqueItems': True,
         },
     )
+    serializer.is_valid()
     assert 'uniqueItems' not in serializer.errors
 
 
@@ -524,6 +539,7 @@ def test_valid_enum_iterable():
             'enum': ['a', 1, True, ['inner', 'array'], {'a': 'b', 'c': 'd'}, 2.0, None],
         },
     )
+    serializer.is_valid()
     assert 'enum' not in serializer.errors
 
 
@@ -572,6 +588,7 @@ def test_min_properties_valid_for_object_type(types):
             'minProperties': 3,
         },
     )
+    serializer.is_valid()
     assert 'minProperties' not in serializer.errors
 
 
@@ -634,6 +651,7 @@ def test_max_properties_valid_for_object_type(types):
             'maxProperties': 3,
         },
     )
+    serializer.is_valid()
     assert 'maxProperties' not in serializer.errors
 
 

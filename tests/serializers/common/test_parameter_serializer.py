@@ -50,6 +50,7 @@ def test_parameter_in_path_with_required_truthy():
         data={'name': 'test', 'in': PATH, 'required': True}
     )
 
+    serializer.is_valid()
     assert 'required' not in serializer.errors
 
 
@@ -111,6 +112,7 @@ def test_valid_in_values_for_multi_collection_format(in_):
         data={'name': 'test', 'in': in_, 'collectionFormat': MULTI}
     )
 
+    serializer.is_valid()
     assert 'collectionFormat' not in serializer.errors
 
 

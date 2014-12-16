@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.validation.operation import (
     construct_operation_validators,
     validate_operation,
@@ -32,7 +33,6 @@ def test_operation_parameter_validation_uses_correct_parameter_definitions():
     This test also serves as a *smoke* test to see that parameter validation is
     working as expected.
     """
-    from django.core.exceptions import ValidationError
     schema = SchemaFactory(
         produces=['application/json'],
         paths={

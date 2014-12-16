@@ -61,7 +61,7 @@ def test_path_to_pattern_with_single_parameter():
         many=True
     )
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     actual = path_to_pattern(input_, parameters=parameters)
 
     assert actual == expected
@@ -79,7 +79,7 @@ def test_path_to_pattern_with_multiple_parameters():
         many=True
     )
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     actual = path_to_pattern(input_, parameters=parameters)
 
     assert actual == expected
@@ -120,6 +120,8 @@ def test_path_to_regex_does_not_overmatch(path, bad_path):
     ),
 )
 def test_match_request_path_to_api_path(path, schema_path):
+    path = '/api/path'
+    schema_path = '/path'
     schema = load('tests/core/path_test_schema.yaml')
     paths = schema['paths']
     base_path = schema['basePath']

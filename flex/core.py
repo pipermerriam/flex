@@ -9,9 +9,8 @@ import six
 import json
 import yaml
 
-from django.core.exceptions import ValidationError
-
 from flex.context_managers import ErrorCollection
+from flex.exceptions import ValidationError
 from flex.serializers.core import (
     SwaggerSerializer,
     SchemaSerializer,
@@ -36,7 +35,6 @@ def load_source(source):
     """
     if isinstance(source, collections.Mapping):
         return source
-
     elif hasattr(source, 'read') and callable(source.read):
         raw_source = source.read()
     elif os.path.exists(os.path.expanduser(str(source))):
@@ -76,12 +74,11 @@ def parse(raw_schema):
         data=raw_schema,
     )
     if not definitions_serializer.is_valid():
-
         message = "Swagger definitions did not validate:\n\n"
         message += prettify_errors(definitions_serializer.errors)
         raise ValueError(message)
 
-    swagger_definitions = definitions_serializer.object
+    swagger_definitions = definitions_serializer.save()
 
     swagger_serializer = SwaggerSerializer(
         swagger_definitions,
@@ -94,7 +91,7 @@ def parse(raw_schema):
         message += prettify_errors(swagger_serializer.errors)
         raise ValueError(message)
 
-    return swagger_serializer.object
+    return swagger_serializer.save()
 
 
 def load(target):
@@ -116,7 +113,7 @@ def validate(schema, target=None, **kwargs):
     if not schema_serializer.is_valid():
         message = "JSON Schema did not validate:\n\n"
         message += prettify_errors(schema_serializer.errors)
-        raise ValueError(message)
+        raise ValidationError(message)
 
     if target is not None:
         validator = schema_serializer.save()
@@ -128,10 +125,10 @@ def validate_api_call(schema, request, response):
         try:
             operation_definition = generate_request_validator(schema, inner=True)(request)
         except ValidationError as err:
-            errors['request'].append(err.messages)
+            errors['request'].add_error(err.messages or getattr(err, 'detail'))
             return
 
         try:
             generate_response_validator(operation_definition, schema, inner=True)(response)
         except ValidationError as err:
-            errors['response'].append(err.messages)
+            errors['response'].add_error(err.messages or getattr(err, 'detail'))

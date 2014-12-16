@@ -1,12 +1,21 @@
 import pytest
 
+from flex.exceptions import (
+    ValidationError,
+)
+from flex.error_messages import (
+    MESSAGES,
+)
 from flex.constants import (
     INTEGER,
     STRING,
     EMPTY,
 )
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_error_message_equal,
+)
 
 
 #
@@ -18,8 +27,14 @@ def test_non_integer_type_raises_error():
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator('1')
+
+    assert 'type' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['type'][0],
+        MESSAGES['type']['invalid'],
+    )
 
 
 def test_string_type_raises_error():
@@ -28,8 +43,14 @@ def test_string_type_raises_error():
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator('abcd')
+
+    assert 'type' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['type'][0],
+        MESSAGES['type']['invalid'],
+    )
 
 
 def test_integer_type_valid():
@@ -62,8 +83,15 @@ def test_invalid_multi_type(value):
         'type': [INTEGER, STRING],
     }
     validator = generate_validator_from_schema(schema)
-    with pytest.raises(ValueError):
+
+    with pytest.raises(ValidationError) as err:
         validator(value)
+
+    assert 'type' in err.value.messages[0]
+    assert_error_message_equal(
+        err.value.messages[0]['type'][0],
+        MESSAGES['type']['invalid'],
+    )
 
 
 def test_type_validation_is_noop_when_not_required_and_not_present():

@@ -8,10 +8,12 @@ import six
 
 from django.core.validators import RegexValidator
 
-from rest_framework import serializers
-
+from flex.exceptions import ValidationError
 from flex.formats import registry
-from flex.decorators import maybe_iterable
+from flex.decorators import (
+    maybe_iterable,
+    translate_validation_error,
+)
 from flex.utils import is_value_of_type
 from flex.constants import (
     SCHEMES,
@@ -31,23 +33,23 @@ def host_validator(value):
     parts = urlparse.urlparse(value)
     host = parts.netloc or parts.path
     if value != host:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Invalid host: {0}, expected {1}".format(value, host),
         )
 
 
 def path_validator(value):
     if not value.startswith('/'):
-        raise serializers.ValidationError("Path must start with a '/'")
+        raise ValidationError("Path must start with a '/'")
     parts = urlparse.urlparse(value)
     if value != parts.path:
-        raise serializers.ValidationError("Invalid Path: {0}".format(value))
+        raise ValidationError("Invalid Path: {0}".format(value))
 
 
 @maybe_iterable
 def scheme_validator(value):
     if value not in SCHEMES:
-        raise serializers.ValidationError("Unknown scheme: {0}".format(value))
+        raise ValidationError("Unknown scheme: {0}".format(value))
 
 
 # top-level type name / [ tree. ] subtype name [ +suffix ] [ ; parameters ]
@@ -79,45 +81,45 @@ MIMETYPE_PATTERN = (
 
 @maybe_iterable
 def mimetype_validator(value):
-    return RegexValidator(MIMETYPE_PATTERN)(value)
+    return translate_validation_error(RegexValidator(MIMETYPE_PATTERN).__call__)(value)
 
 
 @maybe_iterable
 def string_type_validator(value):
     if not isinstance(value, (six.binary_type, six.text_type)):
-        raise serializers.ValidationError("Must be a string")
+        raise ValidationError("Must be a string")
 
 
 def format_validator(value):
     if value not in registry.formats:
         # TODO: unknown formats are ok, but want to be sure we have all of the
         # common ones before removing this.
-        raise serializers.ValidationError('Unknown format: {0}'.format(value))
+        raise ValidationError('Unknown format: {0}'.format(value))
 
 
 @maybe_iterable
 def type_validator(value):
     if value not in PRIMATIVE_TYPES:
-        raise serializers.ValidationError('Unknown type: {0}'.format(value))
+        raise ValidationError(MESSAGES['type']['unknown'].format(value))
 
 
 def header_type_validator(value):
     if value not in HEADER_TYPES:
-        raise serializers.ValidationError(
+        raise ValidationError(
             MESSAGES['type']['invalid_header_type'].format(value),
         )
 
 
 def parameter_in_validator(value):
     if value not in PARAMETER_IN_VALUES:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Unknown value for in: `{0}`".format(value),
         )
 
 
 def collection_format_validator(value):
     if value not in COLLECTION_FORMATS:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Unknown collectionFormat: `{0}`".format(value),
         )
 
@@ -131,7 +133,7 @@ def MinValueValidator(minimum, allow_minimum=False):
             op = operator.gt
             msg_txt = "greater than"
         if not op(value, minimum):
-            raise serializers.ValidationError(
+            raise ValidationError(
                 "{0} is not {1} `{2}`".format(
                     value, msg_txt, minimum,
                 ),
@@ -149,7 +151,7 @@ def MaxValueValidator(maximum, allow_maximum=False):
             op = operator.lt
             msg_txt = "less than"
         if not op(value, maximum):
-            raise serializers.ValidationError(
+            raise ValidationError(
                 "{0} is not {1} `{2}`".format(
                     value, msg_txt, maximum,
                 ),
@@ -160,21 +162,21 @@ def MaxValueValidator(maximum, allow_maximum=False):
 
 def security_type_validator(value):
     if value not in SECURITY_TYPES:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Unknown security type: {0}".format(value),
         )
 
 
 def security_api_key_location_validator(value):
     if value not in SECURITY_API_KEY_LOCATIONS:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Unknown api key location: {0}".format(value),
         )
 
 
 def security_flow_validator(value):
     if value not in SECURITY_FLOWS:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Unknown security flow: {0}".format(value),
         )
 
@@ -183,13 +185,13 @@ def regex_validator(value):
     try:
         re.compile(value)
     except re.error as e:
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Invalid Regex: {0}".format(str(e))
         )
 
 
 def is_array_validator(value):
     if not is_value_of_type(value, ARRAY):
-        raise serializers.ValidationError(
+        raise ValidationError(
             "Must be an array",
         )

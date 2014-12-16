@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -23,11 +24,10 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_parameter_schema_as_reference_validation_for_invalid_value(value, error_key, message_key):
-    from django.core.exceptions import ValidationError
     context = {
         'definitions': {'UUID': {'type': STRING, 'format': 'uuid'}},
     }
-    serializer = ParameterSerializer(many=True, context=context, data=(
+    serializer = ParameterSerializer(many=True, context=context, data=[
         {
             'name': 'id',
             'in': BODY,
@@ -35,9 +35,9 @@ def test_parameter_schema_as_reference_validation_for_invalid_value(value, error
             'required': True,
             'schema': {'$ref': 'UUID'},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -61,8 +61,7 @@ def test_parameter_schema_as_reference_validation_for_invalid_value(value, error
     ),
 )
 def test_parameter_schema_validation_for_invalid_value(value, error_key, message_key):
-    from django.core.exceptions import ValidationError
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': BODY,
@@ -70,9 +69,9 @@ def test_parameter_schema_validation_for_invalid_value(value, error_key, message
             'required': True,
             'schema': {'type': STRING, 'format': 'uuid'},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -96,7 +95,7 @@ def test_parameter_schema_validation_for_invalid_value(value, error_key, message
     ),
 )
 def test_local_parameter_values_override_schema(value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': BODY,
@@ -106,9 +105,9 @@ def test_local_parameter_values_override_schema(value):
             'format': INT32,
             'schema': {'type': STRING, 'format': 'uuid'},
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -125,7 +124,7 @@ def test_local_parameter_values_override_schema(value):
     ),
 )
 def test_parameter_schema_validation_on_valid_values(value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {
             'name': 'id',
             'in': BODY,
@@ -136,9 +135,9 @@ def test_parameter_schema_validation_on_valid_values(value):
                 'format': 'uri',
             },
         },
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

@@ -7,4 +7,4 @@ django.setup()
 
 VERSION = '2.2.0'
 
-from .core import load  # NOQA
+from flex.core import load  # NOQA

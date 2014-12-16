@@ -4,6 +4,7 @@ from flex.validation.request import (
     validate_request,
 )
 from flex.error_messages import MESSAGES
+from flex.exceptions import ValidationError
 
 from tests.factories import (
     SchemaFactory,
@@ -17,8 +18,6 @@ def test_request_validation_with_invalid_operation_on_path():
     Test that request validation detects request paths that are not declared
     in the schema.
     """
-    from django.core.exceptions import ValidationError
-
     schema = SchemaFactory(
         paths={
             '/post': {

@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.validation.response import (
     validate_response,
 )
@@ -16,8 +17,9 @@ from tests.utils import assert_error_message_equal
 
 
 def test_response_header_validation():
-    from django.core.exceptions import ValidationError
-
+    """
+    Test basic validation of response headers.
+    """
     schema = SchemaFactory(
         paths={
             '/get': {

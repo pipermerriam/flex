@@ -4,6 +4,7 @@ from flex.validation.request import (
     validate_request,
 )
 from flex.error_messages import MESSAGES
+from flex.exceptions import ValidationError
 from flex.constants import (
     INTEGER,
     HEADER,
@@ -22,8 +23,6 @@ from tests.utils import assert_error_message_equal
 
 
 def test_request_header_validation():
-    from django.core.exceptions import ValidationError
-
     schema = SchemaFactory(
         paths={
             '/get/': {
@@ -56,12 +55,12 @@ def test_request_header_validation():
         )
 
     assert 'method' in err.value.messages[0]
-    assert 'parameters' in err.value.messages[0]['method'][0][0]
-    assert 'headers' in err.value.messages[0]['method'][0][0]['parameters'][0]
-    assert 'Authorization' in err.value.messages[0]['method'][0][0]['parameters'][0]['headers'][0]
-    assert 'type' in err.value.messages[0]['method'][0][0]['parameters'][0]['headers'][0]['Authorization'][0]
+    assert 'parameters' in err.value.messages[0]['method'][0]
+    assert 'headers' in err.value.messages[0]['method'][0]['parameters'][0]
+    assert 'Authorization' in err.value.messages[0]['method'][0]['parameters'][0]['headers'][0]
+    assert 'type' in err.value.messages[0]['method'][0]['parameters'][0]['headers'][0]['Authorization'][0]
     assert_error_message_equal(
-        err.value.messages[0]['method'][0][0]['parameters'][0]['headers'][0]['Authorization'][0]['type'][0],
+        err.value.messages[0]['method'][0]['parameters'][0]['headers'][0]['Authorization'][0]['type'][0],
         MESSAGES['type']['invalid'],
     )
 

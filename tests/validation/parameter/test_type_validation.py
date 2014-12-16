@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import ParameterSerializer
 from flex.validation.parameter import (
     validate_parameters,
@@ -25,12 +26,11 @@ from tests.utils import assert_error_message_equal
     ),
 )
 def test_parameter_validation_enforces_type(type_, value):
-    from django.core.exceptions import ValidationError
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {'name': 'id', 'in': PATH, 'description': 'id', 'type': type_, 'required': True},
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -63,11 +63,11 @@ def test_parameter_validation_enforces_type(type_, value):
     ),
 )
 def test_parameter_validation_with_correct_type(type_, value):
-    serializer = ParameterSerializer(many=True, data=(
+    serializer = ParameterSerializer(many=True, data=[
         {'name': 'id', 'in': PATH, 'description': 'id', 'type': type_, 'required': True},
-    ))
+    ])
     assert serializer.is_valid(), serializer.errors
-    parameters = serializer.object
+    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

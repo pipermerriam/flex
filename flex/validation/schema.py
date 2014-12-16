@@ -4,9 +4,11 @@ import functools
 
 import six
 
-from django.core.exceptions import ValidationError
-
-from flex.exceptions import SafeNestedValidationError
+from flex.exceptions import (
+    ValidationError,
+    ErrorList,
+)
+from flex.error_messages import MESSAGES
 from flex.constants import (
     OBJECT,
     EMPTY,
@@ -36,7 +38,7 @@ from flex.validation.common import (
 def validate_min_properties(value, minimum):
     if len(value.keys()) < minimum:
         raise ValidationError(
-            "Object must have more than {0} properties.  It had {1}".format(
+            MESSAGES['min_properties']['invalid'].format(
                 minimum, len(value.keys()),
             ),
         )
@@ -51,7 +53,7 @@ def generate_min_properties_validator(minProperties, **kwargs):
 def validate_max_properties(value, maximum):
     if len(value.keys()) > maximum:
         raise ValidationError(
-            "Object must have less than {0} properties.  It had {1}".format(
+            MESSAGES['max_properties']['invalid'].format(
                 maximum, len(value.keys()),
             ),
         )
@@ -77,15 +79,15 @@ def construct_items_validators(items, context):
 
 
 def validate_items(objs, validators):
-    errors = []
+    errors = ErrorList()
     for obj, validator in zip(objs, validators):
         try:
             validate_object(obj, validator, inner=True)
         except ValidationError as e:
-            errors.extend(list(e.messages))
+            errors.add_error(e.detail)
 
     if errors:
-        raise SafeNestedValidationError(errors)
+        raise ValidationError(errors)
 
 
 def generate_items_validator(items, context, **kwargs):

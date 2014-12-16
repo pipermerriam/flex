@@ -1,8 +1,13 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.constants import EMPTY
+from flex.error_messages import MESSAGES
 
-from tests.utils import generate_validator_from_schema
+from tests.utils import (
+    generate_validator_from_schema,
+    assert_error_message_equal,
+)
 
 
 #
@@ -31,8 +36,13 @@ def test_enum_with_invalid_items(letters):
     }
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError) as err:
         validator(letters)
+
+    assert_error_message_equal(
+        err.value.messages[0]['enum'][0],
+        MESSAGES['enum']['invalid'],
+    )
 
 
 def test_enum_noop_when_not_required_and_field_not_present():

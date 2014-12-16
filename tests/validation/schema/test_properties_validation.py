@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.constants import (
     STRING,
 )
@@ -48,7 +49,7 @@ def test_properties_validation_with_invalid_values(value, count):
 
     validator = generate_validator_from_schema(schema)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator({
             'value': value,
             'count': count,

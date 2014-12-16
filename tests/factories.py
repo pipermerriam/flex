@@ -48,10 +48,10 @@ def SchemaFactory(**kwargs):
     assert definitions_serializer.is_valid(), definitions_serializer.errors
 
     swagger_serializer = SwaggerSerializer(
-        definitions_serializer.object,
+        definitions_serializer.save(),
         data=kwargs,
-        context=definitions_serializer.object,
+        context=definitions_serializer.save(),
     )
 
     assert swagger_serializer.is_valid(), swagger_serializer.errors
-    return swagger_serializer.object
+    return swagger_serializer.save()

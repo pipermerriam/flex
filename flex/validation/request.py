@@ -1,8 +1,7 @@
 import functools
 
-from django.core.exceptions import ValidationError
-
 from flex.utils import chain_reduce_partial
+from flex.exceptions import ValidationError
 from flex.context_managers import ErrorCollection
 from flex.paths import (
     match_request_path_to_api_path,
@@ -77,7 +76,7 @@ def validate_request(request, paths, base_path, context, inner=False):
                 context=context,
             )
         except ValidationError as err:
-            errors['path'].extend(list(err.messages))
+            errors['path'].add_error(err.detail)
             return  # this causes an exception to be raised since errors is no longer falsy.
 
         if not path_definition:
@@ -91,7 +90,7 @@ def validate_request(request, paths, base_path, context, inner=False):
                 path_definition=path_definition,
             )
         except ValidationError as err:
-            errors['method'].append(err.message)
+            errors['method'].add_error(err.detail)
             return
 
         if operation_definition is None:
@@ -109,7 +108,7 @@ def validate_request(request, paths, base_path, context, inner=False):
         try:
             validate_operation(request, operation_validators, inner=True)
         except ValidationError as err:
-            errors['method'].append(err.messages)
+            errors['method'].add_error(err.detail)
 
     return operation_definition
 

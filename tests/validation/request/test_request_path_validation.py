@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.serializers.core import PathsSerializer
 from flex.validation.request import (
     validate_request,
@@ -24,8 +25,6 @@ def test_request_validation_with_invalid_request_path():
     Test that request validation detects request paths that are not declared
     in the schema.
     """
-    from django.core.exceptions import ValidationError
-
     schema = SchemaFactory()
     assert not schema['paths']
 
@@ -53,7 +52,7 @@ def test_basic_request_path_validation():
     })
     assert serializer.is_valid()
 
-    paths = serializer.object
+    paths = serializer.save()
 
     request = RequestFactory(url='http://www.example.com/get')
     path, _ = validate_request_to_path(
@@ -73,13 +72,12 @@ def test_basic_request_path_validation():
     )
 )
 def test_basic_request_path_validation_with_unspecified_paths(request_path):
-    from django.core.exceptions import ValidationError
     serializer = PathsSerializer(data={
         '/get': None,
     })
     assert serializer.is_valid()
 
-    paths = serializer.object
+    paths = serializer.save()
 
     url = 'http://www.example.com{0}'.format(request_path)
 
@@ -105,7 +103,7 @@ def test_parametrized_string_path_validation():
     })
     assert serializer.is_valid(), serializer.errors
 
-    paths = serializer.object
+    paths = serializer.save()
 
     request = RequestFactory(url='http://www.example.com/get/25')
     path, _ = validate_request_to_path(
@@ -128,7 +126,7 @@ def test_parametrized_integer_path_validation():
     })
     assert serializer.is_valid(), serializer.errors
 
-    paths = serializer.object
+    paths = serializer.save()
 
     request = RequestFactory(url='http://www.example.com/get/25')
     path, _ = validate_request_to_path(
@@ -152,7 +150,7 @@ def test_parametrized_path_with_multiple_prameters():
     })
     assert serializer.is_valid(), serializer.errors
 
-    paths = serializer.object
+    paths = serializer.save()
 
     request = RequestFactory(url='http://www.example.com/users/john-smith/posts/47')
     path, _ = validate_request_to_path(

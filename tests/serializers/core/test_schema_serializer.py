@@ -1,6 +1,6 @@
 import pytest
 
-from flex.serializers.common import BaseItemsSerializer
+from flex.error_messages import MESSAGES
 from flex.serializers.core import (
     SchemaSerializer,
 )
@@ -10,7 +10,11 @@ from flex.constants import (
     STRING,
 )
 
-from tests.utils import assert_error_message_equal
+from tests.utils import (
+    assert_error_message_equal,
+    assert_message_in_errors,
+)
+
 
 #
 # $ref validation tests
@@ -70,9 +74,10 @@ def test_items_invalid_when_not_array_or_object_or_reference(items):
 
     assert not serializer.is_valid()
     assert 'items' in serializer.errors
+    assert 'non_field_errors' in serializer.errors['items'][0][0]
     assert_error_message_equal(
-        serializer.errors['items'][0],
-        BaseItemsSerializer.default_error_messages['invalid_type_for_items'],
+        serializer.errors['items'][0][0]['non_field_errors'],
+        MESSAGES['items']['invalid_type'],
     )
 
 
@@ -103,6 +108,7 @@ def test_items_as_existing_reference():
             'definitions': {'SomeReference': {}},
         },
     )
+    serializer.is_valid()
     assert 'items' not in serializer.errors
 
 
@@ -117,8 +123,10 @@ def test_items_validated_as_valid_schema_object():
         data=schema,
     )
     assert not serializer.is_valid()
-    assert 'items' in serializer.errors
-    assert 'type' in serializer.errors['items'][0]
+    assert_message_in_errors(
+        MESSAGES['type']['unknown'],
+        serializer.errors,
+    )
 
 
 def test_items_as_array_of_invalid_schemas():
@@ -148,6 +156,7 @@ def test_items_as_array_of_valid_schemas():
     serializer = SchemaSerializer(
         data=schema,
     )
+    serializer.is_valid()
     assert 'items' not in serializer.errors
 
 
@@ -163,11 +172,9 @@ def test_items_as_array_of_references_with_missing_reference():
         },
     )
     assert not serializer.is_valid()
-    assert 'items' in serializer.errors
-    assert 'SomeOtherReference' in serializer.errors['items'][0]
-    assert_error_message_equal(
-        serializer.errors['items'][0],
-        serializer.error_messages['unknown_reference'],
+    assert_message_in_errors(
+        MESSAGES['unknown_reference']['definition'],
+        serializer.errors,
     )
 
 
@@ -185,6 +192,7 @@ def test_items_as_array_of_valid_references():
             },
         },
     )
+    serializer.is_valid()
     assert 'items' not in serializer.errors
 
 
@@ -209,4 +217,5 @@ def test_items_with_mixed_array_of_references_and_schemas():
         context={'definitions': {'SomeReference': {}}}
     )
 
+    serializer.is_valid()
     assert 'items' not in serializer.errors

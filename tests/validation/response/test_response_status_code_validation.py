@@ -1,5 +1,6 @@
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.validation.response import (
     validate_response,
 )
@@ -18,8 +19,6 @@ def test_response_parameter_validation():
     smoke test to ensure that parameter validation is wired into request
     validation correctly.
     """
-    from django.core.exceptions import ValidationError
-
     schema = SchemaFactory(
         paths={
             '/get': {

@@ -1,5 +1,9 @@
 import pytest
 
+from flex.exceptions import ValidationError
+from flex.error_messages import (
+    MESSAGES,
+)
 from flex.serializers.definitions import DefinitionsSerializer
 from flex.constants import (
     STRING,
@@ -62,7 +66,7 @@ def test_reference_with_invalid_values(zipcode):
     }
     validator = generate_validator_from_schema(schema, context=context)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator(zipcode)
 
 
@@ -118,7 +122,7 @@ def test_reference_with_additional_validators_and_invalid_value(name):
     }
     validator = generate_validator_from_schema(schema, context=context)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         validator(name)
 
 
@@ -161,7 +165,7 @@ def test_non_required_circular_reference():
         context={'deferred_references': set()},
     )
     assert serializer.is_valid(), serializer.errors
-    definitions = serializer.object
+    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,
@@ -176,8 +180,6 @@ def test_required_circular_reference():
     deep.  This test ensures that we can handle that case without ending up in
     an infinite recursion situation.
     """
-    from django.core.exceptions import ValidationError
-
     schema = {
         '$ref': 'Node',
     }
@@ -192,7 +194,7 @@ def test_required_circular_reference():
         context={'deferred_references': set()},
     )
     assert serializer.is_valid(), serializer.errors
-    definitions = serializer.object
+    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,
@@ -236,14 +238,14 @@ def test_nested_references_are_validated():
         context={'deferred_references': set()},
     )
     assert serializer.is_valid(), serializer.errors
-    definitions = serializer.object
+    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,
         context={'definitions': definitions},
     )
 
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValidationError) as e:
         validator({
             'parent': {
                 'value': 'bar',
