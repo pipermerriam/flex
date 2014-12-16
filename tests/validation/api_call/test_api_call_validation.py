@@ -1,5 +1,5 @@
 import os
-import urlparse
+from six.moves import urllib_parse as urlparse
 import requests
 
 from flex.core import load, validate_api_call
