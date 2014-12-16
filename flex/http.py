@@ -156,7 +156,10 @@ class Response(URLMixin):
         if self.content is EMPTY:
             return self.content
         elif self.content_type == 'application/json':
-            return json.loads(self.content)
+            if isinstance(self.content, six.binary_type):
+                return json.loads(six.text_type(self.content, encoding='utf-8'))
+            else:
+                return json.loads(self.content)
         raise NotImplementedError("No content negotiation for this content type")
 
 
