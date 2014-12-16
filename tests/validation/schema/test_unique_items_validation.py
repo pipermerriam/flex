@@ -14,6 +14,7 @@ from flex.constants import (
 from tests.utils import (
     generate_validator_from_schema,
     assert_error_message_equal,
+    assert_message_in_errors,
 )
 
 
@@ -56,10 +57,10 @@ def test_unique_items_with_dupes_in_array(letters):
     with pytest.raises(ValidationError) as err:
         validator(letters)
 
-    assert 'uniqueItems' in err.value.messages[0]
-    assert_error_message_equal(
-        err.value.messages[0]['uniqueItems'][0],
+    assert_message_in_errors(
         MESSAGES['unique_items']['invalid'],
+        err.value.detail,
+        'uniqueItems',
     )
 
 

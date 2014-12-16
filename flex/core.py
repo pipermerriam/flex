@@ -86,6 +86,7 @@ def parse(raw_schema):
         context=swagger_definitions,
     )
 
+    import pdb; pdb.set_trace()
     if not swagger_serializer.is_valid():
         message = "Swagger schema did not validate:\n\n"
         message += prettify_errors(swagger_serializer.errors)

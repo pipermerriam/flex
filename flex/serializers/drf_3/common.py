@@ -1,4 +1,3 @@
-import collections
 import copy
 import six
 
@@ -370,7 +369,9 @@ class BaseSchemaSerializer(CommonJSONSchemaSerializer):
             raise ValidationError(errors)
         return super(BaseSchemaSerializer, self).validate(attrs)
 
-BaseSchemaSerializer._declared_fields['$ref'] = serializers.CharField(allow_null=True, required=False)
+BaseSchemaSerializer._declared_fields['$ref'] = serializers.CharField(
+    allow_null=True, required=False,
+)
 
 
 class BaseItemsSerializer(BaseSchemaSerializer):

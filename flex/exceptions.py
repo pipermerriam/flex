@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import six
 import collections
 
@@ -17,7 +19,8 @@ class ErrorList(list):
 
     def add_error(self, error):
         if is_non_string_iterable(error) and not isinstance(error, collections.Mapping):
-            map(self.add_error, error)
+            for value in error:
+                self.add_error(value)
         else:
             self.append(error)
 

@@ -1,11 +1,6 @@
-import collections
-
 from flex.exceptions import (
     ValidationError,
     ErrorDict,
-)
-from flex.utils import (
-    prettify_errors,
 )
 
 
@@ -20,7 +15,6 @@ class ErrorCollection(object):
     def __exit__(self, type_, value, traceback):
         if any((type_, value, traceback)):
             if issubclass(type_, ValidationError):
-                import ipdb; ipdb.set_trace()
                 self.errors = value.detail
             else:
                 return False

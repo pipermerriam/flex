@@ -172,7 +172,9 @@ class OperationSerializer(serializers.Serializer):
     """
     tags = serializers.ListField(
         allow_null=True, required=False,
-        child=serializers.CharField(allow_null=True, required=False, validators=[string_type_validator]),
+        child=serializers.CharField(
+            allow_null=True, required=False, validators=[string_type_validator],
+        ),
     )
     summary = serializers.CharField(allow_null=True, required=False)
     description = serializers.CharField(allow_null=True, required=False)
@@ -180,17 +182,23 @@ class OperationSerializer(serializers.Serializer):
     operationId = serializers.CharField(allow_null=True, required=False)
     consumes = serializers.ListField(
         allow_null=True, required=False,
-        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(
+            allow_null=True, required=False, validators=[mimetype_validator],
+        ),
     )
     produces = serializers.ListField(
         allow_null=True, required=False,
-        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(
+            allow_null=True, required=False, validators=[mimetype_validator],
+        ),
     )
     parameters = ParameterSerializer(allow_null=True, required=False, many=True)
     responses = ResponsesSerializer()
     schemes = serializers.ListField(
         allow_null=True, required=False,
-        child=serializers.CharField(allow_null=True, required=False, validators=[scheme_validator]),
+        child=serializers.CharField(
+            allow_null=True, required=False, validators=[scheme_validator],
+        ),
     )
     deprecated = serializers.NullBooleanField(required=False)
     security = SecuritySerializer(allow_null=True, required=False)
@@ -230,9 +238,15 @@ class PropertiesSerializer(HomogenousDictSerializer):
 
 # These fields include recursive use of the `SchemaSerializer` so they have to
 # be attached after the `SchemaSerializer` class has been created.
-SchemaSerializer._declared_fields['properties'] = PropertiesSerializer(allow_null=True, required=False)
-SchemaSerializer._declared_fields['items'] = ItemsSerializer(allow_null=True, required=False, many=True)
-SchemaSerializer._declared_fields['allOf'] = SchemaSerializer(allow_null=True, required=False, many=True)
+SchemaSerializer._declared_fields['properties'] = PropertiesSerializer(
+    allow_null=True, required=False,
+)
+SchemaSerializer._declared_fields['items'] = ItemsSerializer(
+    allow_null=True, required=False, many=True,
+)
+SchemaSerializer._declared_fields['allOf'] = SchemaSerializer(
+    allow_null=True, required=False, many=True,
+)
 
 
 class PathsSerializer(HomogenousDictSerializer):
@@ -321,15 +335,21 @@ class SwaggerSerializer(serializers.Serializer):
     )
     schemes = serializers.ListField(
         allow_null=True, required=False,
-        child=serializers.CharField(allow_null=True, required=False, validators=[scheme_validator]),
+        child=serializers.CharField(
+            allow_null=True, required=False, validators=[scheme_validator],
+        ),
     )
     consumes = serializers.ListField(
         allow_null=True, required=False,
-        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(
+            allow_null=True, required=False, validators=[mimetype_validator],
+        ),
     )
     produces = serializers.ListField(
         allow_null=True, required=False,
-        child=serializers.CharField(allow_null=True, required=False, validators=[mimetype_validator]),
+        child=serializers.CharField(
+            allow_null=True, required=False, validators=[mimetype_validator],
+        ),
     )
 
     paths = PathsSerializer()
