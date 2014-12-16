@@ -54,10 +54,7 @@ def generate_request_content_type_validator(consumes, **kwargs):
         validate_request_content_type,
         content_types=consumes,
     )
-    return chain_reduce_partial(
-        operator.attrgetter('request'),
-        validator,
-    )
+    return validator
 
 
 def validate_request_parameters(request, validators):
