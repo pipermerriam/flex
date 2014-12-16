@@ -44,7 +44,7 @@ def test_basic_response_body_schema_validation_with_invalid_value():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
     assert 'body' in err.value.messages[0]

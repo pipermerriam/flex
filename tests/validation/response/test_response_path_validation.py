@@ -33,7 +33,7 @@ def test_response_validation_with_invalid_path():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
     assert_message_in_errors(
@@ -61,7 +61,7 @@ def test_response_validation_with_valid_path():
     validate_response(
         response=response,
         request_method='get',
-        context=schema,
+        schema=schema,
     )
 
 
@@ -91,7 +91,7 @@ def test_response_validation_with_parametrized_path():
     validate_response(
         response=response,
         request_method='get',
-        context=schema,
+        schema=schema,
     )
 
 
@@ -122,7 +122,7 @@ def test_response_validation_with_parametrized_path():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
     assert_message_in_errors(
@@ -162,7 +162,7 @@ def test_response_validation_with_parameter_as_reference():
     validate_response(
         response=response,
         request_method='get',
-        context=schema,
+        schema=schema,
     )
 
 
@@ -197,7 +197,7 @@ def test_response_validation_with_parameter_as_reference_for_invalid_value():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
     assert_message_in_errors(

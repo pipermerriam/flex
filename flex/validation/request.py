@@ -14,7 +14,7 @@ from flex.validation.common import (
 from flex.http import normalize_request
 
 
-def validate_request(request, paths, base_path, context):
+def validate_request(request, schema):
     """
     Request validation does the following steps.
 
@@ -28,13 +28,13 @@ def validate_request(request, paths, base_path, context):
         try:
             api_path = validate_path_to_api_path(
                 path=request.path,
-                **context
+                **schema
             )
         except ValidationError as err:
             errors['path'].add_error(err.detail)
             return  # this causes an exception to be raised since errors is no longer falsy.
 
-        path_definition = paths[api_path] or {}
+        path_definition = schema['paths'][api_path] or {}
 
         if not path_definition:
             # TODO: is it valid to not have a definition for a path?
@@ -60,25 +60,9 @@ def validate_request(request, paths, base_path, context):
             api_path=api_path,
             path_definition=path_definition,
             operation_definition=operation_definition,
-            context=context,
+            context=schema,
         )
         try:
             validate_operation(request, operation_validators)
         except ValidationError as err:
             errors['method'].add_error(err.detail)
-
-    return operation_definition
-
-
-def generate_request_validator(schema, **kwargs):
-    request_validator = functools.partial(
-        validate_request,
-        paths=schema['paths'],
-        base_path=schema.get('basePath', ''),
-        context=schema,
-        **kwargs
-    )
-    return chain_reduce_partial(
-        normalize_request,
-        request_validator,
-    )

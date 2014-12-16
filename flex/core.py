@@ -17,8 +17,12 @@ from flex.serializers.core import (
 )
 from flex.serializers.definitions import SwaggerDefinitionsSerializer
 from flex.utils import prettify_errors
-from flex.validation.request import generate_request_validator
-from flex.validation.response import generate_response_validator
+from flex.http import (
+    normalize_request,
+    normalize_response,
+)
+from flex.validation.request import validate_request
+from flex.validation.response import validate_response
 
 
 def load_source(source):
@@ -120,15 +124,25 @@ def validate(schema, target=None, **kwargs):
         validator(target)
 
 
-def validate_api_call(schema, request, response):
+def validate_api_call(schema, raw_request, raw_response):
+    request = normalize_request(raw_request)
+    response = normalize_response(raw_response)
+
     with ErrorCollection() as errors:
         try:
-            operation_definition = generate_request_validator(schema)(request)
+            validate_request(
+                request=request,
+                schema=schema,
+            )
         except ValidationError as err:
             errors['request'].add_error(err.messages or getattr(err, 'detail'))
             return
 
         try:
-            generate_response_validator(operation_definition, schema)(response)
+            validate_response(
+                response=response,
+                request_method=request.method,
+                schema=schema,
+            )
         except ValidationError as err:
             errors['response'].add_error(err.messages or getattr(err, 'detail'))

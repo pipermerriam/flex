@@ -47,10 +47,8 @@ def test_request_header_validation():
 
     with pytest.raises(ValidationError) as err:
         validate_request(
-            request,
-            paths=schema['paths'],
-            base_path=schema.get('base_path', ''),
-            context=schema,
+            request=request,
+            schema=schema,
         )
 
     assert_message_in_errors(
@@ -95,14 +93,12 @@ def test_request_header_array_extraction(format_, value):
         },
     )
 
-    response = RequestFactory(
+    request = RequestFactory(
         url='http://www.example.com/get/',
         headers={'Authorization': value},
     )
 
     validate_request(
-        response,
-        paths=schema['paths'],
-        base_path=schema.get('base_path', ''),
-        context=schema,
+        request=request,
+        schema=schema,
     )

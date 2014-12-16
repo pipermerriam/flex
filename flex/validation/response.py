@@ -175,7 +175,7 @@ def generate_response_validator(api_path, operation_definition, response_definit
     )
 
 
-def validate_response(response, request_method, context):
+def validate_response(response, request_method, schema):
     """
     Response validation involves the following steps.
        4. validate that the response status_code is in the allowed responses for
@@ -190,13 +190,13 @@ def validate_response(response, request_method, context):
         try:
             api_path = validate_path_to_api_path(
                 path=response.path,
-                **context
+                **schema
             )
         except ValidationError as err:
             errors['path'].extend(list(err.messages))
             return  # this causes an exception to be raised since errors is no longer falsy.
 
-        path_definition = context['paths'][api_path] or {}
+        path_definition = schema['paths'][api_path] or {}
 
         # TODO: tests
         try:
@@ -223,7 +223,7 @@ def validate_response(response, request_method, context):
                 operation_definition=operation_definition,
                 path_definition=path_definition,
                 response_definition=response_definition,
-                context=context,
+                context=schema,
             )
             try:
                 response_validator(response)

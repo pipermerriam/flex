@@ -54,10 +54,8 @@ def test_request_parameter_validation():
 
     with pytest.raises(ValidationError) as err:
         validate_request(
-            request,
-            paths=schema['paths'],
-            base_path=schema.get('base_path', ''),
-            context=schema,
+            request=request,
+            schema=schema,
         )
 
     assert_message_in_errors(

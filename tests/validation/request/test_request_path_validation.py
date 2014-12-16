@@ -25,10 +25,8 @@ def test_request_validation_with_invalid_request_path():
 
     with pytest.raises(ValidationError) as err:
         validate_request(
-            request,
-            paths=schema['paths'],
-            base_path=schema.get('base_path', ''),
-            context=schema,
+            request=request,
+            schema=schema,
         )
 
     assert_message_in_errors(

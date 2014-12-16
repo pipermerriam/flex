@@ -36,7 +36,7 @@ def test_produces_validation_is_noop_when_produces_not_declared():
     validate_response(
         response=response,
         request_method='get',
-        context=schema,
+        schema=schema,
     )
 
 
@@ -60,7 +60,7 @@ def test_produces_validation_valid_mimetype_from_global_definition():
     validate_response(
         response=response,
         request_method='get',
-        context=schema,
+        schema=schema,
     )
 
 
@@ -85,7 +85,7 @@ def test_produces_validation_invalid_mimetype_from_global_definition():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
 
@@ -112,7 +112,7 @@ def test_produces_validation_for_valid_mimetype_from_operation_definition():
     validate_response(
         response=response,
         request_method='get',
-        context=schema,
+        schema=schema,
     )
 
 
@@ -140,7 +140,7 @@ def test_produces_validation_for_invalid_mimetype_from_operation_definition():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
     assert_message_in_errors(

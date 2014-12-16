@@ -35,7 +35,7 @@ def test_response_parameter_validation():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
     assert 'status_code' in err.value.messages[0]

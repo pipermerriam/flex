@@ -47,7 +47,7 @@ def test_response_header_validation():
         validate_response(
             response=response,
             request_method='get',
-            context=schema,
+            schema=schema,
         )
 
     assert_message_in_errors(
@@ -95,5 +95,5 @@ def test_response_header_validation_for_non_strings(type_, value):
     validate_response(
         response=response,
         request_method='get',
-        context=schema,
+        schema=schema,
     )
