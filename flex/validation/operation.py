@@ -61,18 +61,6 @@ def generate_request_content_type_validator(consumes, **kwargs):
     return validator
 
 
-def generate_query_parameters_validator(query_parameters, context):
-    query_parameter_validator = functools.partial(
-        validate_query_parameters,
-        query_parameters=query_parameters,
-        context=context,
-    )
-    return chain_reduce_partial(
-        operator.attrgetter('query_data'),
-        query_parameter_validator,
-    )
-
-
 def generate_header_validator(headers, context, **kwargs):
     """
     Generates a validation function that will validate a dictionary of headers.
@@ -133,7 +121,14 @@ def generate_parameters_validator(api_path, path_definition, parameters,
 
     # QUERY
     in_query_parameters = filter_parameters(all_parameters, in_=QUERY)
-    validators['query'] = generate_query_parameters_validator(in_query_parameters, context)
+    validators['query'] = chain_reduce_partial(
+        operator.attrgetter('query_data'),
+        functools.partial(
+            validate_query_parameters,
+            query_parameters=in_query_parameters,
+            context=context,
+        ),
+    )
 
     # HEADERS
     in_header_parameters = filter_parameters(all_parameters, in_=HEADER)
