@@ -13,6 +13,8 @@ from flex.utils import (
     get_type_for_value,
     cast_value_to_type,
     chain_reduce_partial,
+    is_any_string_type,
+    deep_equal,
 )
 from flex.constants import (
     NULL,
@@ -376,3 +378,44 @@ def test_chain_reduce_partial():
     for _ in range(100):
         v = random.randint(-1000000, 1000000)
         assert fn_c(v) == fn_b(fn_a(v))
+
+
+#
+# is_any_string_type tests
+#
+def test_binary_type():
+    assert is_any_string_type(six.binary_type(b'test'))
+
+
+def test_text_type():
+    assert is_any_string_type(six.text_type('test'))
+
+
+def test_not_a_string_at_all():
+    assert not is_any_string_type(1)
+
+
+#
+# deep_equal tests
+#
+@pytest.mark.parametrize(
+    'left,right',
+    (
+        (1, True),
+        (1.0, True),
+        (1, 1.0),
+        (0, False),
+    )
+)
+def test_deep_equal_for_things_that_should_not_be_equal(left, right):
+    assert not deep_equal(left, right)
+
+
+@pytest.mark.parametrize(
+    'left,right',
+    (
+        (six.binary_type(b'test'), six.text_type('test')),
+    )
+)
+def test_deep_equal_for_things_that_should_be_equal(left, right):
+    assert deep_equal(left, right)

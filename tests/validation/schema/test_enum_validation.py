@@ -60,9 +60,9 @@ def test_enum_noop_when_not_required_and_field_not_present():
     'enum_value,value',
     (
         (six.text_type('test'), six.text_type('test')),
-        (six.text_type('test'), six.binary_type('test')),
-        (six.binary_type('test'), six.text_type('test')),
-        (six.binary_type('test'), six.binary_type('test')),
+        (six.text_type('test'), b'test'),
+        (b'test', six.text_type('test')),
+        (b'test', b'test'),
     )
 )
 def test_enum_disperate_text_types(enum_value, value):
@@ -71,4 +71,4 @@ def test_enum_disperate_text_types(enum_value, value):
     }
     validator = generate_validator_from_schema(schema)
 
-    validator(six.text_type(value))
+    validator(value)
