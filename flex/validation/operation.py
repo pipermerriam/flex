@@ -44,7 +44,8 @@ def validate_operation(request, validators):
 
 def validate_request_content_type(request, content_types):
     assert isinstance(request, Request)
-    if request.content_type not in content_types:
+    # TODO: is it correct to skip validation for a null content_type?
+    if request.content_type and request.content_type not in content_types:
         raise ValidationError(
             'Invalid content type `{0}`.  Must be one of `{1}`.'.format(
                 request.content_type, content_types,
