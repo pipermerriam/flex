@@ -1,6 +1,7 @@
 import itertools
 import collections
 import functools
+import operator
 
 import six
 
@@ -30,6 +31,9 @@ from flex.validation.common import (
     generate_pattern_validator,
     generate_enum_validator,
     validate_object,
+)
+from flex.utils import (
+    chain_reduce_partial,
 )
 
 
@@ -136,12 +140,6 @@ validator_mapping = {
 }
 
 
-def validate_properties(obj, key, validators):
-    if obj is EMPTY:
-        return
-    validate_object(obj.get(key, EMPTY), validators)
-
-
 class LazyReferenceValidator(object):
     """
     This class acts as a lazy validator for references in schemas to prevent an
@@ -203,11 +201,12 @@ def construct_schema_validators(schema, context):
                 property_schema,
                 context,
             )
-            validators[property_] = functools.partial(
-                validate_properties,
-                key=property_,
-                validators=property_validators,
-            )
+            validators[property_] = skip_if_empty(skip_if_not_of_type(OBJECT)(
+                chain_reduce_partial(
+                    operator.methodcaller('get', property_, EMPTY),
+                    functools.partial(validate_object, validators=property_validators),
+                ),
+            ))
     assert 'context' not in schema
     for key in schema:
         if key in validator_mapping:
