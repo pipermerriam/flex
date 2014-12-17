@@ -1,3 +1,5 @@
+import six
+
 import pytest
 
 from flex.exceptions import ValidationError
@@ -52,3 +54,21 @@ def test_enum_noop_when_not_required_and_field_not_present():
     validator = generate_validator_from_schema(schema)
 
     validator(EMPTY)
+
+
+@pytest.mark.parametrize(
+    'enum_value,value',
+    (
+        (six.text_type('test'), six.text_type('test')),
+        (six.text_type('test'), b'test'),
+        (b'test', six.text_type('test')),
+        (b'test', b'test'),
+    )
+)
+def test_enum_disperate_text_types(enum_value, value):
+    schema = {
+        'enum': [enum_value],
+    }
+    validator = generate_validator_from_schema(schema)
+
+    validator(value)

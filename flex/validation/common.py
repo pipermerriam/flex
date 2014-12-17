@@ -22,6 +22,7 @@ from flex.utils import (
     get_type_for_value,
     chain_reduce_partial,
     cast_value_to_type,
+    deep_equal,
 )
 from flex.paths import (
     match_path_to_api_path,
@@ -274,17 +275,6 @@ def validate_pattern(value, regex):
 
 def generate_pattern_validator(pattern, **kwargs):
     return functools.partial(validate_pattern, regex=re.compile(pattern))
-
-
-def deep_equal(a, b):
-    """
-    Because of things in python like:
-        >>> 1 == 1.0
-        True
-        >>> 1 == True
-        True
-    """
-    return a == b and isinstance(a, type(b)) and isinstance(b, type(a))
 
 
 @skip_if_empty

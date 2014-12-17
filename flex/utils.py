@@ -19,12 +19,16 @@ from flex.constants import (
 )
 
 
-def is_non_string_iterable(value):
+def is_any_string_type(value):
     if six.PY2:
         string_types = six.string_types
     else:
         string_types = (six.binary_type, six.text_type)
-    return not isinstance(value, string_types) and hasattr(value, '__iter__')
+    return isinstance(value, string_types)
+
+
+def is_non_string_iterable(value):
+    return not is_any_string_type(value) and hasattr(value, '__iter__')
 
 
 def is_value_of_type(value, type_):
@@ -42,6 +46,25 @@ def is_value_of_type(value, type_):
 
 def is_value_of_any_type(value, types):
     return any(is_value_of_type(value, type_) for type_ in types)
+
+
+def deep_equal(a, b):
+    """
+    Because of things in python like:
+        >>> 1 == 1.0
+        True
+        >>> 1 == True
+        True
+        >>> b'test' == 'test'  # python3
+        False
+    """
+    if is_any_string_type(a) and is_any_string_type(b):
+        if isinstance(a, six.binary_type):
+            a = six.text_type(a, encoding='utf-8')
+        if isinstance(b, six.binary_type):
+            b = six.text_type(b, encoding='utf-8')
+        return a == b
+    return a == b and isinstance(a, type(b)) and isinstance(b, type(a))
 
 
 def cast_value_to_type(value, type_):
