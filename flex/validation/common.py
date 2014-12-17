@@ -284,6 +284,8 @@ def deep_equal(a, b):
         >>> 1 == True
         True
     """
+    if isinstance(a, six.string_types) and isinstance(b, six.string_types):
+        return a == b
     return a == b and isinstance(a, type(b)) and isinstance(b, type(a))
 
 
