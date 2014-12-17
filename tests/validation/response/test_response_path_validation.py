@@ -95,9 +95,10 @@ def test_response_validation_with_parametrized_path():
     )
 
 
-def test_response_validation_with_parametrized_path():
+def test_response_validation_with_parametrized_path_and_invalid_value():
     """
-    Test that request validation does type checking on path parameters.
+    Test that request validation does type checking on path parameters.  Ensure
+    that the value in the path is validated.
     """
     schema = SchemaFactory(
         paths={
