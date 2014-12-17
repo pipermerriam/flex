@@ -45,8 +45,7 @@ def test_response_validation_with_invalid_path():
 
 def test_response_validation_with_valid_path():
     """
-    Test that request validation detects request paths that are not declared
-    in the schema.
+    Test that response validation is able to match api paths.
     """
     schema = SchemaFactory(
         paths={
@@ -57,6 +56,29 @@ def test_response_validation_with_valid_path():
     )
 
     response = ResponseFactory(url='http://www.example.com/get')
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
+
+
+def test_response_validation_with_valid_path_and_base_path():
+    """
+    Test that response validation is able to match api paths even when there is
+    a base path.
+    """
+    schema = SchemaFactory(
+        basePath='/api/v1',
+        paths={
+            '/get': {
+                'get': {'responses': {200: {'description': 'Success'}}},
+            },
+        }
+    )
+
+    response = ResponseFactory(url='http://www.example.com/api/v1/get')
 
     validate_response(
         response=response,
@@ -87,6 +109,38 @@ def test_response_validation_with_parametrized_path():
     )
 
     response = ResponseFactory(url='http://www.example.com/get/1234')
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
+
+
+def test_response_validation_with_parametrized_path_and_api_base_path():
+    """
+    Test that request validation finds and validates parametrized paths even
+    when the api has a base path.
+    """
+    schema = SchemaFactory(
+        basePath='/api/v1',
+        paths={
+            '/get/{id}': {
+                'get': {'responses': {200: {'description': 'Success'}}},
+                'parameters': [
+                    {
+                        'name': 'id',
+                        'in': PATH,
+                        'description': 'The Primary Key',
+                        'type': INTEGER,
+                        'required': True,
+                    }
+                ]
+            },
+        }
+    )
+
+    response = ResponseFactory(url='http://www.example.com/api/v1/get/1234')
 
     validate_response(
         response=response,

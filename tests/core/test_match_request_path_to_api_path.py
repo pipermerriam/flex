@@ -119,7 +119,7 @@ def test_path_to_regex_does_not_overmatch(path, bad_path):
         ('/api/get/1', '/get/{id}'),
     ),
 )
-def test_match_request_path_to_api_path(path, schema_path):
+def test_match_target_path_to_api_path(path, schema_path):
     schema = load('tests/core/path_test_schema.yaml')
     paths = schema['paths']
     base_path = schema['basePath']

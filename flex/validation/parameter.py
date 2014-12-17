@@ -42,20 +42,23 @@ def type_cast_parameters(parameter_values, parameter_definitions, context):
     return typed_parameters
 
 
-def get_path_parameter_values(request_path, api_path, path_parameters, context):
+def get_path_parameter_values(target_path, api_path, path_parameters, context):
     raw_values = path_to_regex(
         api_path,
         path_parameters,
-    ).match(request_path).groupdict()
+    ).match(target_path).groupdict()
     return type_cast_parameters(raw_values, path_parameters, context=context)
 
 
-def validate_path_parameters(request_path, api_path, path_parameters, context):
+def validate_path_parameters(target_path, api_path, path_parameters, context):
     """
     Helper function for validating a request path
     """
+    base_path = context.get('basePath', '')
+    if target_path.startswith(base_path):
+        target_path = target_path[len(base_path):]
     parameter_values = get_path_parameter_values(
-        request_path, api_path, path_parameters, context,
+        target_path, api_path, path_parameters, context,
     )
     validate_parameters(parameter_values, path_parameters, context=context)
 
