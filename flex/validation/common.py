@@ -36,24 +36,11 @@ from flex.constants import (
 )
 from flex.decorators import (
     skip_if_not_of_type,
+    skip_if_empty,
     suffix_reserved_words,
     translate_validation_error,
 )
 from flex.error_messages import MESSAGES
-
-
-def skip_if_empty(func):
-    """
-    Decorator for validation functions which makes them pass if the value
-    passed in is the EMPTY sentinal value.
-    """
-    @functools.wraps(func)
-    def inner(value, *args, **kwargs):
-        if value is EMPTY:
-            return
-        else:
-            return func(value, *args, **kwargs)
-    return inner
 
 
 @skip_if_empty

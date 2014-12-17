@@ -1,5 +1,4 @@
 import re
-import functools
 
 import six
 
@@ -14,6 +13,7 @@ else:
 
 from flex.utils import is_value_of_any_type
 from flex.exceptions import ValidationError
+from flex.decorators import partial_safe_wraps
 from flex.constants import (
     STRING,
     INTEGER,
@@ -38,7 +38,7 @@ class FormatRegistry(object):
             )
 
         def outer(func):
-            @functools.wraps(func)
+            @partial_safe_wraps(func)
             def inner(value, *args, **kwargs):
                 """
                 Format validation should only be executed if the value is of

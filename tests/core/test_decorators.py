@@ -1,10 +1,12 @@
 import pytest
+import functools
 
 from flex.exceptions import ValidationError
 from flex.decorators import (
     skip_if_not_of_type,
     rewrite_reserved_words,
     translate_validation_error,
+    partial_safe_wraps,
 )
 from flex.constants import (
     NUMBER,
@@ -80,3 +82,14 @@ def test_django_validation_error_is_converted():
     except Exception as raised_err:
         assert err is not raised_err
         assert isinstance(raised_err, ValidationError)
+
+
+#
+# partial_safe_wraps tests
+#
+def test_partial_safe_wraps_can_wrap_partial():
+    x = functools.partial(range, 3)
+
+    @partial_safe_wraps(x)
+    def foo():
+        return 3
