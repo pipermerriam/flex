@@ -40,17 +40,16 @@ def test_request_validation_with_invalid_request_path():
     )
 
 
-def test_request_validation_with_valid_request_path():
+def test_request_validation_with_valid_path():
     """
-    Test that request validation detects request paths that are not declared
-    in the schema.
+    Test that request validation is able to match api paths.
     """
     schema = SchemaFactory(
         paths={
             '/get': {
                 'get': {'responses': {200: {'description': 'Success'}}},
             },
-        }
+        },
     )
 
     request = RequestFactory(url='http://www.example.com/get')
@@ -153,6 +152,30 @@ def test_request_validation_with_parameter_as_reference():
     )
 
     request = RequestFactory(url='http://www.example.com/get/1234')
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
+
+
+def test_request_validation_with_valid_path_and_base_path():
+    """
+    Test that request validation is able to match api paths that also have a
+    base api path.
+    """
+    schema = SchemaFactory(
+        basePath='/api/v1',
+        paths={
+            '/get': {
+                'get': {
+                    'responses': {200: {'description': "Success"}},
+                },
+            },
+        },
+    )
+
+    request = RequestFactory(url='http://www.example.com/api/v1/get')
 
     validate_request(
         request=request,

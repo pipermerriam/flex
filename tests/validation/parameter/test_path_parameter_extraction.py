@@ -31,7 +31,7 @@ def test_getting_parameter_values_from_path():
     parameters = serializer.save()
 
     values = get_path_parameter_values(
-        request_path='/get/fernando/posts/1234/',
+        target_path='/get/fernando/posts/1234/',
         api_path='/get/{username}/posts/{id}/',
         path_parameters=parameters,
         context={},

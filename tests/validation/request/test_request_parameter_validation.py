@@ -69,3 +69,36 @@ def test_request_parameter_validation():
         err.value.detail,
         'query.page.type',
     )
+
+
+def test_request_parameter_validation_with_base_path():
+    """
+    Test that path parameter validation works even when there is a base path in
+    the api.
+    """
+    schema = SchemaFactory(
+        basePath='/api/v1',
+        paths={
+            '/get/{id}/': {
+                'parameters': [
+                    {
+                        'name': 'id',
+                        'in': PATH,
+                        'description': 'id',
+                        'required': True,
+                        'type': STRING,
+                    },
+                ],
+                'get': {
+                    'responses': {200: {'description': "Success"}},
+                },
+            },
+        },
+    )
+
+    request = RequestFactory(url='http://www.example.com/api/v1/get/32/')
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
