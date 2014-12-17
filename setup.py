@@ -10,7 +10,7 @@ try:
 except ImportError:
     from distutils.core import setup, find_packages
 
-version = '2.5.0'
+version = '2.6.0'
 
 readme = open(os.path.join(DIR, 'README.md')).read()
 
@@ -34,7 +34,7 @@ setup(
         'console_scripts': ["flex=flex.cli:main"],
     },
     keywords='rest swagger',
-    packages=find_packages(exclude="tests"),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

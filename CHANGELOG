@@ -1,3 +1,8 @@
+2.6.0
+-----
+
+- Fix bug related to validating path parameters for api's with a basePath.
+
 2.5.0
 -----
 
