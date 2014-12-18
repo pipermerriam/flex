@@ -77,9 +77,6 @@ def validate_parameters(parameter_values, parameters, context):
     validators = construct_multi_parameter_validators(parameters, context=context)
 
     with ErrorCollection() as errors:
-        # we should have a validator for every parameter value
-        assert not set(parameter_values.keys()).difference(validators.keys())
-
         for key, validator in validators.items():
             try:
                 validator(parameter_values.get(key, EMPTY))
