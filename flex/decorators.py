@@ -7,8 +7,6 @@ from flex.utils import (
 )
 from flex.constants import EMPTY
 
-from django.core.exceptions import ValidationError as DjangoValidationError
-
 
 def partial_safe_wraps(wrapped_func, *args, **kwargs):
     """
@@ -89,21 +87,4 @@ def suffix_reserved_words(func):
                 key = "{0}_".format(word)
                 kwargs[key] = kwargs.pop(word)
         return func(*args, **kwargs)
-    return inner
-
-
-def translate_validation_error(func):
-    """
-    Given a function that potentially raises
-    `django.core.exceptions.ValidationError`, reraise the same error as a
-    `flex.exceptions.ValidationError`.
-    """
-    @partial_safe_wraps(func)
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except DjangoValidationError as err:
-            if isinstance(err, ValidationError):
-                raise
-            raise ValidationError(err.messages)
     return inner

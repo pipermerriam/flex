@@ -5,14 +5,11 @@ from flex.exceptions import ValidationError
 from flex.decorators import (
     skip_if_not_of_type,
     rewrite_reserved_words,
-    translate_validation_error,
     partial_safe_wraps,
 )
 from flex.constants import (
     NUMBER,
 )
-
-from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 #
@@ -52,36 +49,6 @@ def test_rewrite_of_reserved_word_in():
         assert 'in' in kwargs
 
     fn(in_=True)
-
-
-#
-# translate_validation_error tests
-#
-def test_flex_validation_error_is_untouched():
-    err = ValidationError('foo')
-
-    @translate_validation_error
-    def fn():
-        raise err
-
-    try:
-        fn()
-    except Exception as raised_err:
-        assert err is raised_err
-
-
-def test_django_validation_error_is_converted():
-    err = DjangoValidationError('foo')
-
-    @translate_validation_error
-    def fn():
-        raise err
-
-    try:
-        fn()
-    except Exception as raised_err:
-        assert err is not raised_err
-        assert isinstance(raised_err, ValidationError)
 
 
 #

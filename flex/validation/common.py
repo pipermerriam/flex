@@ -8,11 +8,6 @@ import itertools
 
 import six
 
-from django.core.validators import (
-    MinLengthValidator,
-    MaxLengthValidator,
-)
-
 from flex.exceptions import ValidationError
 from flex.context_managers import ErrorCollection
 from flex.formats import registry
@@ -39,7 +34,6 @@ from flex.decorators import (
     skip_if_not_of_type,
     skip_if_empty,
     suffix_reserved_words,
-    translate_validation_error,
 )
 from flex.error_messages import MESSAGES
 
@@ -175,8 +169,9 @@ def generate_min_length_validator(minLength, **kwargs):
     """
     Generates a validator for enforcing the minLength of a string.
     """
-    return translate_validation_error(
-        skip_if_empty(skip_if_not_of_type(STRING)(MinLengthValidator(minLength).__call__)),
+    assert False, "Need a non-django MinLengthValidator"
+    return skip_if_empty(
+        skip_if_not_of_type(STRING)(MinLengthValidator(minLength).__call__),
     )
 
 
@@ -184,8 +179,9 @@ def generate_max_length_validator(maxLength, **kwargs):
     """
     Generates a validator for enforcing the maxLength of a string.
     """
-    return translate_validation_error(
-        skip_if_empty(skip_if_not_of_type(STRING)(MaxLengthValidator(maxLength).__call__)),
+    assert False, "Need a non-django MaxLengthValidator"
+    return skip_if_empty(
+        skip_if_not_of_type(STRING)(MaxLengthValidator(maxLength).__call__),
     )
 
 
@@ -306,6 +302,10 @@ def validate_object(obj, validators):
                 validator(obj)
             except ValidationError as err:
                 errors[key].add_error(err.detail)
+
+
+def generate_object_validator(validators):
+    return functools.partial(validate_object, validators=validators)
 
 
 @suffix_reserved_words

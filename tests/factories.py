@@ -36,20 +36,25 @@ class ResponseFactory(factory.Factory):
         model = Response
 
 
-def SchemaFactory(**kwargs):
+def RawSchemaFactory(**kwargs):
     kwargs.setdefault('swagger', '2.0')
     kwargs.setdefault('info', {'title': 'Test API', 'version': '0.0.1'})
     kwargs.setdefault('paths', {})
 
+    return kwargs
+
+
+def SchemaFactory(**kwargs):
+    raw_schema = RawSchemaFactory(**kwargs)
 
     definitions_serializer = SwaggerDefinitionsSerializer(
-        data=kwargs,
+        data=raw_schema,
     )
     assert definitions_serializer.is_valid(), definitions_serializer.errors
 
     swagger_serializer = SwaggerSerializer(
         definitions_serializer.save(),
-        data=kwargs,
+        data=raw_schema,
         context=definitions_serializer.save(),
     )
 

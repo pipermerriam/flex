@@ -8,8 +8,6 @@ from flex.utils import (
     prettify_errors,
 )
 
-from rest_framework.serializers import ValidationError as DRFValidationError
-
 
 class ErrorList(list):
     def __init__(self, value=None):
@@ -35,7 +33,7 @@ class ErrorDict(collections.defaultdict):
         self[key].add_error(error)
 
 
-class ValidationError(DRFValidationError):
+class ValidationError(ValueError):
     def __init__(self, error):
         if not isinstance(error, collections.Mapping) and \
            is_non_string_iterable(error) and \

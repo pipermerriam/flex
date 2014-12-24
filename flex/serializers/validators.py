@@ -6,13 +6,10 @@ import operator
 
 import six
 
-from django.core.validators import RegexValidator
-
 from flex.exceptions import ValidationError
 from flex.formats import registry
 from flex.decorators import (
     maybe_iterable,
-    translate_validation_error,
 )
 from flex.utils import is_value_of_type
 from flex.constants import (
@@ -81,7 +78,8 @@ MIMETYPE_PATTERN = (
 
 @maybe_iterable
 def mimetype_validator(value):
-    return translate_validation_error(RegexValidator(MIMETYPE_PATTERN).__call__)(value)
+    assert False, "Need a non-django regex validator"
+    return RegexValidator(MIMETYPE_PATTERN)(value)
 
 
 @maybe_iterable
