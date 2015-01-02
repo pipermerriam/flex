@@ -66,3 +66,34 @@ def test_swagger_field_with_valid_version():
         'swagger',
         errors
     )
+
+
+def test_swagger_field_with_invalid_version():
+    raw_schema = RawSchemaFactory(swagger='not-valid')
+
+    with pytest.raises(ValidationError) as err:
+        swagger_schema_validator(raw_schema)
+
+    assert_message_in_errors(
+        MESSAGES['enum']['invalid'],
+        err.value.detail,
+        'swagger.enum',
+    )
+
+
+@pytest.mark.parametrize(
+    'value',
+    (1, 1.1, True, ['a', 'b'], {'a': 'b'}, None),
+)
+def test_version_must_be_a_string(value):
+    data = {
+        'swagger': value,
+    }
+    with pytest.raises(ValidationError) as err:
+        swagger_schema_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'swagger.type',
+    )
