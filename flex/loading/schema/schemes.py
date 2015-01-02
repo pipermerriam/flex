@@ -1,5 +1,4 @@
 from flex.constants import (
-    STRING,
     ARRAY,
     SCHEMES,
 )
@@ -7,7 +6,6 @@ from flex.exceptions import ValidationError
 from flex.error_messages import MESSAGES
 from flex.validation.common import (
     generate_object_validator,
-    generate_type_validator,
 )
 from flex.decorators import (
     skip_if_empty,
@@ -16,9 +14,6 @@ from flex.decorators import (
 from flex.validation.schema import (
     construct_schema_validators,
 )
-
-
-string_type_validator = generate_type_validator(STRING)
 
 
 @skip_if_empty
