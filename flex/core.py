@@ -11,11 +11,11 @@ import yaml
 
 from flex.context_managers import ErrorCollection
 from flex.exceptions import ValidationError
-from flex.serializers.core import (
-    SwaggerSerializer,
-    SchemaSerializer,
-)
-from flex.serializers.definitions import SwaggerDefinitionsSerializer
+#from flex.serializers.core import (
+#    SwaggerSerializer,
+#    SchemaSerializer,
+#)
+#from flex.serializers.definitions import SwaggerDefinitionsSerializer
 from flex.utils import prettify_errors
 from flex.http import (
     normalize_request,

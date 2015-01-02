@@ -1,7 +1,5 @@
 import factory
 
-from flex.serializers.definitions import SwaggerDefinitionsSerializer
-from flex.serializers.core import SwaggerSerializer
 from flex.constants import EMPTY
 from flex.http import (
     Request,

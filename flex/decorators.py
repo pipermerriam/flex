@@ -22,6 +22,8 @@ def maybe_iterable(func):
     @partial_safe_wraps(func)
     def inner(value):
         if is_non_string_iterable(value):
+            # TODO: this should collect all errors that are raised and re-raise
+            # them as a list.
             return list(map(func, value))
         else:
             return func(value)
