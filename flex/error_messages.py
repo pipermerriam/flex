@@ -110,6 +110,24 @@ CONTENT_TYPE_MESSAGES = {
 }
 
 
+HOST_MESSAGES = {
+    'invalid': (
+        "Invalid host: {0}. This MUST be the host only and does not include the "
+        "scheme nor sub-paths. It MAY include a port. If the host is not "
+        "included, the host serving the documentation is to be used (including "
+        "the port)"
+    ),
+    'may_not_include_path': (
+        "Invalid host: {0}.  Includes the path component.  The host value "
+        "should be the host only, without path or scheme."
+    ),
+    'may_not_include_scheme': (
+        "Invalid host: {0}.  Includes the scheme component.  The host value "
+        "should be the host only, without path or scheme."
+    ),
+}
+
+
 MESSAGES = {
     'type': TYPE_MESSAGES,
     'format': FORMAT_MESSAGES,
@@ -130,4 +148,5 @@ MESSAGES = {
     'path': PATH_MESSAGES,
     'unknown_reference': UNKNOWN_REFERENCE_MESSAGES,
     'content_type': CONTENT_TYPE_MESSAGES,
+    'host': HOST_MESSAGES,
 }
