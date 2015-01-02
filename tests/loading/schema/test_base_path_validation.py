@@ -38,3 +38,32 @@ def test_base_path_is_not_required():
         'basePath',
         errors,
     )
+
+
+def test_base_path_must_begin_with_slash():
+    raw_schema = RawSchemaFactory(basePath='api/v3/')
+
+    with pytest.raises(ValidationError) as err:
+        swagger_schema_validator(raw_schema)
+
+    assert_message_in_errors(
+        MESSAGES['path']['must_start_with_slash'],
+        err.value.detail,
+        'basePath.value',
+    )
+
+
+def test_base_path_with_valid_path():
+    raw_schema = RawSchemaFactory(basePath='/api/v3/')
+
+    try:
+        swagger_schema_validator(raw_schema)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'basePath',
+        errors,
+    )
