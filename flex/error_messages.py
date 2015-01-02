@@ -94,7 +94,9 @@ PATH_MESSAGES = {
         "The parameter named `{0}` is declared to be a PATH parameter but does "
         "not appear in the api path `{1}`.  All path parameters must exist as a "
         "parameter in the api path"
-    )
+    ),
+    'must_start_with_slash': "Path must start with a '/'",
+    'invalid': "Invalid Path: {0}",
 }
 
 

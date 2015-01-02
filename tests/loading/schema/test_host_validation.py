@@ -113,7 +113,7 @@ def test_invalid_host_value_with_path(value):
     assert_message_in_errors(
         MESSAGES['host']['may_not_include_path'],
         err.value.detail,
-        'host.path',
+        'host.value.path',
     )
 
 
@@ -137,5 +137,5 @@ def test_invalid_host_value_with_scheme(value):
     assert_message_in_errors(
         MESSAGES['host']['may_not_include_scheme'],
         err.value.detail,
-        'host.scheme',
+        'host.value.scheme',
     )
