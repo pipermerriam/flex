@@ -10,6 +10,7 @@ from flex.validation.common import (
     generate_object_validator,
 )
 from .info import info_validator
+from .swagger import swagger_version_validator
 
 
 __ALL__ = [
@@ -23,6 +24,10 @@ swagger_schema_validators = {
         operator.methodcaller('get', 'info', EMPTY),
         info_validator,
     ),
+    'swagger': chain_reduce_partial(
+        operator.methodcaller('get', 'swagger', EMPTY),
+        swagger_version_validator,
+    )
 }
 
 swagger_schema_validator = generate_object_validator(swagger_schema_validators)
