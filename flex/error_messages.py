@@ -129,6 +129,10 @@ HOST_MESSAGES = {
     ),
 }
 
+SCHEMES_MESSAGES = {
+    'invalid': "Invalid scheme: {0}. Must be one of (http, https, ws, wss).",
+}
+
 
 MESSAGES = {
     'type': TYPE_MESSAGES,
@@ -151,4 +155,5 @@ MESSAGES = {
     'unknown_reference': UNKNOWN_REFERENCE_MESSAGES,
     'content_type': CONTENT_TYPE_MESSAGES,
     'host': HOST_MESSAGES,
+    'schemes': SCHEMES_MESSAGES,
 }

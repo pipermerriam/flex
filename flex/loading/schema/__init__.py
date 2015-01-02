@@ -13,6 +13,7 @@ from .info import info_validator
 from .swagger import swagger_version_validator
 from .host import host_validator
 from .path import base_path_validator
+from .schemes import schemes_validator
 
 
 __ALL__ = [
@@ -37,6 +38,10 @@ swagger_schema_validators = {
     'basePath': chain_reduce_partial(
         operator.methodcaller('get', 'basePath', EMPTY),
         base_path_validator,
+    ),
+    'schemes': chain_reduce_partial(
+        operator.methodcaller('get', 'schemes', EMPTY),
+        schemes_validator,
     ),
 }
 

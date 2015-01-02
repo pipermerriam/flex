@@ -1,6 +1,5 @@
 import functools
 
-from flex.exceptions import ValidationError
 from flex.utils import (
     is_non_string_iterable,
     is_value_of_any_type,
