@@ -15,6 +15,7 @@ from .host import host_validator
 from .path import base_path_validator
 from .schemes import schemes_validator
 from .mimetypes import mimetype_validator
+from .paths import paths_validator
 
 
 __ALL__ = [
@@ -24,6 +25,7 @@ __ALL__ = [
     'base_path_validator',
     'schemes_validator',
     'mimetype_validator',
+    'paths_validator',
 ]
 
 
@@ -56,6 +58,10 @@ swagger_schema_validators = {
         operator.methodcaller('get', 'consumes', EMPTY),
         mimetype_validator,
     ),
+    'paths': chain_reduce_partial(
+        operator.methodcaller('get', 'paths', EMPTY),
+        paths_validator,
+    )
 }
 
 swagger_schema_validator = generate_object_validator(swagger_schema_validators)

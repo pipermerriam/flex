@@ -80,6 +80,6 @@ paths_schema = {
     'required': True,
     'type': OBJECT,
 }
-paths_validators = construct_schema_validators(paths_schema)
+paths_validators = construct_schema_validators(paths_schema, {})
 
 paths_validator = generate_object_validator(paths_validators)
