@@ -134,6 +134,11 @@ SCHEMES_MESSAGES = {
 }
 
 
+MIMETYPE_MESSAGES = {
+    'invalid': "Invalid mimetype: {0}.",
+}
+
+
 MESSAGES = {
     'type': TYPE_MESSAGES,
     'format': FORMAT_MESSAGES,
@@ -156,4 +161,5 @@ MESSAGES = {
     'content_type': CONTENT_TYPE_MESSAGES,
     'host': HOST_MESSAGES,
     'schemes': SCHEMES_MESSAGES,
+    'mimetype': MIMETYPE_MESSAGES,
 }

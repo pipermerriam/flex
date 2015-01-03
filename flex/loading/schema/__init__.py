@@ -14,11 +14,16 @@ from .swagger import swagger_version_validator
 from .host import host_validator
 from .path import base_path_validator
 from .schemes import schemes_validator
+from .mimetypes import mimetype_validator
 
 
 __ALL__ = [
     'info_validator',
     'swagger_schema_validators',
+    'host_validator',
+    'base_path_validator',
+    'schemes_validator',
+    'mimetype_validator',
 ]
 
 
@@ -42,6 +47,14 @@ swagger_schema_validators = {
     'schemes': chain_reduce_partial(
         operator.methodcaller('get', 'schemes', EMPTY),
         schemes_validator,
+    ),
+    'produces': chain_reduce_partial(
+        operator.methodcaller('get', 'produces', EMPTY),
+        mimetype_validator,
+    ),
+    'consumes': chain_reduce_partial(
+        operator.methodcaller('get', 'consumes', EMPTY),
+        mimetype_validator,
     ),
 }
 
