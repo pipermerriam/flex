@@ -32,7 +32,12 @@ def parameters_validator(*args, **kwargs):
     pass
 
 
-path_validators = {
+path_schema = {
+    'type': OBJECT,
+    'required': True,
+}
+path_validators = construct_schema_validators(path_schema, {})
+path_validators.update({
     'get': chain_reduce_partial(
         operator.methodcaller('get', 'get', EMPTY),
         operation_validator,
@@ -62,7 +67,7 @@ path_validators = {
         operation_validator,
     ),
     'parameters': parameters_validator,
-}
+})
 path_validator = skip_if_not_of_type(OBJECT)(
     generate_object_validator(path_validators),
 )
