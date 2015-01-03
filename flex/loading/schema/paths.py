@@ -5,6 +5,7 @@ from flex.constants import (
     EMPTY,
     OBJECT,
 )
+from flex.error_messages import MESSAGES
 from flex.utils import (
     chain_reduce_partial,
 )
@@ -62,7 +63,9 @@ path_validators = {
     ),
     'parameters': parameters_validator,
 }
-path_validator = generate_object_validator(path_validators)
+path_validator = skip_if_not_of_type(OBJECT)(
+    generate_object_validator(path_validators),
+)
 
 
 @skip_if_empty
@@ -70,6 +73,9 @@ path_validator = generate_object_validator(path_validators)
 def _path_validator(paths):
     with ErrorCollection() as errors:
         for path, path_definition in paths.items():
+            if not path.startswith('/'):
+                errors.add_error(path, MESSAGES['path']['must_start_with_slash'])
+
             try:
                 path_validator(path_definition)
             except ValidationError as err:
@@ -81,5 +87,6 @@ paths_schema = {
     'type': OBJECT,
 }
 paths_validators = construct_schema_validators(paths_schema, {})
+paths_validators['value'] = _path_validator
 
 paths_validator = generate_object_validator(paths_validators)

@@ -46,4 +46,13 @@ def test_paths_with_invalid_types(value):
 
 
 def test_paths_dynamically_validates_paths():
-    assert False, "TODO"
+    raw_schema = RawSchemaFactory(paths={'does-not-start-with-slash': None})
+
+    with pytest.raises(ValidationError) as err:
+        swagger_schema_validator(raw_schema)
+
+    assert_message_in_errors(
+        MESSAGES['path']['must_start_with_slash'],
+        err.value.detail,
+        'paths.value.does-not-start-with-slash',
+    )

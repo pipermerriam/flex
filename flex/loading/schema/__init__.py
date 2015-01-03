@@ -12,7 +12,7 @@ from flex.validation.common import (
 from .info import info_validator
 from .swagger import swagger_version_validator
 from .host import host_validator
-from .path import base_path_validator
+from .base_path import base_path_validator
 from .schemes import schemes_validator
 from .mimetypes import mimetype_validator
 from .paths import paths_validator
