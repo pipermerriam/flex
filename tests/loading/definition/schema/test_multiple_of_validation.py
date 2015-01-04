@@ -18,7 +18,7 @@ def test_multiple_of_is_not_required():
     else:
         errors = {}
 
-    assert_path_not_in_errors('type', errors)
+    assert_path_not_in_errors('multipleOf', errors)
 
 
 @pytest.mark.parametrize(

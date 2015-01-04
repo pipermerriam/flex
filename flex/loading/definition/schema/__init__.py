@@ -17,6 +17,8 @@ from flex.validation.schema import (
 )
 
 from .multiple_of import multiple_of_validator
+from .maximum import maximum_validator
+from .minimum import minimum_validator
 
 '''
     multipleOf = serializers.FloatField(
@@ -53,6 +55,12 @@ schema_validators = construct_schema_validators(schema_schema, {})
 extra_validators = {
     'multipleOf': skip_if_empty(skip_if_not_of_type(OBJECT)(
         apply_functions_to_key('multipleOf', multiple_of_validator),
+    )),
+    'maximum': skip_if_empty(skip_if_not_of_type(OBJECT)(
+        apply_functions_to_key('maximum', maximum_validator),
+    )),
+    'minimum': skip_if_empty(skip_if_not_of_type(OBJECT)(
+        apply_functions_to_key('minimum', minimum_validator),
     )),
 }
 schema_validators.update(extra_validators)
