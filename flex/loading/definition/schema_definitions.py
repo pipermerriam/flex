@@ -19,7 +19,7 @@ def schema_validator(*args, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def schema_definition_validator(definitions):
+def schema_definitions_validator(definitions):
     with ErrorCollection() as errors:
         for name, schema in definitions.items():
             try:
@@ -33,6 +33,6 @@ schema_definitions_schema = {
 }
 
 schema_definitions_validators = construct_schema_validators(schema_definitions_schema, {})
-schema_definitions_validators['value'] = schema_definition_validator
+schema_definitions_validators['value'] = schema_definitions_validator
 
 schema_definitions_validator = generate_object_validator(schema_definitions_validators)
