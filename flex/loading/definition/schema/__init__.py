@@ -9,16 +9,25 @@ from flex.functional import (
     apply_functions_to_key,
 )
 from flex.validation.common import (
-    generate_wrapped_validators,
     generate_object_validator,
 )
 from flex.validation.schema import (
     construct_schema_validators,
 )
+from flex.datastructures import (
+    ValidationDict,
+)
 
 from .multiple_of import multiple_of_validator
-from .maximum import maximum_validator
-from .minimum import minimum_validator
+from .maximum import (
+    maximum_validator,
+    validate_maximum_is_gte_minimum,
+    validate_maximum_required_if_exclusive_maximum_set,
+)
+from .minimum import (
+    minimum_validator,
+    validate_minimum_required_if_exclusive_minimum_set,
+)
 
 '''
     multipleOf = serializers.FloatField(
@@ -52,26 +61,12 @@ schema_schema = {
 schema_validators = construct_schema_validators(schema_schema, {})
 
 
-def validate_maximum_is_gte_minimum(obj):
-    # TODO: we should know that these two values are valid.  Otherwise, we have
-    # to reproduce all of the validation here.
-    from flex.exceptions import ValidationError
-    from flex.error_messages import MESSAGES
-    minimum = obj.get('minimum')
-    maximum = obj.get('maximum')
-    if minimum and maximum and not maximum >= minimum:
-        raise ValidationError(MESSAGES['maximum']['must_be_greater_than_minimum'])
-
-
 extra_validators = {
     'multipleOf': skip_if_empty(skip_if_not_of_type(OBJECT)(
         apply_functions_to_key('multipleOf', multiple_of_validator),
     )),
     'maximum': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        generate_wrapped_validators(
-            apply_functions_to_key('maximum', maximum_validator),
-            validate_maximum_is_gte_minimum,
-        ),
+        apply_functions_to_key('maximum', maximum_validator),
     )),
     'minimum': skip_if_empty(skip_if_not_of_type(OBJECT)(
         apply_functions_to_key('minimum', minimum_validator),
@@ -79,4 +74,18 @@ extra_validators = {
 }
 schema_validators.update(extra_validators)
 
-schema_validator = generate_object_validator(schema_validators)
+non_field_validators = ValidationDict()
+non_field_validators.add_validator(
+    'maximum', validate_maximum_is_gte_minimum,
+)
+non_field_validators.add_validator(
+    'maximum', validate_maximum_required_if_exclusive_maximum_set,
+)
+non_field_validators.add_validator(
+    'minimum', validate_minimum_required_if_exclusive_minimum_set,
+)
+
+schema_validator = generate_object_validator(
+    field_validators=schema_validators,
+    non_field_validators=[non_field_validators],
+)

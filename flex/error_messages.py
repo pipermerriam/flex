@@ -32,6 +32,12 @@ MINIMUM_AND_MAXIMUM_MESSAGES = {
     'must_be_greater_than_minimum': (
         "The value of `maximum` must be greater than or equal to the value of `minimum`"
     ),
+    'exclusive_minimum_required_minimum': (
+        "When `exclusiveMinimum` is set, `minimum` is required",
+    ),
+    'exclusive_maximum_required_maximum': (
+        "When `exclusiveMaximum` is set, `maximum` is required",
+    ),
 }
 
 

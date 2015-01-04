@@ -66,7 +66,16 @@ def test_minimum_is_required_if_exclusive_provided():
     """
     Ensure that when `exclusiveMinimum` is set, that `minimum` is required.
     """
-    assert False
+    with pytest.raises(ValidationError) as err:
+        schema_validator(
+            {'exclusiveMinimum': True},
+        )
+
+    assert_message_in_errors(
+        MESSAGES['minimum']['exclusive_minimum_required_minimum'],
+        err.value.detail,
+        'minimum',
+    )
 
 
 def test_maximum_is_required_if_exclusive_provided():

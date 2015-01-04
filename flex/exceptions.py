@@ -28,6 +28,12 @@ class ErrorList(ErrorCollectionMixin, list):
             self.add_error(value)
 
     def add_error(self, error):
+        """
+        In the case where a list/tuple is passed in this just extends the list
+        rather than having nested lists.
+
+        Otherwise, the value is appended.
+        """
         if is_non_string_iterable(error) and not isinstance(error, collections.Mapping):
             for value in error:
                 self.add_error(value)

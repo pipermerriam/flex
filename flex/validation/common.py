@@ -290,38 +290,41 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
-def wrap_validators(obj, validators):
-    with ErrorList() as errors:
-        for validator in validators:
-            try:
-                validator(obj)
-            except ValidationError as err:
-                errors.add_error(err.detail)
-
-
-def generate_wrapped_validators(*validators):
-    return functools.partial(wrap_validators, validators=validators)
-
-
-def validate_object(obj, validators):
+def validate_object(obj, field_validators=None, non_field_validators=None):
     """
     Takes a mapping and applies a mapping of validator functions to it
     collecting and reraising any validation errors that occur.
     """
-    with ErrorDict() as errors:
-        if '$ref' in validators:
-            ref_ = validators.pop('$ref')
-            for k, v in ref_.validators.items():
-                validators.setdefault(k, v)
-        for key, validator in validators.items():
-            try:
-                validator(obj)
-            except ValidationError as err:
-                errors[key].add_error(err.detail)
+    if field_validators is None and non_field_validators is None:
+        raise TypeError("One of `field_validators` or `non_field_validators` is required")
+
+    if field_validators:
+        with ErrorDict() as errors:
+            if '$ref' in field_validators:
+                ref_ = field_validators.pop('$ref')
+                for k, v in ref_.validators.items():
+                    field_validators.setdefault(k, v)
+            for key, validator in field_validators.items():
+                try:
+                    validator(obj)
+                except ValidationError as err:
+                    errors.add_error(key, err.detail)
+
+    if non_field_validators:
+        with ErrorList() as errors:
+            for validator in non_field_validators:
+                try:
+                    validator(obj)
+                except ValidationError as err:
+                    errors.add_error(err.detail)
 
 
-def generate_object_validator(validators):
-    return functools.partial(validate_object, validators=validators)
+def generate_object_validator(field_validators=None, non_field_validators=None):
+    return functools.partial(
+        validate_object,
+        field_validators=field_validators,
+        non_field_validators=non_field_validators,
+    )
 
 
 @suffix_reserved_words

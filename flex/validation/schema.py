@@ -1,7 +1,6 @@
 import itertools
 import collections
 import functools
-import operator
 
 import six
 
@@ -31,9 +30,13 @@ from flex.validation.common import (
     generate_pattern_validator,
     generate_enum_validator,
     validate_object,
+    generate_object_validator,
 )
-from flex.utils import (
-    chain_reduce_partial,
+from flex.functional import (
+    apply_functions_to_key,
+)
+from flex.datastructures import (
+    ValidationDict,
 )
 
 
@@ -116,7 +119,7 @@ def generate_items_validator(items, context, **kwargs):
     else:
         assert "Should not be possible"
     return functools.partial(
-        validate_items, validators=items_validators,
+        validate_items, field_validators=items_validators,
     )
 
 
@@ -185,11 +188,10 @@ def construct_schema_validators(schema, context):
             need recurse back into this function to generate a dictionary of
             validators for the property.
     """
-    validators = {}
+    validators = ValidationDict()
     if '$ref' in schema:
-        validators['$ref'] = LazyReferenceValidator(
-            schema['$ref'],
-            context,
+        validators.add_validator(
+            '$ref', LazyReferenceValidator(schema['$ref'], context),
         )
     if 'properties' in schema:
         # I don't know why this set intersection is enforced...?  Why did I do this.
@@ -201,14 +203,17 @@ def construct_schema_validators(schema, context):
                 property_schema,
                 context,
             )
-            validators[property_] = skip_if_empty(skip_if_not_of_type(OBJECT)(
-                chain_reduce_partial(
-                    operator.methodcaller('get', property_, EMPTY),
-                    functools.partial(validate_object, validators=property_validators),
-                ),
-            ))
+            property_validator = generate_object_validator(
+                field_validators=property_validators,
+            )
+            validators.add_validator(
+                property_,
+                skip_if_empty(skip_if_not_of_type(OBJECT)(
+                    apply_functions_to_key(property_, property_validator)
+                )),
+            )
     assert 'context' not in schema
     for key in schema:
         if key in validator_mapping:
-            validators[key] = validator_mapping[key](context=context, **schema)
+            validators.add_validator(key, validator_mapping[key](context=context, **schema))
     return validators

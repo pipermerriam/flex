@@ -68,31 +68,6 @@ def find_message_in_errors(*args, **kwargs):
     return paths
 
 
-def _enumerate_error_paths(errors, namespace=''):
-    if isinstance(errors, six.string_types):
-        yield namespace
-    elif isinstance(errors, collections.Mapping):
-        for key, error in errors.items():
-            for match in _enumerate_error_paths(
-                error,
-                '.'.join((namespace, key)).strip('.'),
-            ):
-                yield match
-    elif isinstance(errors, list):
-        for index, error in enumerate(errors):
-            for match in _enumerate_error_paths(
-                error,
-                '.'.join((namespace, six.text_type(index))).strip('.'),
-            ):
-                yield match
-    else:
-        raise ValueError("Unsupported type")
-
-
-def enumerate_error_paths(*args, **kwargs):
-    return tuple(_enumerate_error_paths(*args, **kwargs))
-
-
 def _find_matching_paths(target_path, paths):
     target_parts = tuple(reversed(target_path.split('.')))
     for message_path in paths:
@@ -131,21 +106,21 @@ def _enumerate_error_paths(errors, namespace=''):
     if isinstance(errors, six.string_types):
         yield namespace
     elif isinstance(errors, collections.Mapping):
-        for key, value in errors.items():
-            for path in _enumerate_error_paths(
-                value,
+        for key, error in errors.items():
+            for match in _enumerate_error_paths(
+                error,
                 '.'.join((namespace, key)).strip('.'),
             ):
-                yield path
+                yield match
     elif isinstance(errors, list):
         for index, error in enumerate(errors):
-            for path in _enumerate_error_paths(
+            for match in _enumerate_error_paths(
                 error,
                 '.'.join((namespace, six.text_type(index))).strip('.'),
             ):
-                yield path
+                yield match
     else:
-        raise ValueError("Unsupported Type")
+        raise ValueError("Unsupported type")
 
 
 def enumerate_error_paths(*args, **kwargs):
@@ -162,6 +137,7 @@ def assert_path_not_in_errors(path, errors):
 
 
 def generate_validator_from_schema(schema, **kwargs):
+    # TODO: switch this to new non-serializer validation
     from flex.serializers.core import SchemaSerializer
 
     serializer = SchemaSerializer(data=schema, **kwargs)
