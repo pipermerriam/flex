@@ -80,4 +80,14 @@ def test_maximum_must_be_greater_than_minimum():
     """
     Test that the maximum value must be greater than or equal to the minimum.
     """
-    assert False
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'maximum': 10,
+            'minimum': 11,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['maximum']['must_be_greater_than_minimum'],
+        err.value.detail,
+        'maximum',
+    )

@@ -8,8 +8,11 @@ import itertools
 
 import six
 
-from flex.exceptions import ValidationError
-from flex.context_managers import ErrorCollection
+from flex.exceptions import (
+    ValidationError,
+    ErrorDict,
+    ErrorList,
+)
 from flex.formats import registry
 from flex.utils import (
     is_value_of_any_type,
@@ -287,12 +290,25 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
+def wrap_validators(obj, validators):
+    with ErrorList() as errors:
+        for validator in validators:
+            try:
+                validator(obj)
+            except ValidationError as err:
+                errors.add_error(err.detail)
+
+
+def generate_wrapped_validators(*validators):
+    return functools.partial(wrap_validators, validators=validators)
+
+
 def validate_object(obj, validators):
     """
     Takes a mapping and applies a mapping of validator functions to it
     collecting and reraising any validation errors that occur.
     """
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         if '$ref' in validators:
             ref_ = validators.pop('$ref')
             for k, v in ref_.validators.items():

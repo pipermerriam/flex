@@ -1,6 +1,5 @@
 from flex.constants import (
     OBJECT,
-    EMPTY,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -10,6 +9,7 @@ from flex.functional import (
     apply_functions_to_key,
 )
 from flex.validation.common import (
+    generate_wrapped_validators,
     generate_object_validator,
 )
 from flex.validation.schema import (
@@ -52,12 +52,26 @@ schema_schema = {
 schema_validators = construct_schema_validators(schema_schema, {})
 
 
+def validate_maximum_is_gte_minimum(obj):
+    # TODO: we should know that these two values are valid.  Otherwise, we have
+    # to reproduce all of the validation here.
+    from flex.exceptions import ValidationError
+    from flex.error_messages import MESSAGES
+    minimum = obj.get('minimum')
+    maximum = obj.get('maximum')
+    if minimum and maximum and not maximum >= minimum:
+        raise ValidationError(MESSAGES['maximum']['must_be_greater_than_minimum'])
+
+
 extra_validators = {
     'multipleOf': skip_if_empty(skip_if_not_of_type(OBJECT)(
         apply_functions_to_key('multipleOf', multiple_of_validator),
     )),
     'maximum': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('maximum', maximum_validator),
+        generate_wrapped_validators(
+            apply_functions_to_key('maximum', maximum_validator),
+            validate_maximum_is_gte_minimum,
+        ),
     )),
     'minimum': skip_if_empty(skip_if_not_of_type(OBJECT)(
         apply_functions_to_key('minimum', minimum_validator),

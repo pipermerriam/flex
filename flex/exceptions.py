@@ -9,7 +9,19 @@ from flex.utils import (
 )
 
 
-class ErrorList(list):
+class ErrorCollectionMixin(object):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type_, value, traceback):
+        if any((type_, value, traceback)):
+            if not issubclass(type_, ValidationError):
+                return False
+        if self:
+            raise ValidationError(self)
+
+
+class ErrorList(ErrorCollectionMixin, list):
     def __init__(self, value=None):
         super(ErrorList, self).__init__()
         if value:
@@ -23,7 +35,7 @@ class ErrorList(list):
             self.append(error)
 
 
-class ErrorDict(collections.defaultdict):
+class ErrorDict(ErrorCollectionMixin, collections.defaultdict):
     def __init__(self, value=None):
         super(ErrorDict, self).__init__(ErrorList)
         for k, v in (value or {}).items():

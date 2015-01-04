@@ -29,6 +29,9 @@ MULTIPLE_OF_MESSAGES = {
 
 MINIMUM_AND_MAXIMUM_MESSAGES = {
     'invalid': "{0} must be {1} than {2}",
+    'must_be_greater_than_minimum': (
+        "The value of `maximum` must be greater than or equal to the value of `minimum`"
+    ),
 }
 
 
