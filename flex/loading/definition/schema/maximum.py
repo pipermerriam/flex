@@ -3,7 +3,7 @@ from flex.error_messages import MESSAGES
 from flex.constants import (
     NUMBER,
     EMPTY,
-    BOOLEAN,
+    BOOLEAN
 )
 from flex.validation.common import (
     generate_object_validator,

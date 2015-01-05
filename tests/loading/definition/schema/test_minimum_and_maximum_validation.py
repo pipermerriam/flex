@@ -28,7 +28,7 @@ def test_minimum_and_maximum_are_not_required():
 
 @pytest.mark.parametrize(
     'value',
-    ('abc', [1, 2], None, {'a': 1}),
+    ('abc', [1, 2], None, {'a': 1}, True, False),
 )
 def test_minimum_for_invalid_types(value):
     """
@@ -46,7 +46,7 @@ def test_minimum_for_invalid_types(value):
 
 @pytest.mark.parametrize(
     'value',
-    ('abc', [1, 2], None, {'a': 1}),
+    ('abc', [1, 2], None, {'a': 1}, True, False),
 )
 def test_maximum_for_invalid_types(value):
     """
@@ -155,3 +155,15 @@ def test_exclusive_maximum_for_invalid_types(value):
         err.value.detail,
         'exclusiveMaximum.type',
     )
+
+
+def test_exclusive_minimum_and_maximum_for_valid_values():
+    try:
+        schema_validator({'exclusiveMinimum': True, 'exclusiveMaximum': True})
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('exclusiveMinimum', errors)
+    assert_path_not_in_errors('exclusiveMaximum', errors)
