@@ -1,10 +1,20 @@
 import collections
 
+from flex.constants import (
+    OBJECT,
+)
 from flex.utils import (
     is_non_string_iterable,
 )
 from flex.validation.common import (
     validate_object,
+)
+from flex.decorators import (
+    skip_if_not_of_type,
+    skip_if_empty,
+)
+from flex.functional import (
+    apply_functions_to_key,
 )
 
 
@@ -40,6 +50,12 @@ class ValidationDict(collections.defaultdict):
 
     def add_validator(self, key, validator):
         self[key].add_validator(validator)
+
+    def add_property_validator(self, key, validator):
+        self.add_validator(
+            key,
+            skip_if_empty(skip_if_not_of_type(OBJECT)(apply_functions_to_key(key, validator)))
+        )
 
     def update(self, other):
         for key, value in other.items():

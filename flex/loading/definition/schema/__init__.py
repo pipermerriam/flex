@@ -69,31 +69,13 @@ schema_schema = {
 }
 schema_validators = construct_schema_validators(schema_schema, {})
 
-
-extra_validators = {
-    'multipleOf': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('multipleOf', multiple_of_validator),
-    )),
-    'maximum': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('maximum', maximum_validator),
-    )),
-    'minimum': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('minimum', minimum_validator),
-    )),
-    'exclusiveMinimum': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('exclusiveMinimum', exclusive_minimum_validator),
-    )),
-    'exclusiveMaximum': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('exclusiveMaximum', exclusive_maximum_validator),
-    )),
-    'minLength': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('minLength', min_length_validator),
-    )),
-    'maxLength': skip_if_empty(skip_if_not_of_type(OBJECT)(
-        apply_functions_to_key('maxLength', max_length_validator),
-    )),
-}
-schema_validators.update(extra_validators)
+schema_validators.add_property_validator('multipleOf', multiple_of_validator)
+schema_validators.add_property_validator('minimum', minimum_validator)
+schema_validators.add_property_validator('maximum', maximum_validator)
+schema_validators.add_property_validator('exclusiveMinimum', exclusive_minimum_validator)
+schema_validators.add_property_validator('exclusiveMaximum', exclusive_maximum_validator)
+schema_validators.add_property_validator('minLength', min_length_validator)
+schema_validators.add_property_validator('maxLength', max_length_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
