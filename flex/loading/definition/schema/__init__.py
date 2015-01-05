@@ -21,11 +21,13 @@ from flex.datastructures import (
 from .multiple_of import multiple_of_validator
 from .maximum import (
     maximum_validator,
+    exclusive_maximum_validator,
     validate_maximum_is_gte_minimum,
     validate_maximum_required_if_exclusive_maximum_set,
 )
 from .minimum import (
     minimum_validator,
+    exclusive_minimum_validator,
     validate_minimum_required_if_exclusive_minimum_set,
 )
 
@@ -70,6 +72,12 @@ extra_validators = {
     )),
     'minimum': skip_if_empty(skip_if_not_of_type(OBJECT)(
         apply_functions_to_key('minimum', minimum_validator),
+    )),
+    'exclusiveMinimum': skip_if_empty(skip_if_not_of_type(OBJECT)(
+        apply_functions_to_key('exclusiveMinimum', exclusive_minimum_validator),
+    )),
+    'exclusiveMaximum': skip_if_empty(skip_if_not_of_type(OBJECT)(
+        apply_functions_to_key('exclusiveMaximum', exclusive_maximum_validator),
     )),
 }
 schema_validators.update(extra_validators)

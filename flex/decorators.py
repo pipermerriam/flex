@@ -89,3 +89,15 @@ def suffix_reserved_words(func):
                 kwargs[key] = kwargs.pop(word)
         return func(*args, **kwargs)
     return inner
+
+
+def pull_keys_from_obj(*keys):
+    def outer(func):
+        @partial_safe_wraps(func)
+        def inner(obj):
+            kwargs = {}
+            for key in keys:
+                kwargs[key] = obj.get(key, EMPTY)
+            return func(**kwargs)
+        return inner
+    return outer

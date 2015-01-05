@@ -82,7 +82,16 @@ def test_maximum_is_required_if_exclusive_provided():
     """
     Ensure that when `exclusiveMaximum` is set, that `maximum` is required.
     """
-    assert False
+    with pytest.raises(ValidationError) as err:
+        schema_validator(
+            {'exclusiveMaximum': True},
+        )
+
+    assert_message_in_errors(
+        MESSAGES['maximum']['exclusive_maximum_required_maximum'],
+        err.value.detail,
+        'maximum',
+    )
 
 
 def test_maximum_must_be_greater_than_minimum():
@@ -99,4 +108,50 @@ def test_maximum_must_be_greater_than_minimum():
         MESSAGES['maximum']['must_be_greater_than_minimum'],
         err.value.detail,
         'maximum',
+    )
+
+
+def test_exclusive_minimum_and_maximum_are_not_required():
+    try:
+        schema_validator({})
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('exclusiveMinimum', errors)
+    assert_path_not_in_errors('exclusiveMaximum', errors)
+
+
+@pytest.mark.parametrize(
+    'value',
+    ('abc', [1, 2], None, {'a': 1}, 1, 1.1),
+)
+def test_exclusive_minimum_for_invalid_types(value):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'exclusiveMinimum': value,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'exclusiveMinimum.type',
+    )
+
+
+@pytest.mark.parametrize(
+    'value',
+    ('abc', [1, 2], None, {'a': 1}, 1, 1.1),
+)
+def test_exclusive_maximum_for_invalid_types(value):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'exclusiveMaximum': value,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'exclusiveMaximum.type',
     )
