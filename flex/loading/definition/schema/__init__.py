@@ -30,6 +30,13 @@ from .minimum import (
     exclusive_minimum_validator,
     validate_minimum_required_if_exclusive_minimum_set,
 )
+from .min_length import (
+    min_length_validator,
+)
+from .max_length import (
+    max_length_validator,
+    validate_max_length_greater_than_or_equal_to_min_length,
+)
 
 '''
     multipleOf = serializers.FloatField(
@@ -79,6 +86,12 @@ extra_validators = {
     'exclusiveMaximum': skip_if_empty(skip_if_not_of_type(OBJECT)(
         apply_functions_to_key('exclusiveMaximum', exclusive_maximum_validator),
     )),
+    'minLength': skip_if_empty(skip_if_not_of_type(OBJECT)(
+        apply_functions_to_key('minLength', min_length_validator),
+    )),
+    'maxLength': skip_if_empty(skip_if_not_of_type(OBJECT)(
+        apply_functions_to_key('maxLength', max_length_validator),
+    )),
 }
 schema_validators.update(extra_validators)
 
@@ -91,6 +104,9 @@ non_field_validators.add_validator(
 )
 non_field_validators.add_validator(
     'minimum', validate_minimum_required_if_exclusive_minimum_set,
+)
+non_field_validators.add_validator(
+    'maxLength', validate_max_length_greater_than_or_equal_to_min_length,
 )
 
 schema_validator = generate_object_validator(
