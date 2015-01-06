@@ -102,6 +102,14 @@ def assert_message_in_errors(message, errors, target_path=None):
             ))
 
 
+def assert_message_not_in_errors(message, errors):
+    paths = tuple(_find_message_in_errors(message, errors))
+    if paths:
+        raise AssertionError(
+            "Message: `{0}` found under paths: `{1}`".format(message, paths),
+        )
+
+
 def _enumerate_error_paths(errors, namespace=''):
     if isinstance(errors, six.string_types):
         yield namespace

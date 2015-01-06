@@ -84,11 +84,22 @@ MIN_PROPERTIES_MESSAGES = {
 
 MAX_PROPERTIES_MESSAGES = {
     'invalid': "Object must have less than {0} properties.  It had {1}",
+    'must_be_greater_than_min_properties': (
+        "The value of `maxProperties` must be greater than or equal to `minProperties`."
+    ),
 }
 
 
 ITEMS_MESSAGES = {
     'invalid_type': '`items` must be a reference, a schema, or an array of schemas.',
+}
+
+
+DEFAULT_MESSAGES = {
+    'invalid_type': (
+        "The value of `default` must be of one of the declared types for the "
+        "schema.  `{0}` is not one of `{1}`"
+    ),
 }
 
 
@@ -183,4 +194,5 @@ MESSAGES = {
     'host': HOST_MESSAGES,
     'schemes': SCHEMES_MESSAGES,
     'mimetype': MIMETYPE_MESSAGES,
+    'default': DEFAULT_MESSAGES,
 }

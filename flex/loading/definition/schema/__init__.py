@@ -53,33 +53,51 @@ from .unique_items import (
 from .enum import (
     enum_validator,
 )
+from .format import (
+    format_validator,
+)
+from .title import (
+    title_validator,
+)
+from .default import (
+    validate_default_is_of_one_of_declared_types,
+)
+from .min_properties import (
+    min_properties_validator,
+)
+from .max_properties import (
+    max_properties_validator,
+    validate_max_properties_is_greater_than_or_equal_to_min_properties,
+)
+from .required import (
+    required_validator,
+)
 
 '''
-    multipleOf = serializers.FloatField(
+    format = serializers.CharField(validators=[format_validator], allow_null=True, required=False)
+    title = serializers.CharField(allow_null=True, required=False)
+    default = DefaultField(allow_null=True, required=False)
+
+    minProperties = serializers.IntegerField(
+        allow_null=True, required=False, validators=[MinValueValidator(0)]
+    )
+    maxProperties = serializers.IntegerField(
         allow_null=True, required=False, validators=[MinValueValidator(0)],
     )
 
-    maximum = serializers.FloatField(allow_null=True, required=False)
-    exclusiveMaximum = serializers.NullBooleanField(required=False)
+    required = serializers.NullBooleanField(required=False)
+    type = MaybeListCharField(allow_null=True, required=False, validators=[type_validator])
 
-    minimum = serializers.FloatField(allow_null=True, required=False)
-    exclusiveMinimum = serializers.NullBooleanField(required=False)
+    readOnly = serializers.NullBooleanField(required=False)
+    externalDocs = serializers.CharField(allow_null=True, required=False)
+    # TODO: how do we do example
+    # example =
 
-    maxLength = serializers.IntegerField(
-        allow_null=True, required=False, validators=[MinValueValidator(0)],
-    )
-    minLength = serializers.IntegerField(
-        allow_null=True, required=False, validators=[MinValueValidator(0)],
-    )
-
-    pattern = serializers.CharField(allow_null=True, required=False, validators=[regex_validator])
-
-    maxItems = serializers.IntegerField(allow_null=True, required=False)
-    minItems = serializers.IntegerField(allow_null=True, required=False)
-    uniqueItems = serializers.NullBooleanField(required=False)
-
-    enum = DefaultField(required=False, validators=[is_array_validator])
+    # Not Implemented
+    # xml
+    # discriminator
 '''
+
 schema_schema = {
     'type': OBJECT,
 }
@@ -97,6 +115,11 @@ schema_validators.add_property_validator('minItems', min_items_validator)
 schema_validators.add_property_validator('maxItems', max_items_validator)
 schema_validators.add_property_validator('uniqueItems', unique_items_validator)
 schema_validators.add_property_validator('enum', enum_validator)
+schema_validators.add_property_validator('format', format_validator)
+schema_validators.add_property_validator('title', title_validator)
+schema_validators.add_property_validator('minProperties', min_properties_validator)
+schema_validators.add_property_validator('maxProperties', max_properties_validator)
+schema_validators.add_property_validator('required', required_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
@@ -113,6 +136,12 @@ non_field_validators.add_validator(
 )
 non_field_validators.add_validator(
     'maxItems', validate_max_items_less_than_or_equal_to_min_items,
+)
+non_field_validators.add_validator(
+    'default', validate_default_is_of_one_of_declared_types,
+)
+non_field_validators.add_validator(
+    'maxProperties', validate_max_properties_is_greater_than_or_equal_to_min_properties,
 )
 
 schema_validator = generate_object_validator(

@@ -35,3 +35,11 @@ def test_pulling_missing_key():
     assert a == 1
     assert b is EMPTY
     assert c == 3
+
+
+def test_noop_if_all_values_are_empty():
+    @pull_keys_from_obj('a', 'b', 'c')
+    def fn(a, b, c):
+        assert False, 'This should not happen'
+
+    fn({})
