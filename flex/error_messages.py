@@ -54,6 +54,9 @@ MIN_ITEMS_MESSAGES = {
 
 
 MAX_ITEMS_MESSAGES = {
+    'must_be_greater_than_min_items': (
+        "The value of `maxItems` must be greater than or equal to the value of `minItems`"
+    ),
     'invalid': "Array must have no more than {0} items.  It had {1} items.",
 }
 
