@@ -47,6 +47,9 @@ from .max_items import (
     max_items_validator,
     validate_max_items_less_than_or_equal_to_min_items,
 )
+from .unique_items import (
+    unique_items_validator,
+)
 
 '''
     multipleOf = serializers.FloatField(
@@ -89,6 +92,7 @@ schema_validators.add_property_validator('maxLength', max_length_validator)
 schema_validators.add_property_validator('pattern', pattern_validator)
 schema_validators.add_property_validator('minItems', min_items_validator)
 schema_validators.add_property_validator('maxItems', max_items_validator)
+schema_validators.add_property_validator('uniqueItems', unique_items_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
