@@ -69,6 +69,7 @@ ENUM_MESSAGES = {
 
 
 PATTERN_MESSAGES = {
+    'invalid_regex': "{0} is not a valid regular expression",
     'invalid': "{0} did not match the pattern `{1}`.",
 }
 
