@@ -50,6 +50,9 @@ from .max_items import (
 from .unique_items import (
     unique_items_validator,
 )
+from .enum import (
+    enum_validator,
+)
 
 '''
     multipleOf = serializers.FloatField(
@@ -93,6 +96,7 @@ schema_validators.add_property_validator('pattern', pattern_validator)
 schema_validators.add_property_validator('minItems', min_items_validator)
 schema_validators.add_property_validator('maxItems', max_items_validator)
 schema_validators.add_property_validator('uniqueItems', unique_items_validator)
+schema_validators.add_property_validator('enum', enum_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
