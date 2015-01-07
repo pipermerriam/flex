@@ -98,7 +98,7 @@ def pull_keys_from_obj(*keys):
             kwargs = {}
             for key in keys:
                 kwargs[key] = obj.get(key, EMPTY)
-            if all((v is EMPTY for v in kwargs.values())):
+            if any((v is EMPTY for v in kwargs.values())):
                 return
             return func(**kwargs)
         return inner

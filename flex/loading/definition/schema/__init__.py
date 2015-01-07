@@ -72,6 +72,9 @@ from .max_properties import (
 from .required import (
     required_validator,
 )
+from .type import (
+    type_validator,
+)
 
 '''
     format = serializers.CharField(validators=[format_validator], allow_null=True, required=False)
@@ -120,6 +123,7 @@ schema_validators.add_property_validator('title', title_validator)
 schema_validators.add_property_validator('minProperties', min_properties_validator)
 schema_validators.add_property_validator('maxProperties', max_properties_validator)
 schema_validators.add_property_validator('required', required_validator)
+#schema_validators.add_property_validator('type', type_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
