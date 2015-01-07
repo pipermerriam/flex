@@ -1,5 +1,8 @@
 import re
 
+from flex.datastructures import (
+    ValidationList,
+)
 from flex.constants import (
     STRING,
     ARRAY,
@@ -47,7 +50,7 @@ MIMETYPE_PATTERN = (
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY)
-def _mimetype_validator(values):
+def validate_mimetype(values):
     for value in values:
         if not re.match(MIMETYPE_PATTERN, value):
             raise ValidationError(
@@ -59,7 +62,10 @@ mimetype_schema = {
     'type': ARRAY,
 }
 
-mimetype_validators = construct_schema_validators(mimetype_schema, {})
-mimetype_validators['value'] = _mimetype_validator
+non_field_validators = ValidationList()
+non_field_validators.add_validator(validate_mimetype)
 
-mimetype_validator = generate_object_validator(mimetype_validators)
+mimetype_validator = generate_object_validator(
+    schema=mimetype_schema,
+    non_field_validators=non_field_validators,
+)

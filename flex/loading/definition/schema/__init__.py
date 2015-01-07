@@ -9,6 +9,7 @@ from flex.functional import (
     apply_functions_to_key,
 )
 from flex.validation.common import (
+    validate_object,
     generate_object_validator,
 )
 from flex.validation.schema import (
@@ -16,6 +17,7 @@ from flex.validation.schema import (
 )
 from flex.datastructures import (
     ValidationDict,
+    ValidationList,
 )
 
 from .multiple_of import multiple_of_validator
@@ -89,30 +91,32 @@ from .read_only import (
     # discriminator
 '''
 
+
 schema_schema = {
     'type': OBJECT,
 }
-schema_validators = construct_schema_validators(schema_schema, {})
 
-schema_validators.add_property_validator('multipleOf', multiple_of_validator)
-schema_validators.add_property_validator('minimum', minimum_validator)
-schema_validators.add_property_validator('maximum', maximum_validator)
-schema_validators.add_property_validator('exclusiveMinimum', exclusive_minimum_validator)
-schema_validators.add_property_validator('exclusiveMaximum', exclusive_maximum_validator)
-schema_validators.add_property_validator('minLength', min_length_validator)
-schema_validators.add_property_validator('maxLength', max_length_validator)
-schema_validators.add_property_validator('pattern', pattern_validator)
-schema_validators.add_property_validator('minItems', min_items_validator)
-schema_validators.add_property_validator('maxItems', max_items_validator)
-schema_validators.add_property_validator('uniqueItems', unique_items_validator)
-schema_validators.add_property_validator('enum', enum_validator)
-schema_validators.add_property_validator('format', format_validator)
-schema_validators.add_property_validator('title', title_validator)
-schema_validators.add_property_validator('minProperties', min_properties_validator)
-schema_validators.add_property_validator('maxProperties', max_properties_validator)
-schema_validators.add_property_validator('required', required_validator)
-schema_validators.add_property_validator('type', type_validator)
-schema_validators.add_property_validator('readOnly', read_only_validator)
+field_validators = ValidationDict()
+
+field_validators.add_property_validator('multipleOf', multiple_of_validator)
+field_validators.add_property_validator('minimum', minimum_validator)
+field_validators.add_property_validator('maximum', maximum_validator)
+field_validators.add_property_validator('exclusiveMinimum', exclusive_minimum_validator)
+field_validators.add_property_validator('exclusiveMaximum', exclusive_maximum_validator)
+field_validators.add_property_validator('minLength', min_length_validator)
+field_validators.add_property_validator('maxLength', max_length_validator)
+field_validators.add_property_validator('pattern', pattern_validator)
+field_validators.add_property_validator('minItems', min_items_validator)
+field_validators.add_property_validator('maxItems', max_items_validator)
+field_validators.add_property_validator('uniqueItems', unique_items_validator)
+field_validators.add_property_validator('enum', enum_validator)
+field_validators.add_property_validator('format', format_validator)
+field_validators.add_property_validator('title', title_validator)
+field_validators.add_property_validator('minProperties', min_properties_validator)
+field_validators.add_property_validator('maxProperties', max_properties_validator)
+field_validators.add_property_validator('required', required_validator)
+field_validators.add_property_validator('type', type_validator)
+field_validators.add_property_validator('readOnly', read_only_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
@@ -138,6 +142,7 @@ non_field_validators.add_validator(
 )
 
 schema_validator = generate_object_validator(
-    field_validators=schema_validators,
-    non_field_validators=[non_field_validators],
+    schema=schema_schema,
+    field_validators=field_validators,
+    non_field_validators=non_field_validators,
 )

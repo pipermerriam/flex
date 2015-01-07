@@ -1,13 +1,15 @@
 import collections
 
+from flex.exceptions import (
+    ValidationError,
+    ErrorDict,
+    ErrorList,
+)
 from flex.constants import (
     OBJECT,
 )
 from flex.utils import (
     is_non_string_iterable,
-)
-from flex.validation.common import (
-    validate_object,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -33,7 +35,12 @@ class ValidationList(list):
             self.append(validator)
 
     def validate_object(self, obj):
-        validate_object(obj, non_field_validators=self)
+        with ErrorList() as errors:
+            for validator in self:
+                try:
+                    validator(obj)
+                except ValidationError as err:
+                    errors.add_error(err.detail)
 
     def __call__(self, *args, **kwargs):
         return self.validate_object(*args, **kwargs)
@@ -62,10 +69,12 @@ class ValidationDict(collections.defaultdict):
             self.add_validator(key, value)
 
     def validate_object(self, obj):
-        """
-        Proxy to `flex.validation.common.validate_object`.
-        """
-        validate_object(obj, field_validators=self)
+        with ErrorDict() as errors:
+            for key, validator in self.items():
+                try:
+                    validator(obj)
+                except ValidationError as err:
+                    errors.add_error(key, err.detail)
 
     def __call__(self, *args, **kwargs):
         return self.validate_object(*args, **kwargs)

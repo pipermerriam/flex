@@ -3,6 +3,9 @@ from flex.constants import (
     SCHEMES,
 )
 from flex.exceptions import ValidationError
+from flex.datastructures import (
+    ValidationList,
+)
 from flex.error_messages import MESSAGES
 from flex.validation.common import (
     generate_object_validator,
@@ -11,14 +14,11 @@ from flex.decorators import (
     skip_if_empty,
     skip_if_not_of_type,
 )
-from flex.validation.schema import (
-    construct_schema_validators,
-)
 
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY)
-def _schemes_validator(schemes):
+def validate_schemes(schemes):
     for value in schemes:
         if value not in SCHEMES:
             raise ValidationError(
@@ -30,7 +30,10 @@ scheme_schema = {
     'type': ARRAY,
 }
 
-scheme_validators = construct_schema_validators(scheme_schema, {})
-scheme_validators['value'] = _schemes_validator
+non_field_validators = ValidationList()
+non_field_validators.add_validator(validate_schemes)
 
-schemes_validator = generate_object_validator(scheme_validators)
+schemes_validator = generate_object_validator(
+    schema=scheme_schema,
+    non_field_validators=non_field_validators,
+)

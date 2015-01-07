@@ -1,10 +1,9 @@
-import operator
-
 from flex.constants import (
     EMPTY,
+    OBJECT,
 )
-from flex.utils import (
-    chain_reduce_partial,
+from flex.datastructures import (
+    ValidationDict,
 )
 from flex.validation.common import (
     generate_object_validator,
@@ -28,40 +27,21 @@ __ALL__ = [
     'paths_validator',
 ]
 
-
-swagger_schema_validators = {
-    'info': chain_reduce_partial(
-        operator.methodcaller('get', 'info', EMPTY),
-        info_validator,
-    ),
-    'swagger': chain_reduce_partial(
-        operator.methodcaller('get', 'swagger', EMPTY),
-        swagger_version_validator,
-    ),
-    'host': chain_reduce_partial(
-        operator.methodcaller('get', 'host', EMPTY),
-        host_validator,
-    ),
-    'basePath': chain_reduce_partial(
-        operator.methodcaller('get', 'basePath', EMPTY),
-        base_path_validator,
-    ),
-    'schemes': chain_reduce_partial(
-        operator.methodcaller('get', 'schemes', EMPTY),
-        schemes_validator,
-    ),
-    'produces': chain_reduce_partial(
-        operator.methodcaller('get', 'produces', EMPTY),
-        mimetype_validator,
-    ),
-    'consumes': chain_reduce_partial(
-        operator.methodcaller('get', 'consumes', EMPTY),
-        mimetype_validator,
-    ),
-    'paths': chain_reduce_partial(
-        operator.methodcaller('get', 'paths', EMPTY),
-        paths_validator,
-    )
+swagger_schema = {
+    'type': OBJECT,
 }
 
-swagger_schema_validator = generate_object_validator(swagger_schema_validators)
+non_field_validators = ValidationDict()
+non_field_validators.add_validator('info', info_validator)
+non_field_validators.add_validator('swagger', swagger_version_validator)
+non_field_validators.add_validator('host', host_validator)
+non_field_validators.add_validator('basePath', base_path_validator)
+non_field_validators.add_validator('schemes', schemes_validator)
+non_field_validators.add_validator('produces', mimetype_validator)
+non_field_validators.add_validator('consumes', mimetype_validator)
+non_field_validators.add_validator('paths', paths_validator)
+
+swagger_schema_validator = generate_object_validator(
+    schema=swagger_schema,
+    non_field_validators=non_field_validators,
+)

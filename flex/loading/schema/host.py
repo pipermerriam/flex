@@ -1,5 +1,8 @@
 import re
 
+from flex.datastructures import (
+    ValidationList,
+)
 from flex.constants import (
     STRING,
 )
@@ -10,9 +13,6 @@ from flex.validation.common import (
 )
 from flex.decorators import (
     skip_if_empty,
-)
-from flex.validation.schema import (
-    construct_schema_validators,
 )
 from flex.context_managers import ErrorCollection
 
@@ -71,7 +71,10 @@ host_schema = {
     'type': STRING,
 }
 
-host_validators = construct_schema_validators(host_schema, {})
-host_validators['value'] = host_validator
+non_field_validators = ValidationList()
+non_field_validators.add_validator(host_validator)
 
-host_validator = generate_object_validator(host_validators)
+host_validator = generate_object_validator(
+    schema=host_schema,
+    non_field_validators=non_field_validators,
+)

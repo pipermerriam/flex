@@ -1,23 +1,18 @@
-import operator
-
+from flex.datastructures import (
+    ValidationDict,
+    ValidationList,
+)
 from flex.exceptions import ValidationError
 from flex.constants import (
-    EMPTY,
     OBJECT,
 )
 from flex.error_messages import MESSAGES
-from flex.utils import (
-    chain_reduce_partial,
-)
 from flex.decorators import (
     skip_if_not_of_type,
     skip_if_empty,
 )
 from flex.validation.common import (
     generate_object_validator,
-)
-from flex.validation.schema import (
-    construct_schema_validators,
 )
 from flex.context_managers import (
     ErrorCollection,
@@ -36,46 +31,26 @@ path_schema = {
     'type': OBJECT,
     'required': True,
 }
-path_validators = construct_schema_validators(path_schema, {})
-path_validators.update({
-    'get': chain_reduce_partial(
-        operator.methodcaller('get', 'get', EMPTY),
-        operation_validator,
-    ),
-    'put': chain_reduce_partial(
-        operator.methodcaller('get', 'put', EMPTY),
-        operation_validator,
-    ),
-    'post': chain_reduce_partial(
-        operator.methodcaller('get', 'post', EMPTY),
-        operation_validator,
-    ),
-    'delete': chain_reduce_partial(
-        operator.methodcaller('get', 'delete', EMPTY),
-        operation_validator,
-    ),
-    'options': chain_reduce_partial(
-        operator.methodcaller('get', 'options', EMPTY),
-        operation_validator,
-    ),
-    'head': chain_reduce_partial(
-        operator.methodcaller('get', 'head', EMPTY),
-        operation_validator,
-    ),
-    'patch': chain_reduce_partial(
-        operator.methodcaller('get', 'patch', EMPTY),
-        operation_validator,
-    ),
-    'parameters': parameters_validator,
-})
-path_validator = skip_if_not_of_type(OBJECT)(
-    generate_object_validator(path_validators),
+
+non_field_validators = ValidationDict()
+non_field_validators.add_property_validator('get', operation_validator)
+non_field_validators.add_property_validator('put', operation_validator)
+non_field_validators.add_property_validator('post', operation_validator)
+non_field_validators.add_property_validator('delete', operation_validator)
+non_field_validators.add_property_validator('options', operation_validator)
+non_field_validators.add_property_validator('head', operation_validator)
+non_field_validators.add_property_validator('patch', operation_validator)
+non_field_validators.add_property_validator('parameters_validator', parameters_validator)
+
+path_validator = generate_object_validator(
+    schema=path_schema,
+    non_field_validators=non_field_validators,
 )
 
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def _path_validator(paths):
+def validate_paths(paths):
     with ErrorCollection() as errors:
         for path, path_definition in paths.items():
             if not path.startswith('/'):
@@ -91,7 +66,10 @@ paths_schema = {
     'required': True,
     'type': OBJECT,
 }
-paths_validators = construct_schema_validators(paths_schema, {})
-paths_validators['value'] = _path_validator
+non_field_validators = ValidationList()
+non_field_validators.add_validator(validate_paths)
 
-paths_validator = generate_object_validator(paths_validators)
+paths_validator = generate_object_validator(
+    schema=paths_schema,
+    non_field_validators=non_field_validators,
+)

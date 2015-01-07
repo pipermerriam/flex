@@ -13,6 +13,10 @@ from flex.exceptions import (
     ErrorDict,
     ErrorList,
 )
+from flex.datastructures import (
+    ValidationDict,
+    ValidationList,
+)
 from flex.formats import registry
 from flex.utils import (
     is_value_of_any_type,
@@ -290,41 +294,39 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
-def validate_object(obj, field_validators=None, non_field_validators=None):
+def validate_object(obj, field_validators=None, non_field_validators=None,
+                    schema=None, context=None):
     """
     Takes a mapping and applies a mapping of validator functions to it
     collecting and reraising any validation errors that occur.
     """
-    if field_validators is None and non_field_validators is None:
-        raise TypeError("One of `field_validators` or `non_field_validators` is required")
+    if schema is None:
+        schema = {}
+    if context is None:
+        context = {}
+    if field_validators is None:
+        field_validators = ValidationDict()
+    if non_field_validators is None:
+        non_field_validators = ValidationList()
 
-    if field_validators:
-        with ErrorDict() as errors:
-            if '$ref' in field_validators:
-                ref_ = field_validators.pop('$ref')
-                for k, v in ref_.validators.items():
-                    field_validators.setdefault(k, v)
-            for key, validator in field_validators.items():
-                try:
-                    validator(obj)
-                except ValidationError as err:
-                    errors.add_error(key, err.detail)
-
-    if non_field_validators:
-        with ErrorList() as errors:
-            for validator in non_field_validators:
-                try:
-                    validator(obj)
-                except ValidationError as err:
-                    errors.add_error(err.detail)
-
-
-def generate_object_validator(field_validators=None, non_field_validators=None):
-    return functools.partial(
-        validate_object,
-        field_validators=field_validators,
-        non_field_validators=non_field_validators,
+    from flex.validation.schema import (
+        construct_schema_validators,
     )
+    schema_validators = construct_schema_validators(schema, context)
+    schema_validators.update(field_validators)
+
+    if '$ref' in schema_validators:
+        ref_ = field_validators.pop('$ref')
+        for k, v in ref_.validators.items():
+            if k not in schema_validators:
+                schema_validators.add_validator(k, v)
+
+    schema_validators.validate_object(obj)
+    non_field_validators.validate_object(obj)
+
+
+def generate_object_validator(**kwargs):
+    return functools.partial(validate_object, **kwargs)
 
 
 @suffix_reserved_words
