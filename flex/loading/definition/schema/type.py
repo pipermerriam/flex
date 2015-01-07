@@ -68,7 +68,7 @@ type_schema = {
     ],
 }
 type_validators = construct_schema_validators(type_schema, {})
+type_validators.add_validator('type', validate_types)
 type_validator = generate_object_validator(
     field_validators=type_validators,
-    non_field_validators=ErrorList([validate_types]),
 )

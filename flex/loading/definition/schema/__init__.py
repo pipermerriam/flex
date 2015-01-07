@@ -123,7 +123,7 @@ schema_validators.add_property_validator('title', title_validator)
 schema_validators.add_property_validator('minProperties', min_properties_validator)
 schema_validators.add_property_validator('maxProperties', max_properties_validator)
 schema_validators.add_property_validator('required', required_validator)
-#schema_validators.add_property_validator('type', type_validator)
+schema_validators.add_property_validator('type', type_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
