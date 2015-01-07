@@ -66,5 +66,5 @@ def test_schemes_invalid_for_invalid_schemes_value():
     assert_message_in_errors(
         MESSAGES['schemes']['invalid'],
         err.value.detail,
-        'schemes.value',
+        'schemes',
     )

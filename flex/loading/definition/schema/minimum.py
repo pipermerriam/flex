@@ -8,9 +8,6 @@ from flex.error_messages import MESSAGES
 from flex.validation.common import (
     generate_object_validator,
 )
-from flex.validation.schema import (
-    construct_schema_validators,
-)
 from flex.decorators import (
     pull_keys_from_obj,
 )
@@ -29,15 +26,13 @@ def validate_minimum_required_if_exclusive_minimum_set(minimum, exclusiveMinimum
 minimum_schema = {
     'type': NUMBER,
 }
-minimum_validators = construct_schema_validators(minimum_schema, {})
 minimum_validator = generate_object_validator(
-    field_validators=minimum_validators,
+    schema=minimum_schema,
 )
 
 exclusive_minimum_schema = {
     'type': BOOLEAN,
 }
-exclusive_minimum_validators = construct_schema_validators(exclusive_minimum_schema, {})
 exclusive_minimum_validator = generate_object_validator(
-    field_validators=exclusive_minimum_validators,
+    schema=exclusive_minimum_schema,
 )

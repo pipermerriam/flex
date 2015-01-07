@@ -47,7 +47,7 @@ def test_produces_with_invalid_mimetype():
     assert_message_in_errors(
         MESSAGES['mimetype']['invalid'],
         err.value.detail,
-        'produces.value',
+        'produces',
     )
 
 
@@ -96,7 +96,7 @@ def test_consumes_with_invalid_mimetype():
     assert_message_in_errors(
         MESSAGES['mimetype']['invalid'],
         err.value.detail,
-        'consumes.value',
+        'consumes',
     )
 
 

@@ -32,14 +32,14 @@ swagger_schema = {
 }
 
 non_field_validators = ValidationDict()
-non_field_validators.add_validator('info', info_validator)
-non_field_validators.add_validator('swagger', swagger_version_validator)
-non_field_validators.add_validator('host', host_validator)
-non_field_validators.add_validator('basePath', base_path_validator)
-non_field_validators.add_validator('schemes', schemes_validator)
-non_field_validators.add_validator('produces', mimetype_validator)
-non_field_validators.add_validator('consumes', mimetype_validator)
-non_field_validators.add_validator('paths', paths_validator)
+non_field_validators.add_property_validator('info', info_validator)
+non_field_validators.add_property_validator('swagger', swagger_version_validator)
+non_field_validators.add_property_validator('host', host_validator)
+non_field_validators.add_property_validator('basePath', base_path_validator)
+non_field_validators.add_property_validator('schemes', schemes_validator)
+non_field_validators.add_property_validator('produces', mimetype_validator)
+non_field_validators.add_property_validator('consumes', mimetype_validator)
+non_field_validators.add_property_validator('paths', paths_validator)
 
 swagger_schema_validator = generate_object_validator(
     schema=swagger_schema,

@@ -1,3 +1,6 @@
+from flex.datastructures import (
+    ValidationList,
+)
 from flex.exceptions import ValidationError
 from flex.constants import OBJECT
 from flex.decorators import (
@@ -7,19 +10,17 @@ from flex.decorators import (
 from flex.validation.common import (
     generate_object_validator,
 )
-from flex.validation.schema import (
-    construct_schema_validators,
-)
 from flex.context_managers import ErrorCollection
 
 
 def schema_validator(*args, **kwargs):
+    # TODO: real schema validator.
     pass
 
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def schema_definitions_validator(definitions):
+def validate_schema_definitions(definitions):
     with ErrorCollection() as errors:
         for name, schema in definitions.items():
             try:
@@ -32,7 +33,10 @@ schema_definitions_schema = {
     'type': OBJECT,
 }
 
-schema_definitions_validators = construct_schema_validators(schema_definitions_schema, {})
-schema_definitions_validators['value'] = schema_definitions_validator
+non_field_validators = ValidationList()
+non_field_validators.add_validator(validate_schema_definitions)
 
-schema_definitions_validator = generate_object_validator(schema_definitions_validators)
+schema_definitions_validator = generate_object_validator(
+    schema=schema_definitions_schema,
+    non_field_validators=non_field_validators,
+)

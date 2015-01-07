@@ -8,9 +8,6 @@ from flex.constants import (
 from flex.validation.common import (
     generate_object_validator,
 )
-from flex.validation.schema import (
-    construct_schema_validators,
-)
 from flex.decorators import (
     pull_keys_from_obj,
 )
@@ -37,13 +34,13 @@ def validate_maximum_required_if_exclusive_maximum_set(maximum, exclusiveMaximum
 maximum_schema = {
     'type': NUMBER,
 }
-maximum_validators = construct_schema_validators(maximum_schema, {})
-maximum_validator = generate_object_validator(maximum_validators)
+maximum_validator = generate_object_validator(
+    schema=maximum_schema,
+)
 
 exclusive_maximum_schema = {
     'type': BOOLEAN,
 }
-exclusive_maximum_validators = construct_schema_validators(exclusive_maximum_schema, {})
 exclusive_maximum_validator = generate_object_validator(
-    field_validators=exclusive_maximum_validators,
+    schema=exclusive_maximum_schema,
 )

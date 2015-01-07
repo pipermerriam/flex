@@ -54,5 +54,5 @@ def test_paths_dynamically_validates_paths():
     assert_message_in_errors(
         MESSAGES['path']['must_start_with_slash'],
         err.value.detail,
-        'paths.value.does-not-start-with-slash',
+        'paths.does-not-start-with-slash',
     )

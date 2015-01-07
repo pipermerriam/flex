@@ -78,7 +78,6 @@ def test_mimetype_with_invalid_values(value):
     assert_message_in_errors(
         MESSAGES['mimetype']['invalid'],
         err.value.detail,
-        'value',
     )
 
 
@@ -107,5 +106,4 @@ def test_mimetype_with_invalid_value_in_multiple_values():
     assert_message_in_errors(
         MESSAGES['mimetype']['invalid'],
         err.value.detail,
-        'value',
     )

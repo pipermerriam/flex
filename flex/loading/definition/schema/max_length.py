@@ -7,9 +7,6 @@ from flex.constants import (
 from flex.validation.common import (
     generate_object_validator,
 )
-from flex.validation.schema import (
-    construct_schema_validators,
-)
 from flex.decorators import (
     pull_keys_from_obj,
 )
@@ -30,5 +27,6 @@ max_length_schema = {
     'type': INTEGER,
     'minimum': 1,
 }
-max_length_validators = construct_schema_validators(max_length_schema, {})
-max_length_validator = generate_object_validator(max_length_validators)
+max_length_validator = generate_object_validator(
+    schema=max_length_schema,
+)

@@ -49,7 +49,7 @@ def test_base_path_must_begin_with_slash():
     assert_message_in_errors(
         MESSAGES['path']['must_start_with_slash'],
         err.value.detail,
-        'basePath.value',
+        'basePath',
     )
 
 
