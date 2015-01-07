@@ -75,23 +75,11 @@ from .required import (
 from .type import (
     type_validator,
 )
+from .read_only import (
+    read_only_validator,
+)
 
 '''
-    format = serializers.CharField(validators=[format_validator], allow_null=True, required=False)
-    title = serializers.CharField(allow_null=True, required=False)
-    default = DefaultField(allow_null=True, required=False)
-
-    minProperties = serializers.IntegerField(
-        allow_null=True, required=False, validators=[MinValueValidator(0)]
-    )
-    maxProperties = serializers.IntegerField(
-        allow_null=True, required=False, validators=[MinValueValidator(0)],
-    )
-
-    required = serializers.NullBooleanField(required=False)
-    type = MaybeListCharField(allow_null=True, required=False, validators=[type_validator])
-
-    readOnly = serializers.NullBooleanField(required=False)
     externalDocs = serializers.CharField(allow_null=True, required=False)
     # TODO: how do we do example
     # example =
@@ -124,6 +112,7 @@ schema_validators.add_property_validator('minProperties', min_properties_validat
 schema_validators.add_property_validator('maxProperties', max_properties_validator)
 schema_validators.add_property_validator('required', required_validator)
 schema_validators.add_property_validator('type', type_validator)
+schema_validators.add_property_validator('readOnly', read_only_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator(
