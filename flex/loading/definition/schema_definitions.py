@@ -1,7 +1,10 @@
 from flex.datastructures import (
     ValidationList,
 )
-from flex.exceptions import ValidationError
+from flex.exceptions import (
+    ValidationError,
+    ErrorDict,
+)
 from flex.constants import OBJECT
 from flex.decorators import (
     skip_if_empty,
@@ -10,7 +13,6 @@ from flex.decorators import (
 from flex.validation.common import (
     generate_object_validator,
 )
-from flex.context_managers import ErrorCollection
 
 
 def schema_validator(*args, **kwargs):
@@ -21,7 +23,7 @@ def schema_validator(*args, **kwargs):
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
 def validate_schema_definitions(definitions):
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         for name, schema in definitions.items():
             try:
                 schema_validator(schema)
