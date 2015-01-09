@@ -160,12 +160,12 @@ schema_validator = generate_object_validator(
 #
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def validate_properties(properties):
+def validate_properties(properties, **kwargs):
     with ErrorDict() as errors:
         for property_, value in properties.items():
             try:
                 # TODO: this should be able to support a $ref
-                schema_validator(value)
+                schema_validator(value, **kwargs)
             except ValidationError as err:
                 errors.add_error(property_, err.detail)
 
@@ -200,7 +200,7 @@ items_schema = {
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY, OBJECT, STRING)
-def validate_items(items):
+def validate_items(items, **kwargs):
     if is_value_of_type(OBJECT):
         schema_validator(items)
     elif is_value_of_type(STRING):
@@ -210,7 +210,7 @@ def validate_items(items):
         with ErrorList() as errors:
             for item in items:
                 try:
-                    schema_validator(item)
+                    schema_validator(item, **kwargs)
                 except ValidationError as err:
                     errors.add_error(err.detail)
     else:

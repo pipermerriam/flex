@@ -1,3 +1,5 @@
+from flex.exceptions import ErrorDict
+from flex.error_messages import MESSAGES
 from flex.datastructures import (
     ValidationDict,
 )
@@ -6,6 +8,11 @@ from flex.constants import (
 )
 from flex.validation.common import (
     generate_object_validator,
+)
+from flex.decorators import (
+    skip_if_not_of_type,
+    skip_if_empty,
+    pull_keys_from_obj,
 )
 
 from .schema_definitions import schema_definitions_validator
@@ -20,11 +27,33 @@ definitions_schema = {
 }
 
 
+@skip_if_empty
+@skip_if_not_of_type(OBJECT)
+@pull_keys_from_obj('definitions')
+def validate_references(definitions, context, **kwargs):
+    try:
+        deferred_references = context['deferred_references']
+    except:
+        raise KeyError("`deferred_references` not found in context")
+
+    with ErrorDict() as errors:
+        for reference in deferred_references:
+            if reference not in definitions:
+                errors.add_error(
+                    reference,
+                    MESSAGES['reference']['undefined'].format(reference),
+                )
+
+
 field_validators = ValidationDict()
 field_validators.add_property_validator('definitions', schema_definitions_validator)
+
+non_field_validators = ValidationDict()
+non_field_validators.add_validator('definitions', validate_references)
 
 
 definitions_validator = generate_object_validator(
     schema=definitions_schema,
     field_validators=field_validators,
+    non_field_validators=non_field_validators,
 )

@@ -13,20 +13,18 @@ from flex.decorators import (
 from flex.validation.common import (
     generate_object_validator,
 )
-
-
-def schema_validator(*args, **kwargs):
-    # TODO: real schema validator.
-    pass
+from .schema import (
+    schema_validator,
+)
 
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def validate_schema_definitions(definitions):
+def validate_schema_definitions(definitions, **kwargs):
     with ErrorDict() as errors:
         for name, schema in definitions.items():
             try:
-                schema_validator(schema)
+                schema_validator(schema, **kwargs)
             except ValidationError as err:
                 errors.add_error(name, err.detail)
 

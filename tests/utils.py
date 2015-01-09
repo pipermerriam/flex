@@ -26,6 +26,9 @@ def check_if_error_message_equal(formatted_msg, unformatted_msg):
     # replace any parenthesis
     pattern = re.sub('\(', '\(', pattern)
     pattern = re.sub('\)', '\)', pattern)
+    # replace ^ and $
+    pattern = re.sub('\^', '\^', pattern)
+    pattern = re.sub('\$', '\$', pattern)
 
     return bool(re.compile(pattern).search(formatted_msg))
 

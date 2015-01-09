@@ -19,7 +19,7 @@ from flex.decorators import (
 
 @skip_if_empty
 @skip_if_not_of_type(STRING)
-def regex_validator(value):
+def regex_validator(value, **kwargs):
     try:
         re.compile(value)
     except re.error:

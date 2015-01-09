@@ -170,6 +170,11 @@ MIMETYPE_MESSAGES = {
 }
 
 
+REFERENCE_MESSAGES = {
+    'undefined': "The $ref `{0}` is referenced but never defined",
+}
+
+
 MESSAGES = {
     'type': TYPE_MESSAGES,
     'format': FORMAT_MESSAGES,
@@ -195,4 +200,5 @@ MESSAGES = {
     'schemes': SCHEMES_MESSAGES,
     'mimetype': MIMETYPE_MESSAGES,
     'default': DEFAULT_MESSAGES,
+    'reference': REFERENCE_MESSAGES,
 }
