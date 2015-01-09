@@ -8,6 +8,14 @@ TYPE_MESSAGES = {
         "Invalid type for header: `{0}`.  Must be one of 'string', 'number', "
         "'integer', 'boolean', or 'array'."
     ),
+    'invalid_type_for_minimum': '`minimum` can only be used for json number types',
+    'invalid_type_for_maximum': '`maximum` can only be used for json number types',
+    'invalid_type_for_multiple_of': '`multipleOf` can only be used for json number types',
+    'invalid_type_for_min_length': '`minLength` can only be used for string types',
+    'invalid_type_for_max_length': '`maxLength` can only be used for string types',
+    'invalid_type_for_min_items': '`minItems` can only be used for array types',
+    'invalid_type_for_max_items': '`maxItems` can only be used for array types',
+    'invalid_type_for_unique_items': '`uniqueItems` can only be used for array types',
 }
 
 FORMAT_MESSAGES = {

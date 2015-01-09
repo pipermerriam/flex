@@ -29,11 +29,13 @@ from .maximum import (
     exclusive_maximum_validator,
     validate_maximum_is_gte_minimum,
     validate_maximum_required_if_exclusive_maximum_set,
+    validate_type_for_maximum,
 )
 from .minimum import (
     minimum_validator,
     exclusive_minimum_validator,
     validate_minimum_required_if_exclusive_minimum_set,
+    validate_type_for_minimum,
 )
 from .min_length import (
     min_length_validator,
@@ -133,7 +135,13 @@ schema_non_field_validators.add_validator(
     'maximum', validate_maximum_required_if_exclusive_maximum_set,
 )
 schema_non_field_validators.add_validator(
+    'type', validate_type_for_maximum,
+)
+schema_non_field_validators.add_validator(
     'minimum', validate_minimum_required_if_exclusive_minimum_set,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_minimum,
 )
 schema_non_field_validators.add_validator(
     'maxLength', validate_max_length_greater_than_or_equal_to_min_length,

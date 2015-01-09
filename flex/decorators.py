@@ -53,6 +53,17 @@ def skip_if_empty(func):
     return inner
 
 
+def skip_if_any_kwargs_empty(*kwargs):
+    def outer(func):
+        @partial_safe_wraps(func)
+        def inner(*args, **inner_kwargs):
+            if any(inner_kwargs.get(key) is EMPTY for key in kwargs):
+                return
+            return func(*args, **inner_kwargs)
+        return inner
+    return outer
+
+
 RESERVED_WORDS = (
     'in',
     'format',

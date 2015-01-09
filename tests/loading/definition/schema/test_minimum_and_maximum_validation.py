@@ -1,5 +1,12 @@
 import pytest
 
+from flex.constants import (
+    STRING,
+    NULL,
+    NUMBER,
+    INTEGER,
+    OBJECT,
+)
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
 from flex.loading.definition.schema import schema_validator
@@ -45,6 +52,52 @@ def test_minimum_for_invalid_types(value):
 
 
 @pytest.mark.parametrize(
+    'types',
+    (
+        INTEGER,
+        NUMBER,
+        (INTEGER, NUMBER),
+        (STRING, OBJECT, INTEGER, NULL),
+    ),
+)
+def test_correct_types_for_minimum(types):
+    try:
+        schema_validator({
+            'minimum': 7,
+            'type': types,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('minimum', errors)
+    assert_path_not_in_errors('type', errors)
+
+
+@pytest.mark.parametrize(
+    'types',
+    (
+        STRING,
+        (NULL,),
+        (OBJECT, STRING),
+    ),
+)
+def test_no_correct_type_for_minimum(types):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'minimum': 7,
+            'type': types,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid_type_for_minimum'],
+        err.value.detail,
+        'type',
+    )
+
+
+@pytest.mark.parametrize(
     'value',
     ('abc', [1, 2], None, {'a': 1}, True, False),
 )
@@ -59,6 +112,52 @@ def test_maximum_for_invalid_types(value):
         MESSAGES['type']['invalid'],
         err.value.detail,
         'maximum.type',
+    )
+
+
+@pytest.mark.parametrize(
+    'types',
+    (
+        INTEGER,
+        NUMBER,
+        (INTEGER, NUMBER),
+        (STRING, OBJECT, INTEGER, NULL),
+    ),
+)
+def test_correct_types_for_maximum(types):
+    try:
+        schema_validator({
+            'maximum': 7,
+            'type': types,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('maximum', errors)
+    assert_path_not_in_errors('type', errors)
+
+
+@pytest.mark.parametrize(
+    'types',
+    (
+        STRING,
+        (NULL,),
+        (OBJECT, STRING),
+    ),
+)
+def test_no_correct_type_for_maximum(types):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'maximum': 7,
+            'type': types,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid_type_for_maximum'],
+        err.value.detail,
+        'type',
     )
 
 

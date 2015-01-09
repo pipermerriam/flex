@@ -38,6 +38,12 @@ def is_non_string_iterable(value):
     return not is_any_string_type(value) and hasattr(value, '__iter__')
 
 
+def pluralize(value):
+    if is_non_string_iterable(value) and not isinstance(value, collections.Mapping):
+        return value
+    return [value]
+
+
 def is_value_of_type(value, type_):
     if type_ not in PRIMATIVE_TYPES:
         raise ValueError("Unknown type: {0}".format(type_))
