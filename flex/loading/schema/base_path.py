@@ -14,6 +14,7 @@ from flex.validation.common import (
 )
 from flex.decorators import (
     skip_if_empty,
+    skip_if_not_of_type,
 )
 
 
@@ -21,7 +22,8 @@ string_type_validator = generate_type_validator(STRING)
 
 
 @skip_if_empty
-def path_validator(value):
+@skip_if_not_of_type(STRING)
+def base_path_validator(value, **kwargs):
     if not value.startswith('/'):
         raise ValidationError(MESSAGES['path']['must_start_with_slash'])
     parts = urlparse.urlparse(value)
@@ -34,7 +36,7 @@ base_path_schema = {
 }
 
 non_field_validators = ValidationList()
-non_field_validators.add_validator(path_validator)
+non_field_validators.add_validator(base_path_validator)
 
 base_path_validator = generate_object_validator(
     schema=base_path_schema,

@@ -94,9 +94,9 @@ def suffix_reserved_words(func):
 def pull_keys_from_obj(*keys):
     def outer(func):
         @partial_safe_wraps(func)
-        def inner(obj):
-            kwargs = {}
+        def inner(obj, *args, **kwargs):
             for key in keys:
+                assert key not in kwargs
                 kwargs[key] = obj.get(key, EMPTY)
             if all((v is EMPTY for v in kwargs.values())):
                 return

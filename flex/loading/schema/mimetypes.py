@@ -22,20 +22,6 @@ from flex.validation.schema import (
 
 
 # top-level type name / [ tree. ] subtype name [ +suffix ] [ ; parameters ]
-
-TOP_LEVEL_TYPE_NAMES = set((
-    'application',
-    'audio',
-    'example',
-    'image',
-    'message',
-    'model',
-    'multipart',
-    'text',
-    'video',
-))
-
-
 MIMETYPE_PATTERN = (
     '^'
     '(application|audio|example|image|message|model|multipart|text|video)'  # top-level type name
@@ -50,7 +36,7 @@ MIMETYPE_PATTERN = (
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY)
-def validate_mimetype(values):
+def validate_mimetype(values, **kwargs):
     for value in values:
         if not re.match(MIMETYPE_PATTERN, value):
             raise ValidationError(

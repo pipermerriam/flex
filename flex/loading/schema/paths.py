@@ -50,7 +50,7 @@ path_validator = generate_object_validator(
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def validate_paths(paths):
+def validate_paths(paths, **kwargs):
     with ErrorCollection() as errors:
         for path, path_definition in paths.items():
             if not path.startswith('/'):

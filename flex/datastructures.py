@@ -34,11 +34,11 @@ class ValidationList(list):
         else:
             self.append(validator)
 
-    def validate_object(self, obj):
+    def validate_object(self, obj, **kwargs):
         with ErrorList() as errors:
             for validator in self:
                 try:
-                    validator(obj)
+                    validator(obj, **kwargs)
                 except ValidationError as err:
                     errors.add_error(err.detail)
 
@@ -68,11 +68,11 @@ class ValidationDict(collections.defaultdict):
         for key, value in other.items():
             self.add_validator(key, value)
 
-    def validate_object(self, obj):
+    def validate_object(self, obj, **kwargs):
         with ErrorDict() as errors:
             for key, validator in self.items():
                 try:
-                    validator(obj)
+                    validator(obj, **kwargs)
                 except ValidationError as err:
                     errors.add_error(key, err.detail)
 

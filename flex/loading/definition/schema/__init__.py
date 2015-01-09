@@ -83,6 +83,9 @@ from .type import (
 from .read_only import (
     read_only_validator,
 )
+from .ref import (
+    ref_validator,
+)
 
 '''
     externalDocs = serializers.CharField(allow_null=True, required=False)
@@ -120,6 +123,7 @@ schema_field_validators.add_property_validator('maxProperties', max_properties_v
 schema_field_validators.add_property_validator('required', required_validator)
 schema_field_validators.add_property_validator('type', type_validator)
 schema_field_validators.add_property_validator('readOnly', read_only_validator)
+schema_field_validators.add_property_validator('$ref', ref_validator)
 
 schema_non_field_validators = ValidationDict()
 schema_non_field_validators.add_validator(

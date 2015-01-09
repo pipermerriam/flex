@@ -13,7 +13,7 @@ from flex.decorators import (
 
 
 @pull_keys_from_obj('minLength', 'maxLength')
-def validate_max_length_greater_than_or_equal_to_min_length(minLength, maxLength):
+def validate_max_length_greater_than_or_equal_to_min_length(minLength, maxLength, **kwargs):
     if minLength is EMPTY or maxLength is EMPTY:
         return
 

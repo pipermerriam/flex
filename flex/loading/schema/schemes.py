@@ -18,7 +18,7 @@ from flex.decorators import (
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY)
-def validate_schemes(schemes):
+def validate_schemes(schemes, **kwargs):
     for value in schemes:
         if value not in SCHEMES:
             raise ValidationError(

@@ -13,6 +13,7 @@ from flex.validation.common import (
 )
 from flex.decorators import (
     skip_if_empty,
+    skip_if_not_of_type,
 )
 from flex.context_managers import ErrorCollection
 
@@ -34,7 +35,8 @@ def decompose_hostname(value):
 
 
 @skip_if_empty
-def host_validator(value):
+@skip_if_not_of_type(STRING)
+def host_validator(value, **kwargs):
     """
     From: http://stackoverflow.com/questions/2532053/validate-a-hostname-string
     According to: http://en.wikipedia.org/wiki/Hostname#Restrictions_on_valid_host_names

@@ -4,6 +4,12 @@ import functools
 from flex.constants import EMPTY
 
 
+def chain_reduce(value, functions, **kwargs):
+    for function in functions:
+        value = function(value, **kwargs)
+    return value
+
+
 def chain_reduce_partial(*functions):
     """
     Given an iterable of functions, returns a callable that takes a value and
@@ -23,9 +29,8 @@ def chain_reduce_partial(*functions):
         return b(a(x))
     """
     return functools.partial(
-        functools.reduce,
-        lambda value, fn: fn(value),
-        functions,
+        chain_reduce,
+        functions=functions,
     )
 
 

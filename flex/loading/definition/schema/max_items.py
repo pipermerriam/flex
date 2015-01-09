@@ -16,7 +16,7 @@ from flex.decorators import (
 
 
 @pull_keys_from_obj('minItems', 'maxItems')
-def validate_max_items_less_than_or_equal_to_min_items(minItems, maxItems):
+def validate_max_items_less_than_or_equal_to_min_items(minItems, maxItems, **kwargs):
     if minItems is EMPTY or maxItems is EMPTY:
         return
     if not maxItems >= minItems:

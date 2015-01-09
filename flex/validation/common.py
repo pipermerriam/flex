@@ -46,7 +46,7 @@ from flex.error_messages import MESSAGES
 
 
 @skip_if_empty
-def validate_type(value, types):
+def validate_type(value, types, **kwargs):
     """
     Validate that the value is one of the provided primative types.
     """
@@ -87,7 +87,7 @@ def noop(*args, **kwargs):
     pass
 
 
-def validate_required(value):
+def validate_required(value, **kwargs):
     if value is EMPTY:
         raise ValidationError(MESSAGES['required']['required'])
 
@@ -101,7 +101,7 @@ def generate_required_validator(required, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(NUMBER)
-def validate_multiple_of(value, divisor):
+def validate_multiple_of(value, divisor, **kwargs):
     """
     Given a value and a divisor, validate that the value is divisible by the
     divisor.
@@ -118,7 +118,7 @@ def generate_multiple_of_validator(multipleOf, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(NUMBER)
-def validate_minimum(value, minimum, is_exclusive):
+def validate_minimum(value, minimum, is_exclusive, **kwargs):
     """
     Validator function for validating that a value does not violate it's
     minimum allowed value.  This validation can be inclusive, or exclusive of
@@ -146,7 +146,7 @@ def generate_minimum_validator(minimum, exclusiveMinimum=False, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(NUMBER)
-def validate_maximum(value, maximum, is_exclusive):
+def validate_maximum(value, maximum, is_exclusive, **kwargs):
     """
     Validator function for validating that a value does not violate it's
     maximum allowed value.  This validation can be inclusive, or exclusive of
@@ -194,7 +194,7 @@ def generate_max_length_validator(maxLength, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY)
-def validate_min_items(value, minimum):
+def validate_min_items(value, minimum, **kwargs):
     """
     Validator for ARRAY types to enforce a minimum number of items allowed for
     the ARRAY to be valid.
@@ -216,7 +216,7 @@ def generate_min_items_validator(minItems, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY)
-def validate_max_items(value, maximum):
+def validate_max_items(value, maximum, **kwargs):
     """
     Validator for ARRAY types to enforce a maximum number of items allowed for
     the ARRAY to be valid.
@@ -238,7 +238,7 @@ def generate_max_items_validator(maxItems, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(ARRAY)
-def validate_unique_items(value):
+def validate_unique_items(value, **kwargs):
     """
     Validator for ARRAY types to enforce that all array items must be unique.
     """
@@ -269,7 +269,7 @@ def generate_unique_items_validator(uniqueItems, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(STRING)
-def validate_pattern(value, regex):
+def validate_pattern(value, regex, **kwargs):
     if not regex.match(value):
         raise ValidationError(
             MESSAGES['pattern']['invalid'].format(value, regex.pattern),
@@ -281,7 +281,7 @@ def generate_pattern_validator(pattern, **kwargs):
 
 
 @skip_if_empty
-def validate_enum(value, options):
+def validate_enum(value, options, **kwargs):
     if not any(deep_equal(value, option) for option in options):
         raise ValidationError(
             MESSAGES['enum']['invalid'].format(
@@ -313,16 +313,17 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
         construct_schema_validators,
     )
     schema_validators = construct_schema_validators(schema, context)
-    schema_validators.update(field_validators)
 
-    if '$ref' in schema_validators:
+    if '$ref' in schema_validators and hasattr(schema_validators['$ref'], 'validators'):
         ref_ = field_validators.pop('$ref')
         for k, v in ref_.validators.items():
             if k not in schema_validators:
                 schema_validators.add_validator(k, v)
 
-    schema_validators.validate_object(obj)
-    non_field_validators.validate_object(obj)
+    schema_validators.update(field_validators)
+
+    schema_validators.validate_object(obj, context=context)
+    non_field_validators.validate_object(obj, context=context)
 
 
 def generate_object_validator(**kwargs):

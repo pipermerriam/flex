@@ -47,7 +47,7 @@ single_type_validator = generate_object_validator(
 
 @suffix_reserved_words
 @skip_if_not_of_type(ARRAY, STRING)
-def validate_types(type_):
+def validate_types(type_, **kwargs):
     if is_non_string_iterable(type_):
         types = type_
     else:

@@ -14,7 +14,7 @@ from flex.decorators import (
 
 
 @pull_keys_from_obj('minimum', 'exclusiveMinimum')
-def validate_minimum_required_if_exclusive_minimum_set(minimum, exclusiveMinimum):
+def validate_minimum_required_if_exclusive_minimum_set(minimum, exclusiveMinimum, **kwargs):
     if exclusiveMinimum is EMPTY:
         return
     if exclusiveMinimum is True and minimum is EMPTY:
