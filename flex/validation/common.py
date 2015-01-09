@@ -34,6 +34,7 @@ from flex.constants import (
     NUMBER,
     STRING,
     ARRAY,
+    OBJECT,
     DELIMETERS,
     REQUEST_METHODS,
 )
@@ -328,6 +329,28 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
 
 def generate_object_validator(**kwargs):
     return functools.partial(validate_object, **kwargs)
+
+
+@skip_if_empty
+@skip_if_not_of_type(OBJECT)
+def apply_validator_to_object(obj, validator, **kwargs):
+    with ErrorDict() as errors:
+        for key, value in obj.items():
+            try:
+                validator(obj, **kwargs)
+            except ValidationError as err:
+                errors.add_error(key, err.detail)
+
+
+@skip_if_empty
+@skip_if_not_of_type(ARRAY)
+def apply_validator_to_array(values, validator, **kwargs):
+    with ErrorList() as errors:
+        for value in values:
+            try:
+                validator(value, **kwargs)
+            except ValidationError as err:
+                errors.add_error(err.detail)
 
 
 @suffix_reserved_words
