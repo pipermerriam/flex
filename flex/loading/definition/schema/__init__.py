@@ -79,10 +79,12 @@ from .default import (
 )
 from .min_properties import (
     min_properties_validator,
+    validate_type_for_min_properties,
 )
 from .max_properties import (
     max_properties_validator,
     validate_max_properties_is_greater_than_or_equal_to_min_properties,
+    validate_type_for_max_properties,
 )
 from .required import (
     required_validator,
@@ -180,6 +182,12 @@ schema_non_field_validators.add_validator(
 )
 schema_non_field_validators.add_validator(
     'maxProperties', validate_max_properties_is_greater_than_or_equal_to_min_properties,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_min_properties,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_max_properties,
 )
 
 schema_validator = generate_object_validator(

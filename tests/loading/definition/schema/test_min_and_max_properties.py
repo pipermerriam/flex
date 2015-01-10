@@ -1,5 +1,10 @@
 import pytest
 
+from flex.constants import (
+    OBJECT,
+    STRING,
+    INTEGER,
+)
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
 from flex.loading.definition.schema import schema_validator
@@ -41,6 +46,48 @@ def test_min_properties_for_invalid_types(value):
 
 
 @pytest.mark.parametrize(
+    'type_',
+    (
+        STRING,
+        (STRING, INTEGER),
+    ),
+)
+def test_type_validation_for_min_properties_for_invalid_types(type_):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'minProperties': 5,
+            'type': type_,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid_type_for_min_properties'],
+        err.value.detail,
+        'type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        OBJECT,
+        (STRING, OBJECT, INTEGER),
+    ),
+)
+def test_type_validation_for_min_properties_for_valid_types(type_):
+    try:
+        schema_validator({
+            'minProperties': 5,
+            'type': type_,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('type', errors)
+
+
+@pytest.mark.parametrize(
     'value',
     ('abc', [1, 2], None, {'a': 1}, True, False, 1.1),
 )
@@ -56,6 +103,48 @@ def test_max_properties_for_invalid_types(value):
         err.value.detail,
         'maxProperties.type',
     )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        STRING,
+        (STRING, INTEGER),
+    ),
+)
+def test_type_validation_for_max_properties_for_invalid_types(type_):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'maxProperties': 5,
+            'type': type_,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid_type_for_max_properties'],
+        err.value.detail,
+        'type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        OBJECT,
+        (STRING, OBJECT, INTEGER),
+    ),
+)
+def test_type_validation_for_max_properties_for_valid_types(type_):
+    try:
+        schema_validator({
+            'maxProperties': 5,
+            'type': type_,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('type', errors)
 
 
 def test_min_properties_must_be_greater_than_0():
