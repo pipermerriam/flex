@@ -1,12 +1,33 @@
+from flex.error_messages import MESSAGES
+from flex.exceptions import ValidationError
 from flex.constants import (
+    OBJECT,
     INTEGER,
 )
+from flex.utils import pluralize
 from flex.validation.common import (
     generate_object_validator,
 )
 from flex.validation.schema import (
     construct_schema_validators,
 )
+from flex.decorators import (
+    pull_keys_from_obj,
+    suffix_reserved_words,
+    skip_if_any_kwargs_empty,
+)
+
+
+@pull_keys_from_obj('type', 'minItems')
+@suffix_reserved_words
+@skip_if_any_kwargs_empty('type_', 'minItems')
+def validate_type_for_min_items(type_, minItems, **kwargs):
+    types = pluralize(type_)
+
+    if not set(types).intersection((OBJECT,)):
+        raise ValidationError(
+            MESSAGES['type']['invalid_type_for_min_items'],
+        )
 
 
 min_items_schema = {

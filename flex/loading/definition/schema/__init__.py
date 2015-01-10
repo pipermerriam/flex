@@ -54,13 +54,16 @@ from .pattern import (
 )
 from .min_items import (
     min_items_validator,
+    validate_type_for_min_items,
 )
 from .max_items import (
     max_items_validator,
     validate_max_items_less_than_or_equal_to_min_items,
+    validate_type_for_max_items,
 )
 from .unique_items import (
     unique_items_validator,
+    validate_type_for_unique_items,
 )
 from .enum import (
     enum_validator,
@@ -162,6 +165,15 @@ schema_non_field_validators.add_validator(
 )
 schema_non_field_validators.add_validator(
     'maxItems', validate_max_items_less_than_or_equal_to_min_items,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_max_items,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_min_items,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_unique_items,
 )
 schema_non_field_validators.add_validator(
     'default', validate_default_is_of_one_of_declared_types,

@@ -3,7 +3,9 @@ from flex.error_messages import MESSAGES
 from flex.constants import (
     INTEGER,
     EMPTY,
+    OBJECT,
 )
+from flex.utils import pluralize
 from flex.validation.common import (
     generate_object_validator,
 )
@@ -12,6 +14,8 @@ from flex.validation.schema import (
 )
 from flex.decorators import (
     pull_keys_from_obj,
+    suffix_reserved_words,
+    skip_if_any_kwargs_empty,
 )
 
 
@@ -22,6 +26,18 @@ def validate_max_items_less_than_or_equal_to_min_items(minItems, maxItems, **kwa
     if not maxItems >= minItems:
         raise ValidationError(
             MESSAGES['max_items']['must_be_greater_than_min_items']
+        )
+
+
+@pull_keys_from_obj('type', 'maxItems')
+@suffix_reserved_words
+@skip_if_any_kwargs_empty('type_', 'maxItems')
+def validate_type_for_max_items(type_, maxItems, **kwargs):
+    types = pluralize(type_)
+
+    if not set(types).intersection((OBJECT,)):
+        raise ValidationError(
+            MESSAGES['type']['invalid_type_for_max_items'],
         )
 
 

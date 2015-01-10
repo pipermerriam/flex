@@ -16,6 +16,8 @@ TYPE_MESSAGES = {
     'invalid_type_for_min_items': '`minItems` can only be used for array types',
     'invalid_type_for_max_items': '`maxItems` can only be used for array types',
     'invalid_type_for_unique_items': '`uniqueItems` can only be used for array types',
+    'invalid_type_for_min_properties': 'minProperties can only be used for `object` types',
+    'invalid_type_for_max_properties': 'maxProperties can only be used for `object` types',
 }
 
 FORMAT_MESSAGES = {

@@ -1,5 +1,10 @@
 import pytest
 
+from flex.constants import (
+    OBJECT,
+    INTEGER,
+    STRING,
+)
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
 from flex.loading.definition.schema import schema_validator
@@ -38,6 +43,48 @@ def test_min_items_with_invalid_types(value):
 
 
 @pytest.mark.parametrize(
+    'type_',
+    (
+        INTEGER,
+        (INTEGER, STRING),
+    ),
+)
+def test_type_validations_for_min_items_with_invalid_types(type_):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'minItems': 5,
+            'type': type_,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid_type_for_min_items'],
+        err.value.detail,
+        'type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        OBJECT,
+        (INTEGER, OBJECT, STRING),
+    ),
+)
+def test_type_validations_for_min_items_with_valid_types(type_):
+    try:
+        schema_validator({
+            'minItems': 5,
+            'type': type_,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('type', errors)
+
+
+@pytest.mark.parametrize(
     'value',
     ([1, 2], None, {'a': 1}, True, 1.1, 'abc'),
 )
@@ -50,6 +97,48 @@ def test_max_items_with_invalid_types(value):
         err.value.detail,
         'maxItems.type',
     )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        INTEGER,
+        (INTEGER, STRING),
+    ),
+)
+def test_type_validations_for_max_items_with_invalid_types(type_):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'maxItems': 5,
+            'type': type_,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid_type_for_max_items'],
+        err.value.detail,
+        'type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        OBJECT,
+        (INTEGER, OBJECT, STRING),
+    ),
+)
+def test_type_validations_for_max_items_with_valid_types(type_):
+    try:
+        schema_validator({
+            'maxItems': 5,
+            'type': type_,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('type', errors)
 
 
 def test_max_items_must_be_gte_min_items():
