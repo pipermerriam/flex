@@ -36,9 +36,6 @@ def test_min_and_max_length_are_not_required():
     ('abc', [1, 2], None, {'a': 1}, True),
 )
 def test_min_length_for_invalid_types(value):
-    """
-    Ensure that the value of `minLength` is validated to be numeric.
-    """
     with pytest.raises(ValidationError) as err:
         schema_validator({'minLength': value})
 
@@ -57,9 +54,6 @@ def test_min_length_for_invalid_types(value):
     ),
 )
 def test_type_validation_for_min_length_for_invalid_types(type_):
-    """
-    Ensure that the value of `minLength` is validated to be numeric.
-    """
     with pytest.raises(ValidationError) as err:
         schema_validator({
             'minLength': 5,
@@ -67,9 +61,33 @@ def test_type_validation_for_min_length_for_invalid_types(type_):
         })
 
     assert_message_in_errors(
-        MESSAGES['type']['invalid'],
+        MESSAGES['type']['invalid_type_for_min_length'],
         err.value.detail,
         'type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        STRING,
+        (INTEGER, STRING),
+    ),
+)
+def test_type_validation_for_min_length_for_valid_types(type_):
+    try:
+        schema_validator({
+            'minLength': 5,
+            'type': type_,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'type',
+        errors,
     )
 
 
@@ -78,9 +96,6 @@ def test_type_validation_for_min_length_for_invalid_types(type_):
     ('abc', [1, 2], None, {'a': 1}, True),
 )
 def test_max_length_for_invalid_types(value):
-    """
-    Ensure that the value of `maxLength` is validated to be numeric.
-    """
     with pytest.raises(ValidationError) as err:
         schema_validator({'maxLength': value})
 
@@ -99,9 +114,6 @@ def test_max_length_for_invalid_types(value):
     ),
 )
 def test_type_validation_for_max_length_for_invalid_types(type_):
-    """
-    Ensure that the value of `maxLength` is validated to be numeric.
-    """
     with pytest.raises(ValidationError) as err:
         schema_validator({
             'maxLength': 5,
@@ -109,9 +121,33 @@ def test_type_validation_for_max_length_for_invalid_types(type_):
         })
 
     assert_message_in_errors(
-        MESSAGES['type']['invalid'],
+        MESSAGES['type']['invalid_type_for_max_length'],
         err.value.detail,
         'type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        STRING,
+        (INTEGER, STRING),
+    ),
+)
+def test_type_validation_for_max_length_for_valid_types(type_):
+    try:
+        schema_validator({
+            'maxLength': 5,
+            'type': type_,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'type',
+        errors,
     )
 
 

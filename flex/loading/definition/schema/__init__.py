@@ -42,10 +42,12 @@ from .minimum import (
 )
 from .min_length import (
     min_length_validator,
+    validate_type_for_min_length,
 )
 from .max_length import (
     max_length_validator,
     validate_max_length_greater_than_or_equal_to_min_length,
+    validate_type_for_max_length,
 )
 from .pattern import (
     pattern_validator,
@@ -151,6 +153,12 @@ schema_non_field_validators.add_validator(
 )
 schema_non_field_validators.add_validator(
     'maxLength', validate_max_length_greater_than_or_equal_to_min_length,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_max_length,
+)
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_min_length,
 )
 schema_non_field_validators.add_validator(
     'maxItems', validate_max_items_less_than_or_equal_to_min_items,
