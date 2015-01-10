@@ -1,5 +1,11 @@
 import pytest
 
+from flex.constants import (
+    STRING,
+    INTEGER,
+    NUMBER,
+    OBJECT,
+)
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
 from flex.loading.definition.schema import schema_validator
@@ -34,6 +40,50 @@ def test_multiple_of_for_invalid_types(value):
         err.value.detail,
         'multipleOf.type',
     )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        OBJECT,
+        (OBJECT, STRING),
+    ),
+)
+def test_type_validation_for_multiple_of_for_invalid_types(type_):
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'multipleOf': 5,
+            'type': type_,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid_type_for_multiple_of'],
+        err.value.detail,
+        'type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        NUMBER,
+        INTEGER,
+        (INTEGER, NUMBER),
+        (STRING, NUMBER, OBJECT),
+    ),
+)
+def test_type_validation_for_multiple_of_for_valid_types(type_):
+    try:
+        schema_validator({
+            'multipleOf': 5,
+            'type': type_,
+        })
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors('type', errors)
 
 
 @pytest.mark.parametrize(

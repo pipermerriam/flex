@@ -1,5 +1,10 @@
 import pytest
 
+from flex.constants import (
+    INTEGER,
+    NUMBER,
+    STRING,
+)
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
 from flex.loading.definition.schema import schema_validator
@@ -45,6 +50,30 @@ def test_min_length_for_invalid_types(value):
 
 
 @pytest.mark.parametrize(
+    'type_',
+    (
+        INTEGER,
+        (INTEGER, NUMBER),
+    ),
+)
+def test_type_validation_for_min_length_for_invalid_types(type_):
+    """
+    Ensure that the value of `minLength` is validated to be numeric.
+    """
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'minLength': 5,
+            'type': type_,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'type',
+    )
+
+
+@pytest.mark.parametrize(
     'value',
     ('abc', [1, 2], None, {'a': 1}, True),
 )
@@ -59,6 +88,30 @@ def test_max_length_for_invalid_types(value):
         MESSAGES['type']['invalid'],
         err.value.detail,
         'maxLength.type',
+    )
+
+
+@pytest.mark.parametrize(
+    'type_',
+    (
+        INTEGER,
+        (INTEGER, NUMBER),
+    ),
+)
+def test_type_validation_for_max_length_for_invalid_types(type_):
+    """
+    Ensure that the value of `maxLength` is validated to be numeric.
+    """
+    with pytest.raises(ValidationError) as err:
+        schema_validator({
+            'maxLength': 5,
+            'type': type_,
+        })
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'type',
     )
 
 

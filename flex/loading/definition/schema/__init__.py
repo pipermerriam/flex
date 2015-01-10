@@ -23,7 +23,10 @@ from flex.datastructures import (
     ValidationList,
 )
 
-from .multiple_of import multiple_of_validator
+from .multiple_of import (
+    multiple_of_validator,
+    validate_type_for_multiple_of,
+)
 from .maximum import (
     maximum_validator,
     exclusive_maximum_validator,
@@ -128,6 +131,9 @@ schema_field_validators.add_property_validator('readOnly', read_only_validator)
 schema_field_validators.add_property_validator('$ref', ref_validator)
 
 schema_non_field_validators = ValidationDict()
+schema_non_field_validators.add_validator(
+    'type', validate_type_for_multiple_of,
+)
 schema_non_field_validators.add_validator(
     'maximum', validate_maximum_is_gte_minimum,
 )
