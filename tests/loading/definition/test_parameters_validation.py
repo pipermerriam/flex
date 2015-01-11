@@ -41,3 +41,18 @@ def test_parameters_definitions_type_validation_for_invalid_types(value):
         err.value.detail,
         'parameters',
     )
+
+
+def test_parameters_with_valid_array():
+    context = {'deferred_references': set()}
+    try:
+        definitions_validator({}, context=context)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'parameters',
+        errors,
+    )
