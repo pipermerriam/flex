@@ -16,6 +16,9 @@ from flex.decorators import (
 )
 
 from .schema_definitions import schema_definitions_validator
+from .parameters import (
+    parameters_validator,
+)
 
 
 __ALL__ = [
@@ -47,6 +50,7 @@ def validate_references(definitions, context, **kwargs):
 
 field_validators = ValidationDict()
 field_validators.add_property_validator('definitions', schema_definitions_validator)
+field_validators.add_property_validator('parameters', parameters_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator('definitions', validate_references)

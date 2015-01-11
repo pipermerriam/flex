@@ -34,6 +34,19 @@ class ResponseFactory(factory.Factory):
         model = Response
 
 
+class Meta:
+    model = dict
+
+
+ParameterFactory = type(
+    'ParameterFactory',
+    (factory.Factory,),
+    {
+        'Meta': Meta,
+    },
+)
+
+
 def RawSchemaFactory(**kwargs):
     kwargs.setdefault('swagger', '2.0')
     kwargs.setdefault('info', {'title': 'Test API', 'version': '0.0.1'})
