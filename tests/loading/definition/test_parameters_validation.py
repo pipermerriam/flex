@@ -46,7 +46,49 @@ def test_parameters_definitions_type_validation_for_invalid_types(value):
 def test_parameters_with_valid_array():
     context = {'deferred_references': set()}
     try:
-        definitions_validator({}, context=context)
+        definitions_validator({
+            'parameters': [],
+        }, context=context)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'parameters',
+        errors,
+    )
+
+
+@pytest.mark.parametrize(
+    'value',
+    ('abc', 1, 1.1, True, None, [1, 2]),
+)
+def test_single_parameter_type_validation(value):
+    context = {'deferred_references': set()}
+
+    with pytest.raises(ValidationError) as err
+        definitions_validator({
+            'parameters': [
+                value,
+            ],
+        }, context=context)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'parameters.0',
+    )
+
+
+def test_basic_valid_Parameter():
+    context = {'deferred_references': set()}
+    try:
+        definitions_validator({
+            'parameters': [
+                {},
+            ],
+        }, context=context)
     except ValidationError as err:
         errors = err.detail
     else:

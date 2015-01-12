@@ -2,7 +2,7 @@ import pytest
 
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
-from flex.loading.definition.schema import schema_validator
+from flex.loading.definitions.schema import schema_validator
 
 from tests.utils import (
     assert_path_not_in_errors,
