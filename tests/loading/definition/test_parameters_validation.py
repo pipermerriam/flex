@@ -2,10 +2,13 @@ import pytest
 
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
-from flex.loading.definition import (
+from flex.loading.definitions import (
     definitions_validator,
 )
 
+from tests.factories import (
+    ParameterFactory,
+)
 from tests.utils import (
     assert_path_not_in_errors,
     assert_message_in_errors,
@@ -67,7 +70,7 @@ def test_parameters_with_valid_array():
 def test_single_parameter_type_validation(value):
     context = {'deferred_references': set()}
 
-    with pytest.raises(ValidationError) as err
+    with pytest.raises(ValidationError) as err:
         definitions_validator({
             'parameters': [
                 value,
@@ -81,12 +84,13 @@ def test_single_parameter_type_validation(value):
     )
 
 
-def test_basic_valid_Parameter():
+def test_basic_valid_parameter():
     context = {'deferred_references': set()}
+    raw_parameter = ParameterFactory()
     try:
         definitions_validator({
             'parameters': [
-                {},
+                raw_parameter,
             ],
         }, context=context)
     except ValidationError as err:

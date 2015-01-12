@@ -11,7 +11,6 @@ from flex.validation.common import (
 )
 from flex.decorators import (
     skip_if_not_of_type,
-    skip_if_empty,
     pull_keys_from_obj,
 )
 
@@ -30,7 +29,6 @@ definitions_schema = {
 }
 
 
-@skip_if_empty
 @skip_if_not_of_type(OBJECT)
 @pull_keys_from_obj('definitions')
 def validate_references(definitions, context, **kwargs):

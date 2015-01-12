@@ -6,7 +6,7 @@ from flex.constants import (
     OBJECT,
     STRING,
 )
-from flex.loading.definition import (
+from flex.loading.definitions import (
     definitions_validator,
 )
 from tests.utils import (

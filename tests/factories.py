@@ -1,6 +1,9 @@
 import factory
 
-from flex.constants import EMPTY
+from flex.constants import (
+    EMPTY,
+    QUERY,
+)
 from flex.http import (
     Request,
     Response,
@@ -43,6 +46,8 @@ ParameterFactory = type(
     (factory.Factory,),
     {
         'Meta': Meta,
+        'in': QUERY,
+        'name': 'id',
     },
 )
 

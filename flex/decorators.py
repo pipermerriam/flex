@@ -104,6 +104,7 @@ def suffix_reserved_words(func):
 
 def pull_keys_from_obj(*keys):
     def outer(func):
+        @skip_if_empty
         @partial_safe_wraps(func)
         def inner(obj, *args, **kwargs):
             for key in keys:

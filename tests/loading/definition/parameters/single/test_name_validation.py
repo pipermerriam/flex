@@ -24,13 +24,30 @@ def test_name_is_required():
     )
 
 
-def test_in_is_required():
-    context = {'deferred_references': set()}
+@pytest.mark.parametrize(
+    'value',
+    ([1, 2], None, {'a': 1}, True, 1, 1.1),
+)
+def test_name_with_invalid_types(value):
     with pytest.raises(ValidationError) as err:
-        single_parameter_validator({}, context=context)
+        single_parameter_validator({'name': value})
 
     assert_message_in_errors(
-        MESSAGES['required']['required'],
+        MESSAGES['type']['invalid'],
         err.value.detail,
-        'in',
+        'name.type',
+    )
+
+
+def test_in_with_valid_values():
+    try:
+        single_parameter_validator({'name': 'page_size'})
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'name',
+        errors,
     )

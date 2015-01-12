@@ -144,7 +144,11 @@ def assert_path_in_errors(path, errors):
 
 
 def assert_path_not_in_errors(path, errors):
-    assert not find_matching_paths(path, errors)
+    matches = find_matching_paths(path, enumerate_error_paths(errors))
+    if matches:
+        raise AssertionError(
+            "The path {0} was found in the paths: {1}".format(repr(path), repr(matches)),
+        )
 
 
 def generate_validator_from_schema(schema, **kwargs):

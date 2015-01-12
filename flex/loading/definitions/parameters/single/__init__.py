@@ -17,6 +17,13 @@ from flex.loading.definitions.schema import (
     items_validator,
 )
 
+from .in_ import (
+    in_validator,
+)
+from .name import (
+    name_validator,
+)
+
 
 single_parameter_schema = {
     'type': OBJECT,
@@ -25,6 +32,9 @@ single_parameter_schema = {
 single_parameter_field_validators = ValidationDict()
 single_parameter_field_validators.update(common_field_validators)
 
+single_parameter_field_validators.add_property_validator('in', in_validator)
+single_parameter_field_validators.add_property_validator('name', name_validator)
+# schema fields
 single_parameter_field_validators.add_property_validator('schema', schema_validator)
 single_parameter_field_validators.add_property_validator('items', items_validator)
 
