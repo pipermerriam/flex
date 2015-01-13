@@ -26,11 +26,17 @@ from .name import (
 from .description import (
     description_validator,
 )
-from .required import (
+from flex.loading.common.required import (
     required_validator,
 )
 from .type import (
     type_validator,
+)
+from flex.loading.common.format import (
+    format_validator,
+)
+from .collection_format import (
+    collection_format_validator,
 )
 
 
@@ -46,6 +52,10 @@ single_parameter_field_validators.add_property_validator('name', name_validator)
 single_parameter_field_validators.add_property_validator('description', description_validator)
 single_parameter_field_validators.add_property_validator('required', required_validator)
 single_parameter_field_validators.add_property_validator('type', type_validator)
+single_parameter_field_validators.add_property_validator('format', format_validator)
+single_parameter_field_validators.add_property_validator(
+    'collectionFormat', collection_format_validator,
+)
 # schema fields
 single_parameter_field_validators.add_property_validator('schema', schema_validator)
 single_parameter_field_validators.add_property_validator('items', items_validator)

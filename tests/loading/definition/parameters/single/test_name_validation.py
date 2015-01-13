@@ -39,7 +39,7 @@ def test_name_with_invalid_types(value):
     )
 
 
-def test_in_with_valid_values():
+def test_name_with_valid_values():
     try:
         single_parameter_validator({'name': 'page_size'})
     except ValidationError as err:

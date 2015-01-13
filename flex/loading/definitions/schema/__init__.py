@@ -23,7 +23,7 @@ from flex.datastructures import (
     ValidationList,
 )
 
-from .format import (
+from flex.loading.common.format import (
     format_validator,
 )
 from .title import (
@@ -41,7 +41,7 @@ from .max_properties import (
     validate_max_properties_is_greater_than_or_equal_to_min_properties,
     validate_type_for_max_properties,
 )
-from .required import (
+from flex.loading.common.required import (
     required_validator,
 )
 from .type import (
