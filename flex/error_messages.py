@@ -31,6 +31,9 @@ FORMAT_MESSAGES = {
 
 REQUIRED_MESSAGES = {
     'required': "This value is required",
+    'path_parameters_must_be_required': (
+        "A Parameter who's `in` value is 'path' must be declared as required."
+    ),
 }
 
 MULTIPLE_OF_MESSAGES = {

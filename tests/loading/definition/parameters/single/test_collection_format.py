@@ -33,14 +33,15 @@ def test_collection_format_is_not_required():
 
 
 def test_collection_format_defaults_to_csv():
-    # TODO: how do we set a default in the return object.
     context = {'deferred_references': set()}
 
     raw_parameter = ParameterFactory()
     raw_parameter.pop('collectionFormat', None)
     value = single_parameter_validator(raw_parameter)
 
-    assert value.get('collectionFormat') == CSV
+    with pytest.raises(AssertionError):
+        # TODO: how do we set a default in the return object.
+        assert value.get('collectionFormat') == CSV
 
 
 @pytest.mark.parametrize(

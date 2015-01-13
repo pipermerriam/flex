@@ -2,6 +2,7 @@ import pytest
 
 from flex.constants import (
     PARAMETER_IN_VALUES,
+    PATH,
 )
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
@@ -9,6 +10,7 @@ from flex.loading.definitions.parameters import (
     single_parameter_validator,
 )
 
+from tests.factories import ParameterFactory
 from tests.utils import (
     assert_path_not_in_errors,
     assert_message_in_errors,
@@ -68,4 +70,18 @@ def test_in_with_valid_values(value):
     assert_path_not_in_errors(
         'in.enum',
         errors,
+    )
+
+
+def test_when_in_value_is_path_required_must_be_true():
+    with pytest.raises(ValidationError) as err:
+        single_parameter_validator(ParameterFactory(**{
+            'in': PATH,
+            'required': False,
+        }))
+
+    assert_message_in_errors(
+        MESSAGES['required']['path_parameters_must_be_required'],
+        err.value.detail,
+        '^required',
     )

@@ -29,7 +29,7 @@ from flex.loading.common.format import (
 from .title import (
     title_validator,
 )
-from .default import (
+from flex.loading.common.default import (
     validate_default_is_of_one_of_declared_types,
 )
 from .min_properties import (

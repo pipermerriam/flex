@@ -11,7 +11,6 @@ from flex.exceptions import (
 from flex.error_messages import MESSAGES
 from flex.constants import (
     OBJECT,
-    EMPTY,
 )
 from flex.decorators import skip_if_not_of_type
 from flex.validation.common import (
@@ -31,9 +30,6 @@ from flex.validation.common import (
     generate_enum_validator,
     validate_object,
     generate_object_validator,
-)
-from flex.functional import (
-    apply_functions_to_key,
 )
 from flex.datastructures import (
     ValidationDict,
@@ -199,19 +195,11 @@ def construct_schema_validators(schema, context):
         assert not intersection
 
         for property_, property_schema in schema['properties'].items():
-            property_validators = construct_schema_validators(
-                property_schema,
-                context,
-            )
             property_validator = generate_object_validator(
-                field_validators=property_validators,
+                schema=property_schema,
+                context=context,
             )
-            validators.add_validator(
-                property_,
-                skip_if_empty(skip_if_not_of_type(OBJECT)(
-                    apply_functions_to_key(property_, property_validator)
-                )),
-            )
+            validators.add_property_validator(property_, property_validator)
     assert 'context' not in schema
     for key in schema:
         if key in validator_mapping:

@@ -326,6 +326,8 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
     schema_validators.validate_object(obj, context=context)
     non_field_validators.validate_object(obj, context=context)
 
+    return obj
+
 
 def generate_object_validator(**kwargs):
     return functools.partial(validate_object, **kwargs)
