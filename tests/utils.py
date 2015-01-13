@@ -72,17 +72,11 @@ def find_message_in_errors(*args, **kwargs):
 
 
 def _find_matching_paths(target_path, paths):
-    target_parts = tuple(reversed(target_path.split('.')))
+    pattern = re.sub('\.', '.+', target_path)
+    pattern = re.sub(r'^(.+)\^', r'\1\^', pattern)
+    pattern = re.sub(r'\$(.+)$', r'\$\1', pattern)
     for message_path in paths:
-        message_parts = message_path.split('.')
-        for target_part in target_parts:
-            while message_parts:
-                message_part = message_parts.pop()
-                if message_part == target_part:
-                    break
-            else:
-                break
-        else:
+        if re.search(pattern, message_path):
             yield message_path
 
 

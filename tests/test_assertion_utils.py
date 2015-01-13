@@ -110,3 +110,27 @@ def test_simple_mismatch():
 def test_other_mismatch():
     paths = ['foo.0.bar']
     assert not find_matching_paths('foo.0.0.bar', paths)
+
+
+def test_special_start_of_path_character_with_no_matches():
+    paths = ['start.required']
+    assert not find_matching_paths('^required', paths)
+
+def test_special_start_of_path_character_with_matches():
+    paths = ['required.extra']
+    assert find_matching_paths('^required', paths)
+
+
+def test_embedded_special_chars_should_match():
+    paths = ['$ref.extra']
+    assert find_matching_paths('$ref', paths)
+
+
+def test_special_end_of_path_character_with_match():
+    paths = ['start.extra']
+    assert find_matching_paths('extra$', paths)
+
+
+def test_special_end_of_path_character_should_not_match():
+    paths = ['extra.end']
+    assert not find_matching_paths('extra$', paths)

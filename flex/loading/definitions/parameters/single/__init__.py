@@ -23,6 +23,15 @@ from .in_ import (
 from .name import (
     name_validator,
 )
+from .description import (
+    description_validator,
+)
+from .required import (
+    required_validator,
+)
+from .type import (
+    type_validator,
+)
 
 
 single_parameter_schema = {
@@ -34,6 +43,9 @@ single_parameter_field_validators.update(common_field_validators)
 
 single_parameter_field_validators.add_property_validator('in', in_validator)
 single_parameter_field_validators.add_property_validator('name', name_validator)
+single_parameter_field_validators.add_property_validator('description', description_validator)
+single_parameter_field_validators.add_property_validator('required', required_validator)
+single_parameter_field_validators.add_property_validator('type', type_validator)
 # schema fields
 single_parameter_field_validators.add_property_validator('schema', schema_validator)
 single_parameter_field_validators.add_property_validator('items', items_validator)

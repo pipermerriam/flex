@@ -9,7 +9,6 @@ from flex.constants import (
     NUMBER,
     STRING,
     ARRAY,
-    OBJECT,
 )
 from flex.utils import (
     pluralize,
@@ -35,7 +34,6 @@ single_type_schema = {
         NUMBER,
         STRING,
         ARRAY,
-        OBJECT,
     ],
 }
 single_type_validators = construct_schema_validators(single_type_schema, {})
