@@ -2,6 +2,12 @@ import pytest
 
 from flex.constants import (
     CSV,
+    PATH,
+    HEADER,
+    QUERY,
+    FORM_DATA,
+    BODY,
+    MULTI,
 )
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
@@ -12,13 +18,12 @@ from flex.loading.definitions.parameters import (
 from tests.utils import (
     assert_path_not_in_errors,
     assert_message_in_errors,
+    assert_message_not_in_errors,
 )
 from tests.factories import ParameterFactory
 
 
 def test_collection_format_is_not_required():
-    context = {'deferred_references': set()}
-
     try:
         single_parameter_validator({})
     except ValidationError as err:
@@ -33,8 +38,6 @@ def test_collection_format_is_not_required():
 
 
 def test_collection_format_defaults_to_csv():
-    context = {'deferred_references': set()}
-
     raw_parameter = ParameterFactory()
     raw_parameter.pop('collectionFormat', None)
     value = single_parameter_validator(raw_parameter)
@@ -80,5 +83,46 @@ def test_collection_format_with_valid_values():
 
     assert_path_not_in_errors(
         'collectionFormat',
+        errors,
+    )
+
+
+@pytest.mark.parametrize(
+    'in_',
+    (BODY, PATH, HEADER),
+)
+def test_multi_format_invalid_in_values(in_):
+    parameter = ParameterFactory(**{
+        'collectionFormat': MULTI,
+        'in': in_,
+    })
+    with pytest.raises(ValidationError) as err:
+        single_parameter_validator(parameter)
+
+    assert_message_in_errors(
+        MESSAGES['collection_format']['invalid_based_on_in_value'],
+        err.value.detail,
+        'collectionFormat',
+    )
+
+
+@pytest.mark.parametrize(
+    'in_',
+    (QUERY, FORM_DATA),
+)
+def test_multi_format_valid_in_values(in_):
+    parameter = ParameterFactory(**{
+        'collectionFormat': MULTI,
+        'in': in_,
+    })
+    try:
+        single_parameter_validator(parameter)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_message_not_in_errors(
+        MESSAGES['collection_format']['invalid_based_on_in_value'],
         errors,
     )

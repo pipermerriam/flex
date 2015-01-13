@@ -18,6 +18,9 @@ TYPE_MESSAGES = {
     'invalid_type_for_unique_items': '`uniqueItems` can only be used for array types',
     'invalid_type_for_min_properties': 'minProperties can only be used for `object` types',
     'invalid_type_for_max_properties': 'maxProperties can only be used for `object` types',
+    'non_body_parameters_must_declare_a_type': (
+        "A Parameter who's `in` value is not 'body' must declare a type."
+    ),
 }
 
 FORMAT_MESSAGES = {
@@ -188,6 +191,20 @@ REFERENCE_MESSAGES = {
 }
 
 
+SCHEMA_MESSAGES = {
+    'body_parameters_must_include_a_schema': (
+        "A Parameter who's `in` value is 'body' must declare a schema."
+    ),
+}
+
+COLLECTION_FORMAT_MESSAGES = {
+    'invalid_based_on_in_value': (
+        "The collectionFormat 'multi' is only valid for `in` values of "
+        "\"query\" or \"formData\"."
+    ),
+}
+
+
 MESSAGES = {
     'type': TYPE_MESSAGES,
     'format': FORMAT_MESSAGES,
@@ -214,4 +231,6 @@ MESSAGES = {
     'mimetype': MIMETYPE_MESSAGES,
     'default': DEFAULT_MESSAGES,
     'reference': REFERENCE_MESSAGES,
+    'schema': SCHEMA_MESSAGES,
+    'collection_format': COLLECTION_FORMAT_MESSAGES,
 }

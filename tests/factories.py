@@ -3,6 +3,7 @@ import factory
 from flex.constants import (
     EMPTY,
     QUERY,
+    STRING,
 )
 from flex.http import (
     Request,
@@ -48,6 +49,7 @@ ParameterFactory = type(
         'Meta': Meta,
         'in': QUERY,
         'name': 'id',
+        'type': STRING,
     },
 )
 

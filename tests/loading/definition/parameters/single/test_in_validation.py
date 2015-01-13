@@ -3,6 +3,10 @@ import pytest
 from flex.constants import (
     PARAMETER_IN_VALUES,
     PATH,
+    BODY,
+    QUERY,
+    HEADER,
+    FORM_DATA,
 )
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
@@ -84,4 +88,38 @@ def test_when_in_value_is_path_required_must_be_true():
         MESSAGES['required']['path_parameters_must_be_required'],
         err.value.detail,
         '^required',
+    )
+
+
+def test_when_in_value_is_body_a_schema_is_required():
+    parameter = ParameterFactory(**{
+        'in': BODY,
+    })
+    parameter.pop('schema', None)
+    with pytest.raises(ValidationError) as err:
+        single_parameter_validator(parameter)
+
+    assert_message_in_errors(
+        MESSAGES['schema']['body_parameters_must_include_a_schema'],
+        err.value.detail,
+        '^schema',
+    )
+
+
+@pytest.mark.parametrize(
+    'in_',
+    (QUERY, PATH, HEADER, FORM_DATA),
+)
+def test_when_in_value_is_not_body_type_is_required(in_):
+    parameter = ParameterFactory(**{
+        'in': in_,
+    })
+    parameter.pop('type', None)
+    with pytest.raises(ValidationError) as err:
+        single_parameter_validator(parameter)
+
+    assert_message_in_errors(
+        MESSAGES['type']['non_body_parameters_must_declare_a_type'],
+        err.value.detail,
+        '^type',
     )

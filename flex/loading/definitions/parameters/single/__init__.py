@@ -20,6 +20,8 @@ from flex.loading.definitions.schema import (
 from .in_ import (
     in_validator,
     validate_path_parameters_must_be_required,
+    validate_body_parameters_must_include_a_schema,
+    validate_type_declared_for_non_body_parameters,
 )
 from .name import (
     name_validator,
@@ -38,6 +40,7 @@ from flex.loading.common.format import (
 )
 from .collection_format import (
     collection_format_validator,
+    validate_collection_format_based_on_in_value,
 )
 from flex.loading.common.default import (
     validate_default_is_of_one_of_declared_types,
@@ -72,6 +75,15 @@ single_parameter_non_field_validators.add_property_validator(
 )
 single_parameter_non_field_validators.add_validator(
     'required', validate_path_parameters_must_be_required,
+)
+single_parameter_non_field_validators.add_validator(
+    'schema', validate_body_parameters_must_include_a_schema,
+)
+single_parameter_non_field_validators.add_validator(
+    'type', validate_type_declared_for_non_body_parameters,
+)
+single_parameter_non_field_validators.add_validator(
+    'collectionFormat', validate_collection_format_based_on_in_value,
 )
 
 single_parameter_validator = generate_object_validator(
