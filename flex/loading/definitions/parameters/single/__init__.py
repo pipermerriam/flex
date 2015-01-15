@@ -45,6 +45,9 @@ from .collection_format import (
 from flex.loading.common.default import (
     validate_default_is_of_one_of_declared_types,
 )
+from .items import (
+    validate_items_required_if_array_type,
+)
 
 
 single_parameter_schema = {
@@ -84,6 +87,9 @@ single_parameter_non_field_validators.add_validator(
 )
 single_parameter_non_field_validators.add_validator(
     'collectionFormat', validate_collection_format_based_on_in_value,
+)
+single_parameter_non_field_validators.add_validator(
+    'items', validate_items_required_if_array_type,
 )
 
 single_parameter_validator = generate_object_validator(

@@ -108,6 +108,9 @@ MAX_PROPERTIES_MESSAGES = {
 
 ITEMS_MESSAGES = {
     'invalid_type': '`items` must be a reference, a schema, or an array of schemas.',
+    'items_required_for_type_array': (
+        "For type \"array\", the items is required."
+    )
 }
 
 
