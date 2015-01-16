@@ -1,9 +1,15 @@
+from flex.datastructures import (
+    ValidationDict,
+)
 from flex.constants import (
     OBJECT,
     STRING,
 )
 from flex.validation.common import (
     generate_object_validator,
+)
+from flex.loading.definitions.schema import (
+    schema_validator,
 )
 
 
@@ -16,6 +22,11 @@ single_response_schema = {
         },
     },
 }
+
+
+field_validators = ValidationDict()
+
+field_validators.add_property_validator('schema', schema_validator)
 
 
 single_response_validator = generate_object_validator(
