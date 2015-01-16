@@ -18,10 +18,15 @@ from .schema_definitions import schema_definitions_validator
 from .parameters import (
     parameters_validator,
 )
+from .responses import (
+    responses_validator,
+)
 
 
 __ALL__ = [
     'schema_definitions_validator',
+    'parameters_validator',
+    'responses_validator',
 ]
 
 definitions_schema = {
@@ -49,6 +54,7 @@ def validate_references(definitions, context, **kwargs):
 field_validators = ValidationDict()
 field_validators.add_property_validator('definitions', schema_definitions_validator)
 field_validators.add_property_validator('parameters', parameters_validator)
+field_validators.add_property_validator('responses', responses_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_validator('definitions', validate_references)

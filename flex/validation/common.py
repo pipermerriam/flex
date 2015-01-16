@@ -339,7 +339,7 @@ def apply_validator_to_object(obj, validator, **kwargs):
     with ErrorDict() as errors:
         for key, value in obj.items():
             try:
-                validator(obj, **kwargs)
+                validator(value, **kwargs)
             except ValidationError as err:
                 errors.add_error(key, err.detail)
 

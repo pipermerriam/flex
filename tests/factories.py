@@ -54,6 +54,13 @@ ParameterFactory = type(
 )
 
 
+class ResponseDefinitionFactory(factory.Factory):
+    description = "A Generated Response definition"
+
+    class Meta:
+        model = dict
+
+
 def RawSchemaFactory(**kwargs):
     kwargs.setdefault('swagger', '2.0')
     kwargs.setdefault('info', {'title': 'Test API', 'version': '0.0.1'})
