@@ -61,6 +61,11 @@ class ResponseDefinitionFactory(factory.Factory):
         model = dict
 
 
+class HeaderDefinitionFactory(factory.Factory):
+    class Meta:
+        model = dict
+
+
 def RawSchemaFactory(**kwargs):
     kwargs.setdefault('swagger', '2.0')
     kwargs.setdefault('info', {'title': 'Test API', 'version': '0.0.1'})

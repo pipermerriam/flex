@@ -11,6 +11,9 @@ from flex.validation.common import (
 from flex.loading.definitions.schema import (
     schema_validator,
 )
+from .headers import (
+    headers_validator,
+)
 
 
 single_response_schema = {
@@ -27,8 +30,10 @@ single_response_schema = {
 field_validators = ValidationDict()
 
 field_validators.add_property_validator('schema', schema_validator)
+field_validators.add_property_validator('headers', headers_validator)
 
 
 single_response_validator = generate_object_validator(
     schema=single_response_schema,
+    field_validators=field_validators,
 )

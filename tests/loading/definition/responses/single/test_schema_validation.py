@@ -32,5 +32,19 @@ def test_schema_is_not_required():
     )
 
 
-def test_stub():
-    assert False, 'write more tests'
+@pytest.mark.parametrize(
+    'value',
+    ('abc', 1, 1.1, True, None, [1, 2]),
+)
+def test_schema_validation_with_invalid_types(value):
+    context = {'deferred_references': set()}
+
+    response_definition = ResponseDefinitionFactory(schema=value)
+    with pytest.raises(ValidationError) as err:
+        single_response_validator(response_definition, context=context)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'schema.type',
+    )
