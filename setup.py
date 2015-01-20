@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from pip.req import parse_requirements
+from pip.download import PipSession
 import os
 
 DIR = os.path.dirname(os.path.abspath(__file__))
@@ -14,7 +15,9 @@ version = '2.8.0'
 
 readme = open(os.path.join(DIR, 'README.md')).read()
 
-requirements = [str(req.req) for req in parse_requirements('requirements.txt')]
+requirements = [
+    str(req.req) for req in parse_requirements('requirements.txt', session=PipSession())
+]
 
 
 setup(
