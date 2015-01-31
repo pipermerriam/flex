@@ -120,7 +120,7 @@ swagger schema.
    >>> from flex.core import load, validate_api_call
    >>> schema = load("path/to/schema.yaml")
    >>> response = requests.get('http://www.example.com/api/')
-   >>> validate_api_call(schema, request=response.request, response=response)
+   >>> validate_api_call(schema, raw_request=response.request, raw_response=response)
    ValueError: Invalid
    'response':
        - 'Request status code was not found in the known response codes.  Got `301`: Expected one of: `[200]`'
