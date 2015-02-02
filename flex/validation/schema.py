@@ -10,6 +10,7 @@ from flex.exceptions import (
 )
 from flex.error_messages import MESSAGES
 from flex.constants import (
+    ARRAY,
     OBJECT,
 )
 from flex.decorators import skip_if_not_of_type
@@ -69,8 +70,8 @@ def generate_max_properties_validator(maxProperties, **kwargs):
 def construct_items_validators(items, context):
     if isinstance(items, collections.Mapping):
         items_validators = construct_schema_validators(
-            items,
-            context,
+            schema=items,
+            context=context,
         )
     elif isinstance(items, six.string_types):
         items_validators = {
@@ -81,11 +82,17 @@ def construct_items_validators(items, context):
     return items_validators
 
 
-def validate_items(objs, validators):
+@skip_if_not_of_type(ARRAY)
+@skip_if_empty
+def validate_items(objs, field_validators, **kwargs):
     errors = ErrorList()
-    for obj, validator in zip(objs, validators):
+    for obj, _field_validators in zip(objs, field_validators):
         try:
-            validate_object(obj, validator)
+            validate_object(
+                obj,
+                field_validators=_field_validators,
+                **kwargs
+            )
         except ValidationError as e:
             errors.add_error(e.detail)
 

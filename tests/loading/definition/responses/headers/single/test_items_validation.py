@@ -1,5 +1,8 @@
 import pytest
 
+from flex.constants import (
+    ARRAY,
+)
 from flex.exceptions import (
     ValidationError,
 )
@@ -31,4 +34,15 @@ def test_items_type_validation(value, MESSAGES, msg_assertions):
         MESSAGES['type']['invalid'],
         err.value.detail,
         'items.type',
+    )
+
+
+def test_items_is_required_if_type_array(msg_assertions, MESSAGES):
+    with pytest.raises(ValidationError) as err:
+        single_header_validator({'type': ARRAY})
+
+    msg_assertions.assert_message_in_errors(
+        MESSAGES['required']['required'],
+        err.value.detail,
+        'items',
     )
