@@ -1,7 +1,7 @@
 import itertools
 import pytest
 
-from flex.loading.schema import (
+from flex.loading.common.mimetypes import (
     mimetype_validator,
 )
 from flex.loading.schema.host import decompose_hostname

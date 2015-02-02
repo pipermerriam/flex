@@ -21,7 +21,7 @@ def test_tags_is_not_required(msg_assertions):
 
 @pytest.mark.parametrize(
     'value',
-    (None, True, 1, 1.1, [1, 2, 3], {'a': 'b'}),
+    (None, True, 1, 1.1, 'abc', {'a': 'b'}),
 )
 def test_tags_type_validation(value, MESSAGES, msg_assertions):
     with pytest.raises(ValidationError) as err:
@@ -36,7 +36,7 @@ def test_tags_type_validation(value, MESSAGES, msg_assertions):
 
 def test_tags_with_valid_value(msg_assertions):
     try:
-        operation_validator({'tags': 'abc def'})
+        operation_validator({'tags': ['abc', 'def']})
     except ValidationError as err:
         errors = err.detail
     else:

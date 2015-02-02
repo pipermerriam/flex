@@ -28,9 +28,9 @@ def test_operations_are_not_required(method, msg_assertions):
 
 
 @pytest.mark.parametrize(
-    'value',
+    'value,method',
     itertools.product(
-        (None, True, 1, 1.1, [1, 2, 3], {'a': 'b'}),
+        (None, True, 1, 1.1, [1, 2, 3], 'abcd'),
         REQUEST_METHODS,
     ),
 )
@@ -57,4 +57,4 @@ def test_operation_with_valid_value(method, msg_assertions):
     else:
         errors = {}
 
-    msg_assertions.assert_operation_not_in_errors(method, errors)
+    msg_assertions.assert_path_not_in_errors(method, errors)
