@@ -13,6 +13,12 @@ from flex.validation.common import (
 from flex.loading.common.mimetypes import (
     mimetype_validator,
 )
+from .parameters import (
+    parameters_validator,
+)
+from .responses import (
+    responses_validator,
+)
 
 
 operation_schema = {
@@ -48,8 +54,6 @@ operation_schema = {
                 'type': STRING,
             },
         },
-        #'parameters':
-        #'responses':
         #'schemes':
         'deprecated': {
             'type': BOOLEAN,
@@ -60,10 +64,14 @@ operation_schema = {
 
 
 field_validators = ValidationDict()
-field_validators.add_property_validator('consumes', mimetype_validator)
-field_validators.add_property_validator('produces', mimetype_validator)
+field_validators.add_property_validator('parameters', parameters_validator)
+field_validators.add_property_validator('responses', responses_validator)
 
+non_field_validators = ValidationDict()
+non_field_validators.add_property_validator('consumes', mimetype_validator)
+non_field_validators.add_property_validator('produces', mimetype_validator)
 
 operation_validator = generate_object_validator(
     schema=operation_schema,
+    field_validators=field_validators,
 )
