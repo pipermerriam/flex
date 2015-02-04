@@ -11,10 +11,9 @@ from flex.validation.common import (
 from .headers import (
     headers_validator,
 )
-
-
-def schema_validator(*args, **kwargs):
-    assert False # TODO
+from .schema import (
+    schema_validator,
+)
 
 
 single_response_schema = {

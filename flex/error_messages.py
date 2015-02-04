@@ -154,6 +154,7 @@ UNKNOWN_REFERENCE_MESSAGES = {
     'security': "Unknown SecurityScheme reference `{0}`",
     'parameter': "Unknown Parameter reference `{0}`",
     'definition': 'Unknown definition reference `{0}`',
+    'no_definitions': "No definitions found in context",
 }
 
 
