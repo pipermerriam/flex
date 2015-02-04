@@ -3,11 +3,11 @@ from flex.datastructures import (
     ValidationList,
 )
 from flex.constants import (
-    ARRAY,
+    OBJECT,
 )
 from flex.validation.common import (
     generate_object_validator,
-    apply_validator_to_array,
+    apply_validator_to_object,
 )
 from .single import (
     single_parameter_validator,
@@ -15,12 +15,12 @@ from .single import (
 
 
 parameters_schema = {
-    'type': ARRAY,
+    'type': OBJECT,
 }
 
 parameters_non_field_validators = ValidationList()
 parameters_non_field_validators.add_validator(
-    functools.partial(apply_validator_to_array, validator=single_parameter_validator),
+    functools.partial(apply_validator_to_object, validator=single_parameter_validator),
 )
 
 parameters_validator = generate_object_validator(

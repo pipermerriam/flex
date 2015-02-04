@@ -414,9 +414,9 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
                 functools.partial(cast_value_to_type, type_=type_)
             )
 
-    def processor(value):
+    def processor(value, **kwargs):
         try:
-            return chain_reduce_partial(*processors)(value)
+            return chain_reduce_partial(*processors)(value, **kwargs)
         except (ValueError, TypeError):
             return value
 

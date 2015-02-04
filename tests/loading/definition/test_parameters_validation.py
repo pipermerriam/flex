@@ -32,7 +32,7 @@ def test_parameters_definitions_are_not_required():
 
 @pytest.mark.parametrize(
     'value',
-    ('abc', 1, 1.1, True, None, {'a': 1}),
+    ('abc', 1, 1.1, True, None, ['a', 'b']),
 )
 def test_parameters_definitions_type_validation_for_invalid_types(value):
     context = {'deferred_references': set()}
@@ -50,7 +50,7 @@ def test_parameters_with_valid_array():
     context = {'deferred_references': set()}
     try:
         definitions_validator({
-            'parameters': [],
+            'parameters': {},
         }, context=context)
     except ValidationError as err:
         errors = err.detail
@@ -72,15 +72,15 @@ def test_single_parameter_type_validation(value):
 
     with pytest.raises(ValidationError) as err:
         definitions_validator({
-            'parameters': [
-                value,
-            ],
+            'parameters': {
+                'SomeParameter': value,
+            },
         }, context=context)
 
     assert_message_in_errors(
         MESSAGES['type']['invalid'],
         err.value.detail,
-        'parameters.0',
+        'parameters.SomeParameter',
     )
 
 
@@ -89,9 +89,9 @@ def test_basic_valid_parameter():
     raw_parameter = ParameterFactory()
     try:
         definitions_validator({
-            'parameters': [
-                raw_parameter,
-            ],
+            'parameters': {
+                'SomeParameter': raw_parameter,
+            },
         }, context=context)
     except ValidationError as err:
         errors = err.detail
