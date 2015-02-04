@@ -1,6 +1,12 @@
+import functools
 import collections
 import re
 import six
+
+from flex.validation.common import validate_object
+from flex.loading.schema.paths.path_item.operation.responses.single.schema import (
+    schema_validator,
+)
 
 
 def check_if_error_message_equal(formatted_msg, unformatted_msg):
@@ -145,12 +151,7 @@ def assert_path_not_in_errors(path, errors):
         )
 
 
-def generate_validator_from_schema(schema, **kwargs):
-    # TODO: switch this to new non-serializer validation
-    from flex.serializers.core import SchemaSerializer
-
-    serializer = SchemaSerializer(data=schema, **kwargs)
-    assert serializer.is_valid(), serializer.errors
-
-    validator = serializer.save()
+def generate_validator_from_schema(raw_schema, **kwargs):
+    schema = schema_validator(raw_schema, **kwargs)
+    validator = functools.partial(validate_object, schema=schema)
     return validator

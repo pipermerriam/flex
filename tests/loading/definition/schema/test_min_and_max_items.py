@@ -1,7 +1,7 @@
 import pytest
 
 from flex.constants import (
-    OBJECT,
+    ARRAY,
     INTEGER,
     STRING,
 )
@@ -66,8 +66,8 @@ def test_type_validations_for_min_items_with_invalid_types(type_):
 @pytest.mark.parametrize(
     'type_',
     (
-        OBJECT,
-        (INTEGER, OBJECT, STRING),
+        ARRAY,
+        (INTEGER, ARRAY, STRING),
     ),
 )
 def test_type_validations_for_min_items_with_valid_types(type_):
@@ -123,8 +123,8 @@ def test_type_validations_for_max_items_with_invalid_types(type_):
 @pytest.mark.parametrize(
     'type_',
     (
-        OBJECT,
-        (INTEGER, OBJECT, STRING),
+        ARRAY,
+        (INTEGER, ARRAY, STRING),
     ),
 )
 def test_type_validations_for_max_items_with_valid_types(type_):

@@ -1,7 +1,7 @@
 from flex.error_messages import MESSAGES
 from flex.exceptions import ValidationError
 from flex.constants import (
-    OBJECT,
+    ARRAY,
     INTEGER,
 )
 from flex.utils import pluralize
@@ -24,7 +24,7 @@ from flex.decorators import (
 def validate_type_for_min_items(type_, minItems, **kwargs):
     types = pluralize(type_)
 
-    if not set(types).intersection((OBJECT,)):
+    if not set(types).intersection((ARRAY,)):
         raise ValidationError(
             MESSAGES['type']['invalid_type_for_min_items'],
         )

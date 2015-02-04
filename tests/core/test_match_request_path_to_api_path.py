@@ -1,7 +1,14 @@
 import pytest
 
 from flex.core import load
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
+from flex.constants import (
+    PATH,
+    INTEGER,
+)
+from tests.factories import SchemaFactory
 from flex.paths import (
     PARAMETER_REGEX,
     escape_regex_special_chars,
@@ -51,17 +58,12 @@ def test_path_to_pattern_with_single_parameter():
     input_ = '/get/{id}'
     expected = '^/get/(?P<id>.+)$'
 
-    serializer = ParameterSerializer(
-        data=[{
-            'required': True,
-            'type': STRING,
-            'name': 'id',
-            'in': 'path',
-        }],
-        many=True
-    )
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
+    parameters = parameters_validator([{
+        'required': True,
+        'type': STRING,
+        'name': 'id',
+        'in': 'path',
+    }])
     actual = path_to_pattern(input_, parameters=parameters)
 
     assert actual == expected
@@ -71,15 +73,10 @@ def test_path_to_pattern_with_multiple_parameters():
     input_ = '/get/{first_id}/then/{second_id}/'
     expected = '^/get/(?P<first_id>.+)/then/(?P<second_id>.+)/$'
 
-    serializer = ParameterSerializer(
-        data=[
-            {'required': True, 'name': 'first_id', 'in': 'path', 'type': STRING},
-            {'required': True, 'name': 'second_id', 'in': 'path',  'type': STRING},
-        ],
-        many=True
-    )
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
+    parameters = parameters_validator([
+        {'required': True, 'name': 'first_id', 'in': 'path', 'type': STRING},
+        {'required': True, 'name': 'second_id', 'in': 'path',  'type': STRING},
+    ])
     actual = path_to_pattern(input_, parameters=parameters)
 
     assert actual == expected
@@ -120,7 +117,22 @@ def test_path_to_regex_does_not_overmatch(path, bad_path):
     ),
 )
 def test_match_target_path_to_api_path(path, schema_path):
-    schema = load('tests/core/path_test_schema.yaml')
+    schema = SchemaFactory(
+        paths={
+            '/path': {},
+            '/path.json': {},
+            '/get/{id}': {
+                'parameters': [{
+                    'name': 'id',
+                    'in': PATH,
+                    'type': INTEGER,
+                    'required': True,
+                }],
+            },
+            '/post': {},
+        },
+        basePath='/api',
+    )
     paths = schema['paths']
     base_path = schema['basePath']
 

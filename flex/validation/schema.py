@@ -39,7 +39,7 @@ from flex.datastructures import (
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def validate_min_properties(value, minimum):
+def validate_min_properties(value, minimum, **kwargs):
     if len(value.keys()) < minimum:
         raise ValidationError(
             MESSAGES['min_properties']['invalid'].format(
@@ -54,7 +54,7 @@ def generate_min_properties_validator(minProperties, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def validate_max_properties(value, maximum):
+def validate_max_properties(value, maximum, **kwargs):
     if len(value.keys()) > maximum:
         raise ValidationError(
             MESSAGES['max_properties']['invalid'].format(
@@ -161,8 +161,12 @@ class LazyReferenceValidator(object):
         self.reference = reference
         self.context = context
 
-    def __call__(self, value):
-        return validate_object(value, self.validators)
+    def __call__(self, value, **kwargs):
+        return validate_object(
+            value,
+            schema=self.context['definitions'][self.reference],
+            **kwargs
+        )
 
     @property
     def validators(self):

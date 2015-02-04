@@ -3,7 +3,7 @@ from flex.error_messages import MESSAGES
 from flex.constants import (
     INTEGER,
     EMPTY,
-    OBJECT,
+    ARRAY,
 )
 from flex.utils import pluralize
 from flex.validation.common import (
@@ -35,7 +35,7 @@ def validate_max_items_greater_than_or_equal_to_min_items(minItems, maxItems, **
 def validate_type_for_max_items(type_, maxItems, **kwargs):
     types = pluralize(type_)
 
-    if not set(types).intersection((OBJECT,)):
+    if not set(types).intersection((ARRAY,)):
         raise ValidationError(
             MESSAGES['type']['invalid_type_for_max_items'],
         )

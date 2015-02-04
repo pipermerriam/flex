@@ -28,10 +28,6 @@ from flex.loading.common.default import (
 from flex.validation.common import (
     generate_object_validator,
 )
-from flex.loading.definitions.schema import (
-    schema_validator,
-    items_validator,
-)
 from flex.loading.common.format import (
     format_validator,
 )
@@ -52,8 +48,6 @@ single_header_schema = {
 
 single_header_field_validators = ValidationDict()
 single_header_field_validators.update(common_field_validators)
-single_header_field_validators.add_property_validator('schema', schema_validator)
-single_header_field_validators.add_property_validator('items', items_validator)
 single_header_field_validators.add_property_validator('description', description_validator)
 single_header_field_validators.add_property_validator('type', type_validator)
 single_header_field_validators.add_property_validator('format', format_validator)

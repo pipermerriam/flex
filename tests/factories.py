@@ -5,6 +5,8 @@ from flex.constants import (
     QUERY,
     STRING,
 )
+from flex.loading.schema import swagger_schema_validator
+from flex.loading.definitions import definitions_validator
 from flex.http import (
     Request,
     Response,
@@ -77,16 +79,9 @@ def RawSchemaFactory(**kwargs):
 def SchemaFactory(**kwargs):
     raw_schema = RawSchemaFactory(**kwargs)
 
-    definitions_serializer = SwaggerDefinitionsSerializer(
-        data=raw_schema,
-    )
-    assert definitions_serializer.is_valid(), definitions_serializer.errors
+    context = {'deferred_references': set()}
+    definitions = definitions_validator(raw_schema, context=context)
 
-    swagger_serializer = SwaggerSerializer(
-        definitions_serializer.save(),
-        data=raw_schema,
-        context=definitions_serializer.save(),
-    )
+    swagger_schema = swagger_schema_validator(raw_schema, context=definitions)
 
-    assert swagger_serializer.is_valid(), swagger_serializer.errors
-    return swagger_serializer.save()
+    return swagger_schema

@@ -173,24 +173,32 @@ def generate_maximum_validator(maximum, exclusiveMaximum=False, **kwargs):
     return functools.partial(validate_maximum, maximum=maximum, is_exclusive=exclusiveMaximum)
 
 
+@skip_if_empty
+@skip_if_not_of_type(STRING)
+def validate_min_length(value, minLength, **kwargs):
+    if len(value) < minLength:
+        raise ValidationError(MESSAGES['min_length']['invalid'].format(len(value)))
+
+
 def generate_min_length_validator(minLength, **kwargs):
     """
     Generates a validator for enforcing the minLength of a string.
     """
-    assert False, "Need a non-django MinLengthValidator"
-    return skip_if_empty(
-        skip_if_not_of_type(STRING)(MinLengthValidator(minLength).__call__),
-    )
+    return functools.partial(validate_min_length, minLength=minLength)
+
+
+@skip_if_empty
+@skip_if_not_of_type(STRING)
+def validate_max_length(value, maxLength, **kwargs):
+    if len(value) > maxLength:
+        raise ValidationError(MESSAGES['max_length']['invalid'].format(len(value)))
 
 
 def generate_max_length_validator(maxLength, **kwargs):
     """
     Generates a validator for enforcing the maxLength of a string.
     """
-    assert False, "Need a non-django MaxLengthValidator"
-    return skip_if_empty(
-        skip_if_not_of_type(STRING)(MaxLengthValidator(maxLength).__call__),
-    )
+    return functools.partial(validate_max_length, maxLength=maxLength)
 
 
 @skip_if_empty

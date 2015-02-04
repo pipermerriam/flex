@@ -57,7 +57,13 @@ MINIMUM_AND_MAXIMUM_MESSAGES = {
 }
 
 
+MIN_LENGTH_MESSAGES = {
+    "invalid": "value must be no less than {0} characters in length.",
+}
+
+
 MAX_LENGTH_MESSAGES = {
+    "invalid": "value must be no greater than {0} characters in length.",
     'must_be_greater_than_min_length': (
         'The value of `maxLength` must be greater than or equal to the `minLength` value'
     ),
@@ -217,6 +223,7 @@ MESSAGES = {
     'minimum': MINIMUM_AND_MAXIMUM_MESSAGES,
     'maximum': MINIMUM_AND_MAXIMUM_MESSAGES,
     'max_length': MAX_LENGTH_MESSAGES,
+    'min_length': MIN_LENGTH_MESSAGES,
     'min_items': MIN_ITEMS_MESSAGES,
     'max_items': MAX_ITEMS_MESSAGES,
     'min_properties': MIN_PROPERTIES_MESSAGES,
