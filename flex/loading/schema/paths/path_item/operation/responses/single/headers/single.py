@@ -9,14 +9,10 @@ from flex.loading.common.single_header import (
 from flex.validation.common import (
     generate_object_validator,
 )
-
-
-def schema_validator(*args, **kwargs):
-    assert False
-
-
-def items_validator(*args, **kwargs):
-    assert False
+from flex.loading.schema.paths.path_item.operation.responses.single.schema import (
+    schema_validator,
+    items_validator,
+)
 
 
 single_header_field_validators = ValidationDict()
