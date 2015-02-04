@@ -73,7 +73,7 @@ register = registry.register
 
 
 @register(URI, STRING)
-def uri_validator(value):
+def uri_validator(value, **kwargs):
     parts = rfc3987.parse(value, rule='URI')
     if not parts['scheme'] or not parts['authority']:
         raise ValidationError(MESSAGES['format']['invalid_uri'].format(value))
@@ -87,7 +87,7 @@ def number_of_bits(n):
 
 
 @register(INT32, INTEGER)
-def int32_validator(value):
+def int32_validator(value, **kwargs):
     num_bits = number_of_bits(value)
     if num_bits > 32:
         raise ValidationError(MESSAGES['format']['too_many_bits'].format(
@@ -96,7 +96,7 @@ def int32_validator(value):
 
 
 @register(INT64, INTEGER)
-def int64_validator(value):
+def int64_validator(value, **kwargs):
     num_bits = number_of_bits(value)
     if num_bits > 64:
         raise ValidationError(MESSAGES['format']['too_many_bits'].format(
@@ -105,13 +105,13 @@ def int64_validator(value):
 
 
 @register(EMAIL, STRING)
-def email_validator(value):
+def email_validator(value, **kwargs):
     if not validate_email.validate_email(value):
         raise ValidationError(MESSAGES['format']['invalid_email'].format(value))
 
 
 @register(DATETIME, STRING)
-def date_time_format_validator(value):
+def date_time_format_validator(value, **kwargs):
     try:
         iso8601.parse_date(value)
     except iso8601.ParseError:
@@ -130,6 +130,6 @@ UUID_PATTERN = re.compile(
 
 
 @register(UUID, STRING)
-def uuid_format_validator(value):
+def uuid_format_validator(value, **kwargs):
     if not UUID_PATTERN.match(value):
         raise ValidationError(MESSAGES['format']['invalid_uuid'].format(value))

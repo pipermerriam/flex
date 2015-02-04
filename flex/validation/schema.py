@@ -101,7 +101,7 @@ def validate_items(objs, field_validators, **kwargs):
 
 
 def generate_items_validator(items, context, **kwargs):
-    if isinstance(items, collections.Mapping) or isinstance(items, six.string_types):
+    if isinstance(items, collections.Mapping):
         # If items is a reference or a schema, we pass it through as an
         # ever repeating list of the same validation dictionary, thus
         # validating all of the objects against the same schema.

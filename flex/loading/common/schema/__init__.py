@@ -1,23 +1,9 @@
 from flex.constants import (
     OBJECT,
     ARRAY,
-    STRING,
-)
-from flex.exceptions import (
-    ValidationError,
-    ErrorDict,
-    ErrorList,
-)
-from flex.utils import (
-    is_value_of_type,
-)
-from flex.decorators import (
-    skip_if_not_of_type,
-    skip_if_empty,
 )
 from flex.datastructures import (
     ValidationDict,
-    ValidationList,
 )
 
 from flex.loading.common.format import (
@@ -102,6 +88,5 @@ items_schema = {
     'type': [
         ARRAY,  # Array of schemas
         OBJECT,  # Single Schema
-        STRING,  # Reference: TODO: verify this is the correct representation.
     ]
 }

@@ -31,7 +31,7 @@ def validate_path_items(paths, **kwargs):
                 errors.add_error(path, MESSAGES['path']['must_start_with_slash'])
 
             try:
-                path_item_validator(path_definition)
+                path_item_validator(path_definition, **kwargs)
             except ValidationError as err:
                 errors.add_error(path, err.detail)
 

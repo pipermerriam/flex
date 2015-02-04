@@ -130,7 +130,9 @@ def test_response_body_schema_validation_with_items_as_reference():
                 'properties': {
                     'results': {
                         'type': ARRAY,
-                        'items': 'User',
+                        'items':{
+                            '$ref': 'User',
+                        },
                         'required': True,
                     },
                 },
@@ -167,7 +169,7 @@ def test_response_body_schema_validation_with_items_as_reference():
         )
 
     assert_message_in_errors(
-        MESSAGES['type']['invalid'],
+        MESSAGES['enum']['invalid'],
         err.value.detail,
-        'body.schema.type',
+        'body.schema.enum',
     )

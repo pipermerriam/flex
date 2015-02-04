@@ -1,6 +1,7 @@
 import functools
 import operator
 
+from flex.datastructures import ValidationDict
 from flex.exceptions import ValidationError
 from flex.utils import chain_reduce_partial
 from flex.context_managers import ErrorCollection
@@ -9,7 +10,6 @@ from flex.validation.common import (
     validate_path_to_api_path,
     validate_request_method_to_operation,
 )
-from flex.validation.schema import construct_schema_validators
 from flex.error_messages import MESSAGES
 from flex.constants import (
     EMPTY,
@@ -53,18 +53,18 @@ def validate_status_code_to_response_definition(response, operation_definition):
 
 
 def generate_response_body_validator(schema, context, **kwargs):
-    validators = construct_schema_validators(schema, context=context)
     return chain_reduce_partial(
         operator.attrgetter('data'),
         functools.partial(
             validate_object,
-            validators=validators,
+            schema=schema,
+            context=context,
         ),
     )
 
 
 def generate_response_header_validator(headers, context, **kwargs):
-    validators = {}
+    validators = ValidationDict()
     for key, header_definition in headers.items():
         # generate a function that will attempt to cast the header to the
         # appropriate type.
@@ -75,20 +75,20 @@ def generate_response_header_validator(headers, context, **kwargs):
         # generate a function that will validate the header.
         header_validator = functools.partial(
             validate_object,
-            validators=construct_header_validators(header_definition, context=context),
+            field_validators=construct_header_validators(header_definition, context=context),
         )
         # Chain the type casting function, the individual header validation
         # function with a methodcaller that will fetch the header with
         # `response.headers.get(header_name, EMPTY)` and then feed that into
         # the type casting function and then into the validation function.
-        validators[key] = chain_reduce_partial(
+        validators.add_validator(key, chain_reduce_partial(
             operator.methodcaller('get', key, EMPTY),
             header_processor,
             header_validator,
-        )
+        ))
     return chain_reduce_partial(
         operator.attrgetter('headers'),
-        functools.partial(validate_object, validators=validators),
+        functools.partial(validate_object, field_validators=validators),
     )
 
 
@@ -147,31 +147,43 @@ validator_mapping = {
 
 def generate_response_validator(api_path, operation_definition, response_definition,
                                 path_definition, context):
-    validators = {}
+    validators = ValidationDict()
 
     # Parameters is special cause it needs data from both the
     # `operation_definition` and the `path_definition`
-    validators['path'] = generate_path_validator(
+    validators.add_validator('path', generate_path_validator(
         api_path=api_path,
         path_definition=path_definition,
         parameters=operation_definition.get('parameters', []),
         context=context,
-    )
+    ))
 
     for key in validator_mapping:
         if key in response_definition:
-            validators[key] = validator_mapping[key](context=context, **response_definition)
+            validators.add_validator(
+                key,
+                validator_mapping[key](context=context, **response_definition),
+            )
         elif key in operation_definition:
-            validators[key] = validator_mapping[key](context=context, **operation_definition)
+            validators.add_validator(
+                key,
+                validator_mapping[key](context=context, **operation_definition),
+            )
         elif key in path_definition:
-            validators[key] = validator_mapping[key](context=context, **path_definition)
+            validators.add_validator(
+                key,
+                validator_mapping[key](context=context, **path_definition),
+            )
 
     if 'produces' in context and 'produces' not in validators:
-        validators['produces'] = generate_response_content_type_validator(**context)
+        validators.add_validator(
+            'produces',
+            generate_response_content_type_validator(**context),
+        )
 
     return functools.partial(
         validate_object,
-        validators=validators,
+        field_validators=validators,
     )
 
 
@@ -226,6 +238,6 @@ def validate_response(response, request_method, schema):
                 context=schema,
             )
             try:
-                response_validator(response)
+                response_validator(response, context=schema)
             except ValidationError as err:
                 errors['body'].add_error(err.detail)

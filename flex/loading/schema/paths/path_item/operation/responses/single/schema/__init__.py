@@ -1,8 +1,8 @@
 import functools
 
 from flex.constants import (
+    ARRAY,
     OBJECT,
-    STRING,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -64,24 +64,15 @@ schema_field_validators.add_property_validator('properties', properties_validato
 #
 # Items
 #
-@skip_if_empty
-@skip_if_not_of_type(STRING)
-def items_as_reference_stub(*args, **kwargs):
-    raise NotImplementedError("Not implemented")
-
-
 items_non_field_validators = ValidationList()
 items_non_field_validators.add_validator(
-    skip_if_empty(skip_if_not_of_type(OBJECT)(
-        functools.partial(apply_validator_to_object, validator=schema_validator),
-    )),
+    skip_if_empty(skip_if_not_of_type(OBJECT)(schema_validator))
 )
 items_non_field_validators.add_validator(
-    skip_if_empty(skip_if_not_of_type(OBJECT)(
+    skip_if_empty(skip_if_not_of_type(ARRAY)(
         functools.partial(apply_validator_to_array, validator=schema_validator),
     )),
 )
-items_non_field_validators.add_validator(items_as_reference_stub)
 
 items_validator = generate_object_validator(
     schema=common_items_schema,
