@@ -1,13 +1,10 @@
 import functools
 
-from flex.exceptions import ValidationError
 from flex.utils import (
     is_non_string_iterable,
     is_value_of_any_type,
 )
 from flex.constants import EMPTY
-
-from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 def partial_safe_wraps(wrapped_func, *args, **kwargs):
@@ -24,6 +21,8 @@ def maybe_iterable(func):
     @partial_safe_wraps(func)
     def inner(value):
         if is_non_string_iterable(value):
+            # TODO: this should collect all errors that are raised and re-raise
+            # them as a list.
             return list(map(func, value))
         else:
             return func(value)
@@ -52,6 +51,17 @@ def skip_if_empty(func):
         else:
             return func(value, *args, **kwargs)
     return inner
+
+
+def skip_if_any_kwargs_empty(*kwargs):
+    def outer(func):
+        @partial_safe_wraps(func)
+        def inner(*args, **inner_kwargs):
+            if any(inner_kwargs.get(key) is EMPTY for key in kwargs):
+                return
+            return func(*args, **inner_kwargs)
+        return inner
+    return outer
 
 
 RESERVED_WORDS = (
@@ -92,18 +102,16 @@ def suffix_reserved_words(func):
     return inner
 
 
-def translate_validation_error(func):
-    """
-    Given a function that potentially raises
-    `django.core.exceptions.ValidationError`, reraise the same error as a
-    `flex.exceptions.ValidationError`.
-    """
-    @partial_safe_wraps(func)
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except DjangoValidationError as err:
-            if isinstance(err, ValidationError):
-                raise
-            raise ValidationError(err.messages)
-    return inner
+def pull_keys_from_obj(*keys):
+    def outer(func):
+        @skip_if_empty
+        @partial_safe_wraps(func)
+        def inner(obj, *args, **kwargs):
+            for key in keys:
+                assert key not in kwargs
+                kwargs[key] = obj.get(key, EMPTY)
+            if all((v is EMPTY for v in kwargs.values())):
+                return
+            return func(**kwargs)
+        return inner
+    return outer

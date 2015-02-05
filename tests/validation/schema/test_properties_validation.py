@@ -3,6 +3,7 @@ import pytest
 from flex.exceptions import ValidationError
 from flex.constants import (
     STRING,
+    OBJECT,
 )
 
 from tests.utils import generate_validator_from_schema
@@ -54,3 +55,20 @@ def test_properties_validation_with_invalid_values(value, count):
             'value': value,
             'count': count,
         })
+
+
+def test_schema_property_and_field_intersection():
+    """
+    Test the case where the schema has a property that intersects with a schema
+    reserved word.
+    """
+    schema = {
+        'type': OBJECT,
+        'properties': {
+            'type': {
+                'type': STRING,
+            },
+        },
+    }
+    validator = generate_validator_from_schema(schema)
+    validator({'type': 'foo'})

@@ -1,4 +1,3 @@
-import functools
 import math
 import collections
 import numbers
@@ -18,6 +17,14 @@ from flex.constants import (
     FALSE_VALUES,
 )
 
+from flex.functional import chain_reduce_partial as _chain_reduce_partial
+
+
+def chain_reduce_partial(*args, **kwargs):
+    import warnings
+    warnings.warn("moved to `flex.functional.chain_reduce_partial`", DeprecationWarning)
+    return _chain_reduce_partial(*args, **kwargs)
+
 
 def is_any_string_type(value):
     if six.PY2:
@@ -29,6 +36,12 @@ def is_any_string_type(value):
 
 def is_non_string_iterable(value):
     return not is_any_string_type(value) and hasattr(value, '__iter__')
+
+
+def pluralize(value):
+    if is_non_string_iterable(value) and not isinstance(value, collections.Mapping):
+        return value
+    return [value]
 
 
 def is_value_of_type(value, type_):
@@ -173,28 +186,3 @@ def format_errors(errors, indent=0, prefix='', suffix=''):
 
 def prettify_errors(errors):
     return '\n'.join(format_errors(errors))
-
-
-def chain_reduce_partial(*functions):
-    """
-    Given an iterable of functions, returns a callable that takes a value and
-    passes it through all of the given functions in order.
-
-    def a(x):
-        ...
-
-    def b(x):
-        ...
-
-    c = chain_reduce_partial(a, b)
-
-    This is equivilent to
-
-    def c(x):
-        return b(a(x))
-    """
-    return functools.partial(
-        functools.reduce,
-        lambda value, fn: fn(value),
-        functions,
-    )

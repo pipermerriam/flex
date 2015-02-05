@@ -1,7 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     validate_parameters,
 )
@@ -16,7 +18,7 @@ from tests.utils import assert_message_in_errors
 
 
 def test_parameter_items_validation_on_invalid_array():
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': QUERY,
@@ -28,8 +30,6 @@ def test_parameter_items_validation_on_invalid_array():
             'type': ARRAY,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     value = [1, 2, '3', -1, 4]
     parameter_values = {
         'id': value,
@@ -51,7 +51,7 @@ def test_parameter_items_validation_on_invalid_array():
 
 
 def test_parameter_items_validation_on_valid_value():
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': QUERY,
@@ -63,8 +63,6 @@ def test_parameter_items_validation_on_valid_value():
             'type': ARRAY,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     value = [1, 2, 3, 4, 5]
     parameter_values = {
         'id': value,

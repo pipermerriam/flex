@@ -4,7 +4,9 @@ from flex.exceptions import ValidationError
 from flex.error_messages import (
     MESSAGES,
 )
-from flex.serializers.definitions import DefinitionsSerializer
+from flex.loading.definitions.schema_definitions import (
+    schema_definitions_validator,
+)
 from flex.constants import (
     STRING,
     EMPTY,
@@ -156,8 +158,8 @@ def test_non_required_circular_reference():
     schema = {
         '$ref': 'Node',
     }
-    serializer = DefinitionsSerializer(
-        data={
+    definitions = schema_definitions_validator(
+        {
             'Node': {
                 'properties': {
                     'parent': {'$ref': 'Node'},
@@ -167,8 +169,6 @@ def test_non_required_circular_reference():
         },
         context={'deferred_references': set()},
     )
-    assert serializer.is_valid(), serializer.errors
-    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,
@@ -186,8 +186,8 @@ def test_required_circular_reference():
     schema = {
         '$ref': 'Node',
     }
-    serializer = DefinitionsSerializer(
-        data={
+    definitions = schema_definitions_validator(
+        {
             'Node': {
                 'properties': {
                     'parent': {'$ref': 'Node', 'required': True},
@@ -196,8 +196,6 @@ def test_required_circular_reference():
         },
         context={'deferred_references': set()},
     )
-    assert serializer.is_valid(), serializer.errors
-    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,
@@ -227,8 +225,8 @@ def test_nested_references_are_validated():
     schema = {
         '$ref': 'Node',
     }
-    serializer = DefinitionsSerializer(
-        data={
+    definitions = schema_definitions_validator(
+        {
             'Node': {
                 'properties': {
                     'parent': {'$ref': 'Node'},
@@ -238,8 +236,6 @@ def test_nested_references_are_validated():
         },
         context={'deferred_references': set()},
     )
-    assert serializer.is_valid(), serializer.errors
-    definitions = serializer.save()
 
     validator = generate_validator_from_schema(
         schema,

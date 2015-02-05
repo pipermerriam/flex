@@ -1,8 +1,12 @@
 import factory
 
-from flex.serializers.definitions import SwaggerDefinitionsSerializer
-from flex.serializers.core import SwaggerSerializer
-from flex.constants import EMPTY
+from flex.constants import (
+    EMPTY,
+    QUERY,
+    STRING,
+)
+from flex.loading.schema import swagger_schema_validator
+from flex.loading.definitions import definitions_validator
 from flex.http import (
     Request,
     Response,
@@ -36,22 +40,48 @@ class ResponseFactory(factory.Factory):
         model = Response
 
 
-def SchemaFactory(**kwargs):
+class Meta:
+    model = dict
+
+
+ParameterFactory = type(
+    'ParameterFactory',
+    (factory.Factory,),
+    {
+        'Meta': Meta,
+        'in': QUERY,
+        'name': 'id',
+        'type': STRING,
+    },
+)
+
+
+class ResponseDefinitionFactory(factory.Factory):
+    description = "A Generated Response definition"
+
+    class Meta:
+        model = dict
+
+
+class HeaderDefinitionFactory(factory.Factory):
+    class Meta:
+        model = dict
+
+
+def RawSchemaFactory(**kwargs):
     kwargs.setdefault('swagger', '2.0')
     kwargs.setdefault('info', {'title': 'Test API', 'version': '0.0.1'})
     kwargs.setdefault('paths', {})
 
+    return kwargs
 
-    definitions_serializer = SwaggerDefinitionsSerializer(
-        data=kwargs,
-    )
-    assert definitions_serializer.is_valid(), definitions_serializer.errors
 
-    swagger_serializer = SwaggerSerializer(
-        definitions_serializer.save(),
-        data=kwargs,
-        context=definitions_serializer.save(),
-    )
+def SchemaFactory(**kwargs):
+    raw_schema = RawSchemaFactory(**kwargs)
 
-    assert swagger_serializer.is_valid(), swagger_serializer.errors
-    return swagger_serializer.save()
+    context = {'deferred_references': set()}
+    definitions = definitions_validator(raw_schema, context=context)
+
+    swagger_schema = swagger_schema_validator(raw_schema, context=definitions)
+
+    return swagger_schema

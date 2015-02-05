@@ -8,16 +8,32 @@ from flex.utils import (
     prettify_errors,
 )
 
-from rest_framework.serializers import ValidationError as DRFValidationError
+
+class ErrorCollectionMixin(object):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type_, value, traceback):
+        if any((type_, value, traceback)):
+            if not issubclass(type_, ValidationError):
+                return False
+        if self:
+            raise ValidationError(self)
 
 
-class ErrorList(list):
+class ErrorList(ErrorCollectionMixin, list):
     def __init__(self, value=None):
         super(ErrorList, self).__init__()
         if value:
             self.add_error(value)
 
     def add_error(self, error):
+        """
+        In the case where a list/tuple is passed in this just extends the list
+        rather than having nested lists.
+
+        Otherwise, the value is appended.
+        """
         if is_non_string_iterable(error) and not isinstance(error, collections.Mapping):
             for value in error:
                 self.add_error(value)
@@ -25,7 +41,7 @@ class ErrorList(list):
             self.append(error)
 
 
-class ErrorDict(collections.defaultdict):
+class ErrorDict(ErrorCollectionMixin, collections.defaultdict):
     def __init__(self, value=None):
         super(ErrorDict, self).__init__(ErrorList)
         for k, v in (value or {}).items():
@@ -35,7 +51,7 @@ class ErrorDict(collections.defaultdict):
         self[key].add_error(error)
 
 
-class ValidationError(DRFValidationError):
+class ValidationError(ValueError):
     def __init__(self, error):
         if not isinstance(error, collections.Mapping) and \
            is_non_string_iterable(error) and \

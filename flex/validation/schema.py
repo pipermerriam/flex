@@ -1,7 +1,6 @@
 import itertools
 import collections
 import functools
-import operator
 
 import six
 
@@ -11,8 +10,8 @@ from flex.exceptions import (
 )
 from flex.error_messages import MESSAGES
 from flex.constants import (
+    ARRAY,
     OBJECT,
-    EMPTY,
 )
 from flex.decorators import skip_if_not_of_type
 from flex.validation.common import (
@@ -31,15 +30,16 @@ from flex.validation.common import (
     generate_pattern_validator,
     generate_enum_validator,
     validate_object,
+    generate_object_validator,
 )
-from flex.utils import (
-    chain_reduce_partial,
+from flex.datastructures import (
+    ValidationDict,
 )
 
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def validate_min_properties(value, minimum):
+def validate_min_properties(value, minimum, **kwargs):
     if len(value.keys()) < minimum:
         raise ValidationError(
             MESSAGES['min_properties']['invalid'].format(
@@ -54,7 +54,7 @@ def generate_min_properties_validator(minProperties, **kwargs):
 
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
-def validate_max_properties(value, maximum):
+def validate_max_properties(value, maximum, **kwargs):
     if len(value.keys()) > maximum:
         raise ValidationError(
             MESSAGES['max_properties']['invalid'].format(
@@ -70,8 +70,8 @@ def generate_max_properties_validator(maxProperties, **kwargs):
 def construct_items_validators(items, context):
     if isinstance(items, collections.Mapping):
         items_validators = construct_schema_validators(
-            items,
-            context,
+            schema=items,
+            context=context,
         )
     elif isinstance(items, six.string_types):
         items_validators = {
@@ -82,11 +82,17 @@ def construct_items_validators(items, context):
     return items_validators
 
 
-def validate_items(objs, validators):
+@skip_if_not_of_type(ARRAY)
+@skip_if_empty
+def validate_items(objs, field_validators, **kwargs):
     errors = ErrorList()
-    for obj, validator in zip(objs, validators):
+    for obj, _field_validators in zip(objs, field_validators):
         try:
-            validate_object(obj, validator)
+            validate_object(
+                obj,
+                field_validators=_field_validators,
+                **kwargs
+            )
         except ValidationError as e:
             errors.add_error(e.detail)
 
@@ -95,7 +101,7 @@ def validate_items(objs, validators):
 
 
 def generate_items_validator(items, context, **kwargs):
-    if isinstance(items, collections.Mapping) or isinstance(items, six.string_types):
+    if isinstance(items, collections.Mapping):
         # If items is a reference or a schema, we pass it through as an
         # ever repeating list of the same validation dictionary, thus
         # validating all of the objects against the same schema.
@@ -116,7 +122,7 @@ def generate_items_validator(items, context, **kwargs):
     else:
         assert "Should not be possible"
     return functools.partial(
-        validate_items, validators=items_validators,
+        validate_items, field_validators=items_validators,
     )
 
 
@@ -155,8 +161,12 @@ class LazyReferenceValidator(object):
         self.reference = reference
         self.context = context
 
-    def __call__(self, value):
-        return validate_object(value, self.validators)
+    def __call__(self, value, **kwargs):
+        return validate_object(
+            value,
+            schema=self.context['definitions'][self.reference],
+            **kwargs
+        )
 
     @property
     def validators(self):
@@ -185,30 +195,20 @@ def construct_schema_validators(schema, context):
             need recurse back into this function to generate a dictionary of
             validators for the property.
     """
-    validators = {}
+    validators = ValidationDict()
     if '$ref' in schema:
-        validators['$ref'] = LazyReferenceValidator(
-            schema['$ref'],
-            context,
+        validators.add_validator(
+            '$ref', LazyReferenceValidator(schema['$ref'], context),
         )
     if 'properties' in schema:
-        # I don't know why this set intersection is enforced...?  Why did I do this.
-        intersection = set(schema['properties'].keys()).intersection(schema.keys())
-        assert not intersection
-
         for property_, property_schema in schema['properties'].items():
-            property_validators = construct_schema_validators(
-                property_schema,
-                context,
+            property_validator = generate_object_validator(
+                schema=property_schema,
+                context=context,
             )
-            validators[property_] = skip_if_empty(skip_if_not_of_type(OBJECT)(
-                chain_reduce_partial(
-                    operator.methodcaller('get', property_, EMPTY),
-                    functools.partial(validate_object, validators=property_validators),
-                ),
-            ))
+            validators.add_property_validator(property_, property_validator)
     assert 'context' not in schema
     for key in schema:
         if key in validator_mapping:
-            validators[key] = validator_mapping[key](context=context, **schema)
+            validators.add_validator(key, validator_mapping[key](context=context, **schema))
     return validators

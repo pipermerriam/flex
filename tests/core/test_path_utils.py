@@ -1,4 +1,6 @@
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.paths import (
     get_parameter_names_from_path,
     path_to_pattern,
@@ -43,10 +45,6 @@ def test_undeclared_api_path_parameters_are_skipped():
     in the parameter definitions are ignored.
     """
     path = '/get/{username}/posts/{id}/'
-    serializer = ParameterSerializer(many=True, data=[
-        ID_IN_PATH,
-    ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
+    parameters = parameters_validator([ID_IN_PATH])
     pattern = path_to_pattern(path, parameters)
     assert pattern == '^/get/\{username\}/posts/(?P<id>.+)/$'

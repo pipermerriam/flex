@@ -59,6 +59,6 @@ def validate_request(request, schema):
             context=schema,
         )
         try:
-            validate_operation(request, operation_validators)
+            validate_operation(request, operation_validators, context=schema)
         except ValidationError as err:
             errors['method'].add_error(err.detail)

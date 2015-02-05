@@ -1,6 +1,8 @@
 import six
 
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     get_path_parameter_values,
 )
@@ -23,12 +25,10 @@ USERNAME_IN_PATH = {
 #  get_path_parameter_values tests
 #
 def test_getting_parameter_values_from_path():
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         ID_IN_PATH,
         USERNAME_IN_PATH,
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
 
     values = get_path_parameter_values(
         target_path='/get/fernando/posts/1234/',

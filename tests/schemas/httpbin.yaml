@@ -52,12 +52,12 @@ definitions:
         type: string
   Post:
     properties:
-      files:
-      origin:
-      form:
-      url:
-      args:
-      headers:
+      files: {}
+      origin: {}
+      form: {}
+      url: {}
+      args: {}
+      headers: {}
       json:
-        type: null
-      data:
+        type: "null"
+      data: {}

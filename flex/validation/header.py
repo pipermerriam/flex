@@ -1,3 +1,6 @@
+from flex.datastructures import (
+    ValidationDict,
+)
 from flex.validation.common import (
     generate_type_validator,
     generate_format_validator,
@@ -40,10 +43,13 @@ validator_mapping = {
 
 
 def construct_header_validators(header_definition, context):
-    validators = {}
+    validators = ValidationDict()
 
     for key in header_definition:
         if key in validator_mapping:
-            validators[key] = validator_mapping[key](context=context, **header_definition)
+            validators.add_validator(
+                key,
+                validator_mapping[key](context=context, **header_definition),
+            )
 
     return validators

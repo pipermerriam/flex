@@ -11,16 +11,20 @@ import yaml
 
 from flex.context_managers import ErrorCollection
 from flex.exceptions import ValidationError
-from flex.serializers.core import (
-    SwaggerSerializer,
-    SchemaSerializer,
+from flex.loading.definitions import (
+    definitions_validator,
 )
-from flex.serializers.definitions import SwaggerDefinitionsSerializer
-from flex.utils import prettify_errors
+from flex.loading.schema import (
+    swagger_schema_validator,
+)
+from flex.loading.schema.paths.path_item.operation.responses.single.schema import (
+    schema_validator,
+)
 from flex.http import (
     normalize_request,
     normalize_response,
 )
+from flex.validation.common import validate_object
 from flex.validation.request import validate_request
 from flex.validation.response import validate_response
 
@@ -74,28 +78,16 @@ def load_source(source):
 
 
 def parse(raw_schema):
-    definitions_serializer = SwaggerDefinitionsSerializer(
-        data=raw_schema,
-    )
-    if not definitions_serializer.is_valid():
-        message = "Swagger definitions did not validate:\n\n"
-        message += prettify_errors(definitions_serializer.errors)
-        raise ValueError(message)
+    context = {
+        'deferred_references': set(),
+    }
+    swagger_definitions = definitions_validator(raw_schema, context=context)
 
-    swagger_definitions = definitions_serializer.save()
-
-    swagger_serializer = SwaggerSerializer(
-        swagger_definitions,
-        data=raw_schema,
+    swagger_schema = swagger_schema_validator(
+        raw_schema,
         context=swagger_definitions,
     )
-
-    if not swagger_serializer.is_valid():
-        message = "Swagger schema did not validate:\n\n"
-        message += prettify_errors(swagger_serializer.errors)
-        raise ValueError(message)
-
-    return swagger_serializer.save()
+    return swagger_schema
 
 
 def load(target):
@@ -107,24 +99,24 @@ def load(target):
     return parse(raw_schema)
 
 
-def validate(schema, target=None, **kwargs):
+def validate(raw_schema, target=None, **kwargs):
     """
     Given the python representation of a JSONschema as defined in the swagger
     spec, validate that the schema complies to spec.  If `target` is provided,
     that target will be validated against the provided schema.
     """
-    schema_serializer = SchemaSerializer(data=schema, **kwargs)
-    if not schema_serializer.is_valid():
-        message = "JSON Schema did not validate:\n\n"
-        message += prettify_errors(schema_serializer.errors)
-        raise ValidationError(message)
+    schema = schema_validator(raw_schema)
 
     if target is not None:
-        validator = schema_serializer.save()
-        validator(target)
+        validate_object(target, schema=schema)
 
 
 def validate_api_call(schema, raw_request, raw_response):
+    """
+    Validate the request/response cycle of an api call against a swagger
+    schema.  Request/Response objects from the `requests` and `urllib` library
+    are supported.
+    """
     request = normalize_request(raw_request)
     response = normalize_response(raw_response)
 

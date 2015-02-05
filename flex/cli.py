@@ -1,5 +1,6 @@
 import click
 
+from flex.exceptions import ValidationError
 from flex.core import load
 
 
@@ -24,5 +25,5 @@ def main(source):
         load(source)
         click.echo("Validation passed")
         return 0
-    except ValueError as e:
+    except ValidationError as e:
         raise click.ClickException(str(e))

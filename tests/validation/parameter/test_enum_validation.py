@@ -1,7 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     validate_parameters,
 )
@@ -36,7 +38,7 @@ from tests.utils import assert_message_in_errors
     ),
 )
 def test_enum_validation_with_invalid_values(enum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -46,8 +48,6 @@ def test_enum_validation_with_invalid_values(enum, value):
             'enum': enum,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -75,7 +75,7 @@ def test_enum_validation_with_invalid_values(enum, value):
     ),
 )
 def test_enum_validation_with_allowed_values(enum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -85,8 +85,6 @@ def test_enum_validation_with_allowed_values(enum, value):
             'enum': enum,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

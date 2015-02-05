@@ -50,7 +50,9 @@ def test_invalid_values_against_single_schema(items):
 def test_invalid_values_against_schema_reference(items):
     schema = {
         'type': ARRAY,
-        'items': 'SomeReference',
+        'items': {
+            '$ref': 'SomeReference',
+        },
     }
     context = {
         'definitions': {
@@ -65,7 +67,7 @@ def test_invalid_values_against_schema_reference(items):
     validator = generate_validator_from_schema(schema, context=context)
 
     with pytest.raises(ValidationError) as err:
-        validator(items)
+        validator(items, context=context)
 
     assert_path_in_errors('items', err.value.detail)
 

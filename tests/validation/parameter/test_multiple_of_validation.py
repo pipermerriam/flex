@@ -1,7 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     validate_parameters,
 )
@@ -24,7 +26,7 @@ from tests.utils import assert_message_in_errors
     ),
 )
 def test_multiple_of_validation_for_invalid_values(divisor, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -34,8 +36,6 @@ def test_multiple_of_validation_for_invalid_values(divisor, value):
             'multipleOf': divisor,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -59,7 +59,7 @@ def test_multiple_of_validation_for_invalid_values(divisor, value):
     ),
 )
 def test_multiple_of_validation_for_valid_multiples(divisor, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -69,8 +69,6 @@ def test_multiple_of_validation_for_valid_multiples(divisor, value):
             'multipleOf': divisor,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

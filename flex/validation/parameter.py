@@ -1,5 +1,4 @@
-import functools
-
+from flex.datastructures import ValidationDict
 from flex.utils import is_non_string_iterable
 from flex.exceptions import ValidationError
 from flex.context_managers import ErrorCollection
@@ -17,7 +16,7 @@ from flex.validation.common import (
     generate_unique_items_validator,
     generate_pattern_validator,
     generate_enum_validator,
-    validate_object,
+    generate_object_validator,
     generate_value_processor,
 )
 from flex.validation.schema import (
@@ -89,12 +88,17 @@ def construct_parameter_validators(parameter, context):
     Constructs a dictionary of validator functions for the provided parameter
     definition.
     """
-    validators = {}
-    if 'schema' in parameter:
-        validators.update(construct_schema_validators(parameter['schema'], context=context))
+    validators = ValidationDict()
     for key in parameter:
         if key in validator_mapping:
-            validators[key] = validator_mapping[key](context=context, **parameter)
+            validators.add_validator(
+                key,
+                validator_mapping[key](context=context, **parameter),
+            )
+    if 'schema' in parameter:
+        schema_validators = construct_schema_validators(parameter['schema'], context=context)
+        for key, value in schema_validators.items():
+            validators.setdefault(key, value)
     return validators
 
 
@@ -122,15 +126,15 @@ def construct_multi_parameter_validators(parameters, context):
     functions for each parameter.  Note that this expects the parameters to be
     unique in their name value, and throws an error if this is not the case.
     """
-    validators = {}
+    validators = ValidationDict()
     for parameter in parameters:
         key = parameter['name']
         if key in validators:
             raise ValueError("Duplicate parameter name {0}".format(key))
         parameter_validators = construct_parameter_validators(parameter, context=context)
-        validators[key] = functools.partial(
-            validate_object,
-            validators=parameter_validators,
+        validators.add_validator(
+            key,
+            generate_object_validator(field_validators=parameter_validators),
         )
 
     return validators
