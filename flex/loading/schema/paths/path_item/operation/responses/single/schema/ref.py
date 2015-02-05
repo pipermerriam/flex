@@ -37,4 +37,3 @@ ref_validator = generate_object_validator(
     schema=ref_schema,
     non_field_validators=non_field_validators,
 )
-

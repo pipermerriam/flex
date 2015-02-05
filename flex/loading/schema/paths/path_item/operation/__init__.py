@@ -54,11 +54,11 @@ operation_schema = {
                 'type': STRING,
             },
         },
-        #'schemes':
+        # 'schemes':  # TODO:  Implement this.
         'deprecated': {
             'type': BOOLEAN,
         },
-        #'security':
+        # 'security':  # TODO:  Implement this.
     },
 }
 

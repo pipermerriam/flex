@@ -1,5 +1,4 @@
 from flex.constants import (
-    EMPTY,
     OBJECT,
 )
 from flex.datastructures import (

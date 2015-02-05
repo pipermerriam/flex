@@ -28,7 +28,6 @@ from flex.validation.path import (
     generate_path_parameters_validator,
 )
 from flex.validation.common import (
-    validate_object,
     generate_value_processor,
     generate_object_validator,
 )

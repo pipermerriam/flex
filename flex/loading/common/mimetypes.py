@@ -4,7 +4,6 @@ from flex.datastructures import (
     ValidationList,
 )
 from flex.constants import (
-    STRING,
     ARRAY,
 )
 from flex.exceptions import ValidationError
@@ -15,9 +14,6 @@ from flex.validation.common import (
 from flex.decorators import (
     skip_if_empty,
     skip_if_not_of_type,
-)
-from flex.validation.schema import (
-    construct_schema_validators,
 )
 
 
