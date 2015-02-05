@@ -201,10 +201,6 @@ def construct_schema_validators(schema, context):
             '$ref', LazyReferenceValidator(schema['$ref'], context),
         )
     if 'properties' in schema:
-        # I don't know why this set intersection is enforced...?  Why did I do this.
-        intersection = set(schema['properties'].keys()).intersection(schema.keys())
-        assert not intersection
-
         for property_, property_schema in schema['properties'].items():
             property_validator = generate_object_validator(
                 schema=property_schema,
