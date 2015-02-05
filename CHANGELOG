@@ -1,3 +1,10 @@
+3.0.0
+-----
+
+- Remove DRF dependency.
+- Remove limitation that schema properties cannot intersect with reserved words
+  in the schema spec.
+
 2.8.0
 -----
 
