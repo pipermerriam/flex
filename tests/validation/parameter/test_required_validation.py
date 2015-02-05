@@ -1,7 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     validate_parameters,
 )
@@ -16,11 +18,9 @@ from tests.utils import assert_message_in_errors
 
 
 def test_required_parameters_invalid_when_not_present():
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {'name': 'id', 'in': PATH, 'description': 'id', 'type': STRING, 'required': True},
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {}
 
     with pytest.raises(ValidationError) as err:
@@ -34,7 +34,7 @@ def test_required_parameters_invalid_when_not_present():
 
 
 def test_parameters_allowed_missing_when_not_required():
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': BODY,
@@ -46,8 +46,6 @@ def test_parameters_allowed_missing_when_not_required():
             },
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {}
 
     validate_parameters(parameter_values, parameters, {})

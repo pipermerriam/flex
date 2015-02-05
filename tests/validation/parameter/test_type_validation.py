@@ -1,7 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     validate_parameters,
 )
@@ -26,11 +28,9 @@ from tests.utils import assert_message_in_errors
     ),
 )
 def test_parameter_validation_enforces_type(type_, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {'name': 'id', 'in': PATH, 'description': 'id', 'type': type_, 'required': True},
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -62,11 +62,9 @@ def test_parameter_validation_enforces_type(type_, value):
     ),
 )
 def test_parameter_validation_with_correct_type(type_, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {'name': 'id', 'in': PATH, 'description': 'id', 'type': type_, 'required': True},
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

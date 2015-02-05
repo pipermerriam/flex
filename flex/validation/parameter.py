@@ -89,14 +89,16 @@ def construct_parameter_validators(parameter, context):
     definition.
     """
     validators = ValidationDict()
-    if 'schema' in parameter:
-        validators.update(construct_schema_validators(parameter['schema'], context=context))
     for key in parameter:
         if key in validator_mapping:
             validators.add_validator(
                 key,
                 validator_mapping[key](context=context, **parameter),
             )
+    if 'schema' in parameter:
+        schema_validators = construct_schema_validators(parameter['schema'], context=context)
+        for key, value in schema_validators.items():
+            validators.setdefault(key, value)
     return validators
 
 

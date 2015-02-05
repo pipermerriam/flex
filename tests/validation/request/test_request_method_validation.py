@@ -21,7 +21,7 @@ def test_request_validation_with_invalid_operation_on_path():
     schema = SchemaFactory(
         paths={
             '/post': {
-                'post': None,
+                'post': {},
             },
         },
     )

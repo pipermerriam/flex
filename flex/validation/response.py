@@ -92,7 +92,7 @@ def generate_response_header_validator(headers, context, **kwargs):
     )
 
 
-def validate_response_content_type(response, content_types):
+def validate_response_content_type(response, content_types, **kwargs):
     assert isinstance(response, Response)  # TODO: remove this sanity check
     if response.content_type and response.content_type not in content_types:
         raise ValidationError(

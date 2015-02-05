@@ -1,7 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     validate_parameters,
 )
@@ -26,7 +28,7 @@ from tests.utils import assert_message_in_errors
     ),
 )
 def test_minimum_validation_for_invalid_values(minimum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -36,8 +38,6 @@ def test_minimum_validation_for_invalid_values(minimum, value):
             'minimum': minimum,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -64,7 +64,7 @@ def test_minimum_validation_for_invalid_values(minimum, value):
     ),
 )
 def test_exclusive_minimum_validation_for_invalid_values(minimum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -75,8 +75,6 @@ def test_exclusive_minimum_validation_for_invalid_values(minimum, value):
             'exclusiveMinimum': True,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -102,7 +100,7 @@ def test_exclusive_minimum_validation_for_invalid_values(minimum, value):
     ),
 )
 def test_minimum_validation_for_valid_values(minimum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -112,8 +110,6 @@ def test_minimum_validation_for_valid_values(minimum, value):
             'minimum': minimum,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -130,7 +126,7 @@ def test_minimum_validation_for_valid_values(minimum, value):
     ),
 )
 def test_exclusive_minimum_validation_for_valid_values(minimum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -141,8 +137,6 @@ def test_exclusive_minimum_validation_for_valid_values(minimum, value):
             'exclusiveMinimum': True,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -162,7 +156,7 @@ def test_exclusive_minimum_validation_for_valid_values(minimum, value):
     ),
 )
 def test_maximum_validation_for_invalid_values(maximum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -172,8 +166,6 @@ def test_maximum_validation_for_invalid_values(maximum, value):
             'maximum': maximum,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -200,7 +192,7 @@ def test_maximum_validation_for_invalid_values(maximum, value):
     ),
 )
 def test_exclusive_maximum_validation_for_invalid_values(maximum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -211,8 +203,6 @@ def test_exclusive_maximum_validation_for_invalid_values(maximum, value):
             'exclusiveMaximum': True,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -238,7 +228,7 @@ def test_exclusive_maximum_validation_for_invalid_values(maximum, value):
     ),
 )
 def test_maximum_validation_for_valid_values(maximum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -248,8 +238,6 @@ def test_maximum_validation_for_valid_values(maximum, value):
             'maximum': maximum,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -266,7 +254,7 @@ def test_maximum_validation_for_valid_values(maximum, value):
     ),
 )
 def test_exclusive_maximum_validation_for_valid_values(maximum, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -277,8 +265,6 @@ def test_exclusive_maximum_validation_for_valid_values(maximum, value):
             'exclusiveMaximum': True,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

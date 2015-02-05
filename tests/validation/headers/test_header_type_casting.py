@@ -1,6 +1,8 @@
 import pytest
 
-from flex.serializers.core import HeaderSerializer
+from flex.loading.schema.paths.path_item.operation.responses.single.headers.single import (
+    single_header_validator,
+)
 from flex.validation.common import generate_value_processor
 from flex.constants import (
     INTEGER,
@@ -16,13 +18,10 @@ from flex.constants import (
 
 
 def test_integer_header_type():
-    serializer = HeaderSerializer(
-        data={
-            'type': INTEGER,
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': INTEGER,
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor('123')
     expected = 123
@@ -37,26 +36,20 @@ def test_integer_header_type():
     )
 )
 def test_integer_header_type_with_invalid_values(value):
-    serializer = HeaderSerializer(
-        data={
-            'type': INTEGER,
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': INTEGER,
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor(value)
     assert actual == value
 
 
 def test_number_header_type():
-    serializer = HeaderSerializer(
-        data={
-            'type': NUMBER,
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': NUMBER,
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor('10.5')
     expected = 10.5
@@ -64,13 +57,10 @@ def test_number_header_type():
 
 
 def test_number_header_type_with_invalid_value():
-    serializer = HeaderSerializer(
-        data={
-            'type': NUMBER,
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': NUMBER,
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor('abc')
     assert actual == 'abc'
@@ -89,26 +79,20 @@ def test_number_header_type_with_invalid_value():
     )
 )
 def test_boolean_header_type(input_, expected):
-    serializer = HeaderSerializer(
-        data={
-            'type': BOOLEAN,
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': BOOLEAN,
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor(input_)
     assert actual == expected
 
 
 def test_boolean_header_type_for_invalid_value():
-    serializer = HeaderSerializer(
-        data={
-            'type': BOOLEAN,
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': BOOLEAN,
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor('not-a-known-boolean')
     assert actual == 'not-a-known-boolean'
@@ -128,15 +112,12 @@ def test_boolean_header_type_for_invalid_value():
     )
 )
 def test_array_header_type_casting_with_single_tems(format_, input_):
-    serializer = HeaderSerializer(
-        data={
-            'type': ARRAY,
-            'collectionFormat': format_,
-            'items': {'type': INTEGER}
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': ARRAY,
+        'collectionFormat': format_,
+        'items': {'type': INTEGER}
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor(input_)
     expected = [1, 2, 3]
@@ -144,19 +125,16 @@ def test_array_header_type_casting_with_single_tems(format_, input_):
 
 
 def test_array_header_type_casting_with_multiple_items():
-    serializer = HeaderSerializer(
-        data={
-            'type': ARRAY,
-            'collectionFormat': CSV,
-            'items': [
-                {'type': INTEGER},
-                {'type': STRING},
-                {'type': BOOLEAN},
-            ]
-        }
-    )
-    assert serializer.is_valid(), serializer.errors
-    value_processor = generate_value_processor(context={}, **serializer.save())
+    header_definition = single_header_validator({
+        'type': ARRAY,
+        'collectionFormat': CSV,
+        'items': [
+            {'type': INTEGER},
+            {'type': STRING},
+            {'type': BOOLEAN},
+        ]
+    })
+    value_processor = generate_value_processor(context={}, **header_definition)
 
     actual = value_processor('1,a,true,2')
     expected = [1, 'a', True, '2']

@@ -1,7 +1,7 @@
 import pytest
 
-from flex.serializers.core import (
-    HeaderSerializer,
+from flex.loading.schema.paths.path_item.operation.responses.single.headers.single import (
+    single_header_validator,
 )
 from flex.constants import (
     INTEGER,
@@ -25,13 +25,9 @@ from tests.utils import assert_error_message_equal
     )
 )
 def test_header_type_validation_for_invalid_values(type_, value):
-    serializer = HeaderSerializer(
-        data={
-            'type': type_,
-        }
-    )
-    assert serializer.is_valid()
-    header_definition = serializer.save()
+    header_definition = single_header_validator({
+        'type': type_,
+    })
     validators = construct_header_validators(header_definition=header_definition, context={})
 
     with pytest.raises(ValidationError) as err:

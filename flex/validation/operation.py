@@ -1,6 +1,7 @@
 import functools
 import operator
 
+from flex.datastructures import ValidationDict
 from flex.exceptions import ValidationError
 from flex.utils import chain_reduce_partial
 from flex.context_managers import ErrorCollection
@@ -10,7 +11,6 @@ from flex.http import (
 from flex.constants import (
     QUERY,
     PATH,
-    EMPTY,
     HEADER,
 )
 from flex.parameters import (
@@ -30,19 +30,20 @@ from flex.validation.path import (
 from flex.validation.common import (
     validate_object,
     generate_value_processor,
+    generate_object_validator,
 )
 
 
-def validate_operation(request, validators):
+def validate_operation(request, validators, **kwargs):
     with ErrorCollection() as errors:
         for key, validator in validators.items():
             try:
-                validator(request)
+                validator(request, **kwargs)
             except ValidationError as err:
                 errors[key].add_error(err.detail)
 
 
-def validate_request_content_type(request, content_types):
+def validate_request_content_type(request, content_types, **kwargs):
     assert isinstance(request, Request)
     # TODO: is it correct to skip validation for a null content_type?
     if request.content_type and request.content_type not in content_types:
@@ -65,22 +66,23 @@ def generate_header_validator(headers, context, **kwargs):
     """
     Generates a validation function that will validate a dictionary of headers.
     """
-    validators = {}
+    validators = ValidationDict()
     for header_definition in headers:
         header_processor = generate_value_processor(
             context=context,
             **header_definition
         )
-        header_validator = functools.partial(
-            validate_object,
-            validators=construct_header_validators(header_definition, context=context),
+        header_validator = generate_object_validator(
+            field_validators=construct_header_validators(header_definition, context=context),
         )
-        validators[header_definition['name']] = chain_reduce_partial(
-            operator.methodcaller('get', header_definition['name'], EMPTY),
-            header_processor,
-            header_validator,
+        validators.add_property_validator(
+            header_definition['name'],
+            chain_reduce_partial(
+                header_processor,
+                header_validator,
+            ),
         )
-    return functools.partial(validate_object, validators=validators)
+    return generate_object_validator(field_validators=validators)
 
 
 def generate_parameters_validator(api_path, path_definition, parameters,
@@ -96,7 +98,7 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     """
     # TODO: figure out how to merge this with the same code in response
     # validation.
-    validators = {}
+    validators = ValidationDict()
     parameter_definitions = context.get('parameters', {})
     path_level_parameters = dereference_parameter_list(
         path_definition.get('parameters', []),
@@ -114,30 +116,39 @@ def generate_parameters_validator(api_path, path_definition, parameters,
 
     # PATH
     in_path_parameters = filter_parameters(all_parameters, in_=PATH)
-    validators['path'] = chain_reduce_partial(
-        operator.attrgetter('path'),
-        generate_path_parameters_validator(api_path, in_path_parameters, context),
+    validators.add_validator(
+        'path',
+        chain_reduce_partial(
+            operator.attrgetter('path'),
+            generate_path_parameters_validator(api_path, in_path_parameters, context),
+        ),
     )
 
     # QUERY
     in_query_parameters = filter_parameters(all_parameters, in_=QUERY)
-    validators['query'] = chain_reduce_partial(
-        operator.attrgetter('query_data'),
-        functools.partial(
-            validate_query_parameters,
-            query_parameters=in_query_parameters,
-            context=context,
+    validators.add_validator(
+        'query',
+        chain_reduce_partial(
+            operator.attrgetter('query_data'),
+            functools.partial(
+                validate_query_parameters,
+                query_parameters=in_query_parameters,
+                context=context,
+            ),
         ),
     )
 
     # HEADERS
     in_header_parameters = filter_parameters(all_parameters, in_=HEADER)
-    validators['headers'] = chain_reduce_partial(
-        operator.attrgetter('headers'),
-        generate_header_validator(in_header_parameters, context),
+    validators.add_validator(
+        'headers',
+        chain_reduce_partial(
+            operator.attrgetter('headers'),
+            generate_header_validator(in_header_parameters, context),
+        ),
     )
 
-    return functools.partial(validate_object, validators=validators)
+    return generate_object_validator(field_validators=validators)
 
 
 validator_mapping = {

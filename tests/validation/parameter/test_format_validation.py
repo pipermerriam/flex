@@ -1,7 +1,9 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import ParameterSerializer
+from flex.loading.schema.paths.path_item.operation.parameters import (
+    parameters_validator,
+)
 from flex.validation.parameter import (
     validate_parameters,
 )
@@ -26,7 +28,7 @@ from tests.utils import assert_message_in_errors
     )
 )
 def test_parameter_format_validation_on_invalid_values(format_, value, error_key):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -36,8 +38,6 @@ def test_parameter_format_validation_on_invalid_values(format_, value, error_key
             'format': format_,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }
@@ -60,7 +60,7 @@ def test_parameter_format_validation_on_invalid_values(format_, value, error_key
     ),
 )
 def test_parameter_format_validation_succeeds_on_valid_values(format_, value):
-    serializer = ParameterSerializer(many=True, data=[
+    parameters = parameters_validator([
         {
             'name': 'id',
             'in': PATH,
@@ -70,8 +70,6 @@ def test_parameter_format_validation_succeeds_on_valid_values(format_, value):
             'format': format_,
         },
     ])
-    assert serializer.is_valid(), serializer.errors
-    parameters = serializer.save()
     parameter_values = {
         'id': value,
     }

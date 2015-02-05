@@ -1,7 +1,6 @@
 import pytest
 
 from flex.exceptions import ValidationError
-from flex.serializers.core import PathsSerializer
 from flex.validation.common import (
     validate_path_to_api_path,
 )
@@ -21,7 +20,7 @@ from tests.utils import assert_message_in_errors
 
 def test_basic_request_path_validation():
     context = SchemaFactory(
-        paths={'/get': None},
+        paths={'/get': {}},
     )
 
     request = RequestFactory(url='http://www.example.com/get')
@@ -41,7 +40,7 @@ def test_basic_request_path_validation():
 )
 def test_basic_request_path_validation_with_unspecified_paths(request_path):
     context = SchemaFactory(
-        paths={'/get': None},
+        paths={'/get': {}},
     )
 
     url = 'http://www.example.com{0}'.format(request_path)

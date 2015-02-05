@@ -416,7 +416,7 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
 
     def processor(value, **kwargs):
         try:
-            return chain_reduce_partial(*processors)(value, **kwargs)
+            return chain_reduce_partial(*processors)(value)
         except (ValueError, TypeError):
             return value
 

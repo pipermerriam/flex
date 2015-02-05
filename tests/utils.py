@@ -153,5 +153,5 @@ def assert_path_not_in_errors(path, errors):
 
 def generate_validator_from_schema(raw_schema, **kwargs):
     schema = schema_validator(raw_schema, **kwargs)
-    validator = functools.partial(validate_object, schema=schema)
+    validator = functools.partial(validate_object, schema=schema, **kwargs)
     return validator
