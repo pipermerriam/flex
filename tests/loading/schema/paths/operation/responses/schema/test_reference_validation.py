@@ -12,7 +12,7 @@ def test_context_missing_definitions(msg_assertions):
         schema_validator({'$ref': 'SomeReference'})
 
     msg_assertions.assert_error_message_equal(
-        err.value.message,
+        str(err.value),
         MESSAGES['unknown_reference']['no_definitions'],
     )
 
