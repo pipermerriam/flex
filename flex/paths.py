@@ -127,7 +127,7 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', global_p
     if not matches:
         raise LookupError('No paths found for {0}'.format(target_path))
     elif len(matches) > 1:
-        raise LookupError('Multipue paths found for {0}.  Found `{1}`'.format(
+        raise LookupError('Multiple paths found for {0}.  Found `{1}`'.format(
             target_path, matches,
         ))
     else:
