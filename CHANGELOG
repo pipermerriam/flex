@@ -1,3 +1,9 @@
+3.1.0
+-----
+
+- Fix bug with request path matching where a path with a parameter defined at
+  the operation level would not be matched.
+
 3.0.0
 -----
 
