@@ -5,12 +5,6 @@ import six
 import iso8601
 import rfc3987
 
-if six.PY2:
-    import validate_email
-else:
-    # TODO: when a new version is released, this can be removed.
-    from flex.compat import validate_email
-
 from flex.utils import is_value_of_any_type
 from flex.exceptions import ValidationError
 from flex.decorators import partial_safe_wraps
@@ -25,6 +19,12 @@ from flex.constants import (
     URI,
 )
 from flex.error_messages import MESSAGES
+
+if six.PY2:
+    import validate_email
+else:
+    # TODO: when a new version is released, this can be removed.
+    from flex.compat import validate_email
 
 
 class FormatRegistry(object):
