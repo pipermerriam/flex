@@ -1,6 +1,5 @@
 import pytest
 
-from flex.core import load
 from flex.loading.schema.paths.path_item.operation.parameters import (
     parameters_validator,
 )
@@ -142,3 +141,27 @@ def test_match_target_path_to_api_path(path, schema_path):
         base_path=base_path,
     )
     assert path == schema_path
+
+
+def test_match_path_with_parameter_defined_in_operation():
+    schema = SchemaFactory(
+        paths={
+            '/get/{id}': {
+                'get': {
+                    'parameters': [{
+                        'name': 'id',
+                        'in': PATH,
+                        'type': INTEGER,
+                        'required': True,
+                    }],
+                },
+            },
+        },
+    )
+    paths = schema['paths']
+
+    path = match_path_to_api_path(
+        path_definitions=paths,
+        target_path='/get/1234',
+    )
+    assert path == '/get/{id}'

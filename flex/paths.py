@@ -1,9 +1,11 @@
+import itertools
 import collections
 import functools
 import re
 
 from flex.constants import (
     PATH,
+    REQUEST_METHODS,
 )
 from flex.parameters import (
     find_parameter,
@@ -87,17 +89,34 @@ def path_to_pattern(api_path, parameters):
     return pattern
 
 
-def path_to_regex(api_path, path_parameters, global_parameters=None):
+def path_to_regex(api_path, path_parameters, operation_parameters=None, global_parameters=None):
     if global_parameters is None:
         global_parameters = {}
+    if operation_parameters is None:
+        operation_parameters = []
     pattern = path_to_pattern(
         api_path=api_path,
         parameters=merge_parameter_lists(
             global_parameters.values(),
             dereference_parameter_list(path_parameters, global_parameters),
+            dereference_parameter_list(operation_parameters, global_parameters),
         ),
     )
     return re.compile(pattern)
+
+
+def extract_path_parameters(path_definition):
+    if not path_definition:
+        return []
+    return path_definition.get('parameters', [])
+
+
+def extract_operation_parameters(path_definition):
+    return list(itertools.chain.from_iterable(
+        (v or {}).get('parameters', [])
+        for k, v in path_definition.items()
+        if k in REQUEST_METHODS
+    ))
 
 
 def match_path_to_api_path(path_definitions, target_path, base_path='', global_parameters=None):
@@ -116,7 +135,8 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', global_p
     paths = {
         p: path_to_regex(
             api_path=p,
-            path_parameters=(v or {}).get('parameters', []),
+            path_parameters=extract_path_parameters(v),
+            operation_parameters=extract_operation_parameters(v),
             global_parameters=global_parameters,
         )
         for p, v in path_definitions.items()
