@@ -3,6 +3,8 @@ import collections
 import functools
 import re
 
+from flex.exceptions import MultiplePathsFound
+from flex.error_messages import MESSAGES
 from flex.constants import (
     PATH,
     REQUEST_METHODS,
@@ -142,13 +144,26 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', global_p
         for p, v in path_definitions.items()
     }
 
-    matches = [p for p, r in paths.items() if r.match(target_path)]
+    matching_api_paths = [p for p, r in paths.items() if r.match(target_path)]
 
-    if not matches:
-        raise LookupError('No paths found for {0}'.format(target_path))
-    elif len(matches) > 1:
-        raise LookupError('Multiple paths found for {0}.  Found `{1}`'.format(
-            target_path, matches,
-        ))
+    if not matching_api_paths:
+        raise LookupError(MESSAGES['path']['no_matching_paths_found'].format(target_path))
+    elif len(matching_api_paths) > 1:
+        # TODO: This area needs improved logic.
+        # We check to see if any of the matches has more matched groups than
+        # the others.  If so, we *assume* it is the correct match.  This is
+        # going to be prone to false positives. in certain cases.
+        matches = [(p, r.match(target_path)) for p, r in paths.items()]
+        matches_by_group_size = collections.defaultdict(list)
+        for path, match in matches:
+            matches_by_group_size[len(match.groups())].append(path)
+        longest_match = max(matches_by_group_size.keys())
+        if len(matches_by_group_size[longest_match]) == 1:
+            return matches_by_group_size[longest_match][0]
+        raise MultiplePathsFound(
+            MESSAGES['path']['multiple_paths_found'].format(
+                target_path, matching_api_paths,
+            )
+        )
     else:
-        return matches[0]
+        return matching_api_paths[0]

@@ -88,3 +88,7 @@ class ValidationError(ValueError):
         elif isinstance(self._error, collections.Mapping):
             return [self._error]
         return self._error
+
+
+class MultiplePathsFound(ValueError):
+    pass

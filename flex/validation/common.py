@@ -12,6 +12,7 @@ from flex.exceptions import (
     ValidationError,
     ErrorDict,
     ErrorList,
+    MultiplePathsFound,
 )
 from flex.datastructures import (
     ValidationDict,
@@ -455,7 +456,9 @@ def validate_path_to_api_path(path, paths, basePath='', parameters=None, **kwarg
             base_path=basePath,
             global_parameters=parameters,
         )
-    except LookupError:
-        raise ValidationError(MESSAGES['path']['unknown_path'])
+    except LookupError as err:
+        raise ValidationError(str(err))
+    except MultiplePathsFound as err:
+        raise ValidationError(str(err))
 
     return api_path
