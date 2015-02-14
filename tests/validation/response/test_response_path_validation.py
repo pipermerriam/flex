@@ -37,7 +37,7 @@ def test_response_validation_with_invalid_path():
         )
 
     assert_message_in_errors(
-        MESSAGES['path']['unknown_path'],
+        MESSAGES['path']['no_matching_paths_found'],
         err.value.detail,
         'path',
     )

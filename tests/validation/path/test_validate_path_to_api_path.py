@@ -54,7 +54,7 @@ def test_basic_request_path_validation_with_unspecified_paths(request_path):
         )
 
     assert_message_in_errors(
-        MESSAGES['path']['unknown_path'],
+        MESSAGES['path']['no_matching_paths_found'],
         err.value.detail,
     )
 

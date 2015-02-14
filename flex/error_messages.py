@@ -145,6 +145,10 @@ RESPONSE_MESSAGES = {
 
 
 PATH_MESSAGES = {
+    'no_matching_paths_found': 'No paths found for {0}',
+    'multiple_paths_found': (
+        'Unable to determine path for {0}.  Found multiple matches: `{1}`'
+    ),
     'unknown_path': 'Request path did not match any of the known api paths.',
     'missing_parameter': (
         "The parameter named `{0}` is declared to be a PATH parameter but does "
