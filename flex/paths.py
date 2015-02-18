@@ -156,7 +156,8 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', global_p
         matches = [(p, r.match(target_path)) for p, r in paths.items()]
         matches_by_group_size = collections.defaultdict(list)
         for path, match in matches:
-            matches_by_group_size[len(match.groups())].append(path)
+            if match:
+                matches_by_group_size[len(match.groups())].append(path)
         longest_match = max(matches_by_group_size.keys())
         if len(matches_by_group_size[longest_match]) == 1:
             return matches_by_group_size[longest_match][0]
