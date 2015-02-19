@@ -207,3 +207,47 @@ def test_matching_with_nested_path():
         target_path='/get/1234/nested/5678',
     )
     assert path == '/get/{id}/nested/{other_id}'
+
+def test_matching_with_full_nested_path():
+    schema = SchemaFactory(
+        paths={
+            '/get/main/':{
+                'get':{},
+            },
+            '/get/main/{id}': {
+                'get': {
+                    'parameters': [{
+                        'name': 'id',
+                        'in': PATH,
+                        'type': STRING,
+                        'required': True,
+                    }],
+                },
+            },
+            '/get/main/{id}/nested/{other_id}': {
+                'get': {
+                    'parameters': [
+                        {
+                            'name': 'id',
+                            'in': PATH,
+                            'type': STRING,
+                            'required': True,
+                        },
+                        {
+                            'name': 'other_id',
+                            'in': PATH,
+                            'type': STRING,
+                            'required': True,
+                        },
+                    ],
+                },
+            },
+        },
+    )
+    paths = schema['paths']
+
+    path = match_path_to_api_path(
+        path_definitions=paths,
+        target_path='/get/main/1234/nested/5678',
+    )
+    assert path == '/get/main/{id}/nested/{other_id}'
