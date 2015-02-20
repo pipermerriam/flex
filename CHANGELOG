@@ -1,3 +1,9 @@
+3.3.0
+-----
+
+- Bugfix around path matching and handling duplicate path matches for api
+  request/response validation.
+
 3.1.0
 -----
 
