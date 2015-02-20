@@ -144,7 +144,8 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', global_p
         for p, v in path_definitions.items()
     }
 
-    matching_api_paths = [p for p, r in paths.items() if r.match(target_path)]
+    matching_api_paths = [(p, r.match(target_path))
+                          for p, r in paths.items() if r.match(target_path)]
 
     if not matching_api_paths:
         raise LookupError(MESSAGES['path']['no_matching_paths_found'].format(target_path))
@@ -153,17 +154,16 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', global_p
         # We check to see if any of the matches has more matched groups than
         # the others.  If so, we *assume* it is the correct match.  This is
         # going to be prone to false positives. in certain cases.
-        matches = [(p, r.match(target_path)) for p, r in paths.items()]
         matches_by_group_size = collections.defaultdict(list)
-        for path, match in matches:
+        for path, match in matching_api_paths:
             matches_by_group_size[len(match.groups())].append(path)
         longest_match = max(matches_by_group_size.keys())
         if len(matches_by_group_size[longest_match]) == 1:
             return matches_by_group_size[longest_match][0]
         raise MultiplePathsFound(
             MESSAGES['path']['multiple_paths_found'].format(
-                target_path, matching_api_paths,
+                [v[0] for v in matching_api_paths]
             )
         )
     else:
-        return matching_api_paths[0]
+        return matching_api_paths[0][0]
