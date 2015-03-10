@@ -72,9 +72,10 @@ def test_basic_response_body_schema_validation_with_type_mismatch():
                             'description': 'Success',
                             'schema': {
                                 'type': OBJECT,
+                                'required': ['id', 'name'],
                                 'properties': {
-                                    'id': {'type': INTEGER, 'required': True},
-                                    'name': {'type': STRING, 'required': True},
+                                    'id': {'type': INTEGER},
+                                    'name': {'type': STRING},
                                 },
                             },
                         }
@@ -114,26 +115,30 @@ def test_response_body_schema_validation_with_items_as_reference():
     schema = SchemaFactory(
         definitions={
             'User': {
+                'required': [
+                    'id',
+                    'name',
+                ],
                 'properties': {
                     'id': {
-                        'required': True,
                         'type': INTEGER,
                     },
                     'name': {
-                        'required': True,
                         'enum': ('bob', 'joe'),
                     },
                 },
             },
             'UserList': {
                 'type': OBJECT,
+                'required': [
+                    'results',
+                ],
                 'properties': {
                     'results': {
                         'type': ARRAY,
                         'items':{
                             '$ref': 'User',
                         },
-                        'required': True,
                     },
                 },
             },

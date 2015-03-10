@@ -18,7 +18,6 @@ def parameters_validator(*args, **kwargs):
 
 path_item_schema = {
     'type': OBJECT,
-    'required': True,
 }
 
 non_field_validators = ValidationDict()

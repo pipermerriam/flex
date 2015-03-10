@@ -8,7 +8,6 @@ from flex.validation.common import (
 
 name_schema = {
     'type': STRING,
-    'required': True,
 }
 
 
