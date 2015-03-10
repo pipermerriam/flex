@@ -37,7 +37,6 @@ def validate_path_items(paths, **kwargs):
 
 
 paths_schema = {
-    'required': True,
     'type': OBJECT,
 }
 non_field_validators = ValidationList()

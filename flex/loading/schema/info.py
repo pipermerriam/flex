@@ -7,10 +7,11 @@ from flex.validation.common import (
 
 
 info_schema = {
-    'required': True,
+    'required': [
+        'title',
+    ],
     'properties': {
         'title': {
-            'required': True,
             'type': STRING,
         },
         'description': {'type': STRING},

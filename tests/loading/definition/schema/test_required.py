@@ -23,7 +23,7 @@ def test_required_is_not_required():
 
 @pytest.mark.parametrize(
     'value',
-    ([1, 2], None, {'a': 1}, 'abc', 1, 1.1),
+    (True, False, None, {'a': 1}, 'abc', 1, 1.1),
 )
 def test_required_with_invalid_types(value):
     with pytest.raises(ValidationError) as err:
@@ -36,9 +36,20 @@ def test_required_with_invalid_types(value):
     )
 
 
+def test_required_with_invalid_sub_types():
+    with pytest.raises(ValidationError) as err:
+        schema_validator({'required': ['field-A', True, 'Field-B']})
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'required.type',
+    )
+
+
 def test_required_for_valid_required():
     try:
-        schema_validator({'required': True})
+        schema_validator({'required': ['field-A', 'field-B']})
     except ValidationError as err:
         errors = err.detail
     else:

@@ -31,7 +31,6 @@ from flex.paths import (
     match_path_to_api_path,
 )
 from flex.constants import (
-    EMPTY,
     NUMBER,
     STRING,
     ARRAY,
@@ -89,14 +88,21 @@ def noop(*args, **kwargs):
     pass
 
 
-def validate_required(value, **kwargs):
-    if value is EMPTY:
-        raise ValidationError(MESSAGES['required']['required'])
+@skip_if_empty
+@skip_if_not_of_type(OBJECT)
+def validate_required(value, required_fields, **kwargs):
+    with ErrorDict() as errors:
+        for key in required_fields:
+            if key not in value:
+                errors.add_error(key, MESSAGES['required']['required'])
 
 
 def generate_required_validator(required, **kwargs):
     if required:
-        return validate_required
+        return functools.partial(
+            validate_required,
+            required_fields=required,
+        )
     else:
         return noop
 

@@ -18,10 +18,12 @@ from .schema import (
 
 single_response_schema = {
     'type': OBJECT,
+    'required': [
+        'description',
+    ],
     'properties': {
         'description': {
             'type': STRING,
-            'required': True,
         },
     },
 }
