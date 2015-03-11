@@ -31,7 +31,6 @@ from flex.paths import (
     match_path_to_api_path,
 )
 from flex.constants import (
-    EMPTY,
     NUMBER,
     STRING,
     ARRAY,
@@ -87,18 +86,6 @@ def noop(*args, **kwargs):
     No-Op validator that does nothing.
     """
     pass
-
-
-def validate_required(value, **kwargs):
-    if value is EMPTY:
-        raise ValidationError(MESSAGES['required']['required'])
-
-
-def generate_required_validator(required, **kwargs):
-    if required:
-        return validate_required
-    else:
-        return noop
 
 
 @skip_if_empty

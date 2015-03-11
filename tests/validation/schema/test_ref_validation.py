@@ -133,8 +133,9 @@ def test_reference_with_additional_validators_and_invalid_value(name):
 
 def test_reference_is_noop_when_not_required_and_not_provided():
     schema = {
-        '$ref': 'Name',
-        'required': False,
+        'properties': {
+            'name': {'$ref': 'Name'},
+        },
     }
     context = {
         'definitions': {
@@ -147,7 +148,7 @@ def test_reference_is_noop_when_not_required_and_not_provided():
     }
     validator = generate_validator_from_schema(schema, context=context)
 
-    validator(EMPTY)
+    validator({})
 
 
 def test_non_required_circular_reference():
@@ -189,8 +190,9 @@ def test_required_circular_reference():
     definitions = schema_definitions_validator(
         {
             'Node': {
+                'required': ['parent'],
                 'properties': {
-                    'parent': {'$ref': 'Node', 'required': True},
+                    'parent': {'$ref': 'Node'},
                 },
             },
         },
@@ -217,7 +219,7 @@ def test_required_circular_reference():
     assert_message_in_errors(
         MESSAGES['required']['required'],
         err.value.detail,
-        'parent.parent.parent.parent.parent.required',
+        'parent.parent.parent.parent.required.parent',
     )
 
 

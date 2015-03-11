@@ -44,6 +44,9 @@ from .collection_format import (
 
 single_header_schema = {
     'type': OBJECT,
+    'required': [
+        'type',
+    ]
 }
 
 single_header_field_validators = ValidationDict()

@@ -22,7 +22,7 @@ def test_type_is_required(MESSAGES, msg_assertions):
     msg_assertions.assert_message_in_errors(
         MESSAGES['required']['required'],
         err.value.detail,
-        'type.required',
+        'required.type',
     )
 
 

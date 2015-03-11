@@ -7,6 +7,7 @@ import six
 from flex.exceptions import (
     ValidationError,
     ErrorList,
+    ErrorDict,
 )
 from flex.error_messages import MESSAGES
 from flex.constants import (
@@ -15,10 +16,10 @@ from flex.constants import (
 )
 from flex.decorators import skip_if_not_of_type
 from flex.validation.common import (
+    noop,
     skip_if_empty,
     generate_type_validator,
     generate_format_validator,
-    generate_required_validator,
     generate_multiple_of_validator,
     generate_minimum_validator,
     generate_maximum_validator,
@@ -35,6 +36,25 @@ from flex.validation.common import (
 from flex.datastructures import (
     ValidationDict,
 )
+
+
+@skip_if_empty
+@skip_if_not_of_type(OBJECT)
+def validate_required(value, required_fields, **kwargs):
+    with ErrorDict() as errors:
+        for key in required_fields:
+            if key not in value:
+                errors.add_error(key, MESSAGES['required']['required'])
+
+
+def generate_required_validator(required, **kwargs):
+    if required:
+        return functools.partial(
+            validate_required,
+            required_fields=required,
+        )
+    else:
+        return noop
 
 
 @skip_if_empty

@@ -30,6 +30,11 @@ __ALL__ = [
 
 swagger_schema = {
     'type': OBJECT,
+    'required': [
+        'info',
+        'paths',
+        'swagger',
+    ],
 }
 
 non_field_validators = ValidationDict()

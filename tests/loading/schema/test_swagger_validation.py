@@ -34,7 +34,7 @@ def test_swagger_field_is_required():
     assert_message_in_errors(
         MESSAGES['required']['required'],
         err.value.detail,
-        'swagger.required',
+        'required.swagger',
     )
 
 
@@ -86,9 +86,9 @@ def test_swagger_field_with_invalid_version():
     (1, 1.1, True, ['a', 'b'], {'a': 'b'}, None),
 )
 def test_version_must_be_a_string(value):
-    data = {
-        'swagger': value,
-    }
+    data = RawSchemaFactory(
+        swagger=value,
+    )
     with pytest.raises(ValidationError) as err:
         swagger_schema_validator(data)
 

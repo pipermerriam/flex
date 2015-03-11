@@ -34,7 +34,7 @@ def test_info_field_is_required():
     assert_message_in_errors(
         MESSAGES['required']['required'],
         err.value.detail,
-        'info.required',
+        'required.info',
     )
 
 
@@ -49,7 +49,7 @@ def test_title_is_required():
     assert_message_in_errors(
         MESSAGES['required']['required'],
         err.value.detail,
-        'title.required',
+        'required.title',
     )
 
 

@@ -20,7 +20,6 @@ from flex.decorators import (
 in_schema = {
     'type': STRING,
     'enum': PARAMETER_IN_VALUES,
-    'required': True,
 }
 
 

@@ -8,7 +8,6 @@ from flex.validation.common import (
 
 swagger_version_schema = {
     'enum': ['2.0'],
-    'required': True,
     'type': STRING,
 }
 

@@ -24,7 +24,7 @@ from .max_properties import (
     validate_max_properties_is_greater_than_or_equal_to_min_properties,
     validate_type_for_max_properties,
 )
-from flex.loading.common.required import (
+from .required import (
     required_validator,
 )
 from .type import (

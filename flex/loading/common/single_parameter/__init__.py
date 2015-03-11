@@ -45,6 +45,10 @@ from .items import (
 
 single_parameter_schema = {
     'type': OBJECT,
+    'required': [
+        'name',
+        'in',
+    ],
 }
 
 single_parameter_field_validators = ValidationDict()

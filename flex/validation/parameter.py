@@ -1,11 +1,12 @@
 from flex.datastructures import ValidationDict
 from flex.utils import is_non_string_iterable
 from flex.exceptions import ValidationError
+from flex.error_messages import MESSAGES
 from flex.context_managers import ErrorCollection
 from flex.validation.common import (
+    noop,
     generate_type_validator,
     generate_format_validator,
-    generate_required_validator,
     generate_multiple_of_validator,
     generate_minimum_validator,
     generate_maximum_validator,
@@ -26,6 +27,18 @@ from flex.validation.schema import (
 from flex.parameters import find_parameter
 from flex.paths import path_to_regex
 from flex.constants import EMPTY
+
+
+def validate_required(value, **kwargs):
+    if value is EMPTY:
+        raise ValidationError(MESSAGES['required']['required'])
+
+
+def generate_required_validator(required, **kwargs):
+    if required:
+        return validate_required
+    else:
+        return noop
 
 
 def type_cast_parameters(parameter_values, parameter_definitions, context):

@@ -24,7 +24,7 @@ def test_paths_is_required():
     assert_message_in_errors(
         MESSAGES['required']['required'],
         err.value.detail,
-        'paths.required',
+        'required.paths',
     )
 
 

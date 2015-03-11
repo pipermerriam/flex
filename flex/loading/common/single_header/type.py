@@ -22,7 +22,6 @@ ALLOWED_TYPES = [STRING, NUMBER, INTEGER, BOOLEAN, ARRAY]
 
 type_schema = {
     'type': [STRING, ARRAY],
-    'required': True,
     'items': {
         'type': STRING,
         'enum': ALLOWED_TYPES,
