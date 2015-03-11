@@ -1,3 +1,11 @@
+3.4.0
+-----
+
+- Backwards Incompatible Bugfix around how the `required` keyword for Schema
+  Objects is handled.  Previously, it was expected to be a boolean and to apply
+  to the current schema.  It is now correctly validated as an array of strings
+  that dictate which properties are required.
+
 3.3.0
 -----
 
