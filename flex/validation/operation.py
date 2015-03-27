@@ -12,6 +12,8 @@ from flex.constants import (
     QUERY,
     PATH,
     HEADER,
+    FORM_DATA,
+    BODY,
 )
 from flex.parameters import (
     filter_parameters,
@@ -84,6 +86,14 @@ def generate_header_validator(headers, context, **kwargs):
     return generate_object_validator(field_validators=validators)
 
 
+def generate_form_data_validator(form_data_parameters, context, **kwargs):
+    pass
+
+
+def generate_request_body_validator(body_parameters, context, **kwargs):
+    pass
+
+
 def generate_parameters_validator(api_path, path_definition, parameters,
                                   context, **kwargs):
     """
@@ -145,6 +155,26 @@ def generate_parameters_validator(api_path, path_definition, parameters,
             operator.attrgetter('headers'),
             generate_header_validator(in_header_parameters, context),
         ),
+    )
+
+    # FORM_DATA
+    in_form_data_parameters = filter_parameters(all_parameters, in_=FORM_DATA)
+    validators.add_validator(
+        'form_data',
+        chain_reduce_partial(
+            operator.attrgetter('data'),
+            generate_form_data_validator(in_form_data_parameters, context),
+        )
+    )
+
+    # REQUEST_BODY
+    in_request_body_parameters = filter_parameters(all_parameters, in_=BODY)
+    validators.add_validator(
+        'request_body',
+        chain_reduce_partial(
+            operator.attrgetter('data'),
+            generate_request_body_validator(in_request_body_parameters, context),
+        )
     )
 
     return generate_object_validator(field_validators=validators)
