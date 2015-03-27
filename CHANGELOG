@@ -1,3 +1,10 @@
+3.4.1
+-----
+
+- Bugfix: Changed the strategy for picking an api_path when multiple regexes
+  match from using the length of the regex match groups, to the length of the
+  corresponding API path.
+
 3.4.0
 -----
 
