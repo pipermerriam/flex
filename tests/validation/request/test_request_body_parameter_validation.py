@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from flex.exceptions import ValidationError
 from flex.validation.request import (
     validate_request,
 )
@@ -55,7 +56,7 @@ def user_post_schema():
     return schema
 
 
-def test_request_body_parameter_validation_with_no_declared_parameters(user_post_schema):
+def test_request_body_parameter_validation_with_valid_value(user_post_schema):
     """
     Test validating the request body with a valid post.
     """
@@ -69,4 +70,27 @@ def test_request_body_parameter_validation_with_no_declared_parameters(user_post
     validate_request(
         request=request,
         schema=user_post_schema,
+    )
+
+
+def test_request_body_parameter_validation_with_invalid_value(user_post_schema):
+    """
+    Test validating the request body with a valid post.
+    """
+    request = RequestFactory(
+        url='http://www.example.com/post/',
+        content_type='application/json',
+        body=json.dumps({'username': 'Test User', 'email': 'test'}),
+        method=POST,
+    )
+
+    with pytest.raises(ValidationError) as err:
+        validate_request(
+            request=request,
+            schema=user_post_schema,
+        )
+
+    assert_message_in_errors(
+        MESSAGES['format']['invalid_email'],
+        err.value.detail,
     )

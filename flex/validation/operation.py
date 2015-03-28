@@ -31,6 +31,7 @@ from flex.validation.path import (
     generate_path_parameters_validator,
 )
 from flex.validation.common import (
+    noop,
     generate_value_processor,
     generate_object_validator,
 )
@@ -94,6 +95,8 @@ def generate_form_data_validator(form_data_parameters, context, **kwargs):
 def generate_request_body_validator(body_parameters, context, **kwargs):
     if len(body_parameters) > 1:
         raise ValueError("Too many body parameters.  Should only be one")
+    elif not body_parameters:
+        return noop
     body_validators = construct_parameter_validators(
         body_parameters[0], context=context,
     )

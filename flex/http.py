@@ -48,8 +48,10 @@ class Request(URLMixin):
         TODO: What is the right way to do this?
         """
         if not self.body:
-            return None
-        if self.content_type == 'application/json':
+            return self.body
+        elif self.body is EMPTY:
+            return EMPTY
+        elif self.content_type == 'application/json':
             return json.loads(self.body)
         else:
             raise NotImplementedError("No parser for content type")
