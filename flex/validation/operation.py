@@ -12,7 +12,6 @@ from flex.constants import (
     QUERY,
     PATH,
     HEADER,
-    FORM_DATA,
     BODY,
 )
 from flex.parameters import (
