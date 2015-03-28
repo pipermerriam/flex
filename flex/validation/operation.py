@@ -167,14 +167,14 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     )
 
     # FORM_DATA
-    #in_form_data_parameters = filter_parameters(all_parameters, in_=FORM_DATA)
-    #validators.add_validator(
-    #    'form_data',
-    #    chain_reduce_partial(
-    #        operator.attrgetter('data'),
-    #        generate_form_data_validator(in_form_data_parameters, context),
-    #    )
-    #)
+    # in_form_data_parameters = filter_parameters(all_parameters, in_=FORM_DATA)
+    # validators.add_validator(
+    #     'form_data',
+    #     chain_reduce_partial(
+    #         operator.attrgetter('data'),
+    #         generate_form_data_validator(in_form_data_parameters, context),
+    #     )
+    # )
 
     # REQUEST_BODY
     in_request_body_parameters = filter_parameters(all_parameters, in_=BODY)
