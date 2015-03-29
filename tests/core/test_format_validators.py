@@ -50,7 +50,7 @@ def test_date_time_format_validator_detects_invalid_values(value):
         # Leap second should be valid but iso8601 doesn't correctly parse.
         pytest.mark.xfail('1990-12-31T15:59:60-08:00'),
         # Weird netherlands time from strange 1909 law.
-        pytest.mark.xfail('1937-01-01T12:00:27.87+00:20'),
+        '1937-01-01T12:00:27.87+00:20',
     )
 )
 def test_date_time_format_validator_with_valid_dateties(value):

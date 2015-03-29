@@ -12,6 +12,7 @@ from flex.constants import (
     QUERY,
     PATH,
     HEADER,
+    BODY,
 )
 from flex.parameters import (
     filter_parameters,
@@ -20,6 +21,7 @@ from flex.parameters import (
 )
 from flex.validation.parameter import (
     validate_query_parameters,
+    construct_parameter_validators,
 )
 from flex.validation.header import (
     construct_header_validators,
@@ -28,6 +30,7 @@ from flex.validation.path import (
     generate_path_parameters_validator,
 )
 from flex.validation.common import (
+    noop,
     generate_value_processor,
     generate_object_validator,
 )
@@ -82,6 +85,21 @@ def generate_header_validator(headers, context, **kwargs):
             ),
         )
     return generate_object_validator(field_validators=validators)
+
+
+def generate_form_data_validator(form_data_parameters, context, **kwargs):
+    pass
+
+
+def generate_request_body_validator(body_parameters, context, **kwargs):
+    if len(body_parameters) > 1:
+        raise ValueError("Too many body parameters.  Should only be one")
+    elif not body_parameters:
+        return noop
+    body_validators = construct_parameter_validators(
+        body_parameters[0], context=context,
+    )
+    return generate_object_validator(field_validators=body_validators)
 
 
 def generate_parameters_validator(api_path, path_definition, parameters,
@@ -145,6 +163,26 @@ def generate_parameters_validator(api_path, path_definition, parameters,
             operator.attrgetter('headers'),
             generate_header_validator(in_header_parameters, context),
         ),
+    )
+
+    # FORM_DATA
+    # in_form_data_parameters = filter_parameters(all_parameters, in_=FORM_DATA)
+    # validators.add_validator(
+    #     'form_data',
+    #     chain_reduce_partial(
+    #         operator.attrgetter('data'),
+    #         generate_form_data_validator(in_form_data_parameters, context),
+    #     )
+    # )
+
+    # REQUEST_BODY
+    in_request_body_parameters = filter_parameters(all_parameters, in_=BODY)
+    validators.add_validator(
+        'request_body',
+        chain_reduce_partial(
+            operator.attrgetter('data'),
+            generate_request_body_validator(in_request_body_parameters, context),
+        )
     )
 
     return generate_object_validator(field_validators=validators)

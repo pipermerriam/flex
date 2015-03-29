@@ -42,6 +42,20 @@ class Request(URLMixin):
         self.content_type = content_type
         self.headers = headers or {}
 
+    @property
+    def data(self):
+        """
+        TODO: What is the right way to do this?
+        """
+        if not self.body:
+            return self.body
+        elif self.body is EMPTY:
+            return EMPTY
+        elif self.content_type == 'application/json':
+            return json.loads(self.body)
+        else:
+            raise NotImplementedError("No parser for content type")
+
 
 def _normalize_requests_request(request):
     import requests
