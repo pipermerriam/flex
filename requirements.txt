@@ -5,3 +5,4 @@ validate-email>=1.2
 rfc3987>=1.3.4
 requests>=2.4.3
 click>=3.3
+jsonpointer==1.7

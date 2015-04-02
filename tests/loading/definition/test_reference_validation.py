@@ -24,7 +24,7 @@ def test_references_end_up_in_deferred_referrences():
                 'type': OBJECT,
                 'properties': {
                     'address': {
-                        '$ref': 'Address',
+                        '$ref': '#/definitions/Address',
                     }
                 }
             },
@@ -34,7 +34,7 @@ def test_references_end_up_in_deferred_referrences():
         }
     }
     definitions_validator(definitions, context=context)
-    assert 'Address' in deferred_references
+    assert '#/definitions/Address' in deferred_references
 
 
 def test_deferred_references_are_validated():
@@ -47,7 +47,7 @@ def test_deferred_references_are_validated():
                 'type': OBJECT,
                 'properties': {
                     'address': {
-                        '$ref': 'Address',
+                        '$ref': '#/definitions/Address',
                     }
                 }
             },

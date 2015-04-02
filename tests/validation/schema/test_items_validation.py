@@ -51,7 +51,7 @@ def test_invalid_values_against_schema_reference(items):
     schema = {
         'type': ARRAY,
         'items': {
-            '$ref': 'SomeReference',
+            '$ref': '#/definitions/SomeReference',
         },
     }
     context = {

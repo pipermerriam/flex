@@ -32,7 +32,7 @@ from tests.utils import (
 )
 def test_reference_with_valid_values(zipcode):
     schema = {
-        '$ref': 'ZipCode',
+        '$ref': '#/definitions/ZipCode',
     }
     context = {
         'definitions': {
@@ -58,7 +58,7 @@ def test_reference_with_valid_values(zipcode):
 )
 def test_reference_with_invalid_values(zipcode):
     schema = {
-        '$ref': 'ZipCode',
+        '$ref': '#/definitions/ZipCode',
     }
     context = {
         'definitions': {
@@ -86,7 +86,7 @@ def test_reference_with_invalid_values(zipcode):
 )
 def test_reference_with_additional_validators_and_valid_value(name):
     schema = {
-        '$ref': 'Name',
+        '$ref': '#/definitions/Name',
         'pattern': '^[A-Z][a-z]*$',
     }
     context = {
@@ -113,7 +113,7 @@ def test_reference_with_additional_validators_and_valid_value(name):
 )
 def test_reference_with_additional_validators_and_invalid_value(name):
     schema = {
-        '$ref': 'Name',
+        '$ref': '#/definitions/Name',
         'pattern': '^[A-Z][a-z]*$',
     }
     context = {
@@ -134,7 +134,7 @@ def test_reference_with_additional_validators_and_invalid_value(name):
 def test_reference_is_noop_when_not_required_and_not_provided():
     schema = {
         'properties': {
-            'name': {'$ref': 'Name'},
+            'name': {'$ref': '#/definitions/Name'},
         },
     }
     context = {
@@ -157,13 +157,13 @@ def test_non_required_circular_reference():
     reference is not required.  This test ensures that such a case is handled.
     """
     schema = {
-        '$ref': 'Node',
+        '$ref': '#/definitions/Node',
     }
     definitions = schema_definitions_validator(
         {
             'Node': {
                 'properties': {
-                    'parent': {'$ref': 'Node'},
+                    'parent': {'$ref': '#/definitions/Node'},
                     'value': {'type': STRING},
                 },
             },
@@ -185,14 +185,14 @@ def test_required_circular_reference():
     an infinite recursion situation.
     """
     schema = {
-        '$ref': 'Node',
+        '$ref': '#/definitions/Node',
     }
     definitions = schema_definitions_validator(
         {
             'Node': {
                 'required': ['parent'],
                 'properties': {
-                    'parent': {'$ref': 'Node'},
+                    'parent': {'$ref': '#/definitions/Node'},
                 },
             },
         },
@@ -225,13 +225,13 @@ def test_required_circular_reference():
 
 def test_nested_references_are_validated():
     schema = {
-        '$ref': 'Node',
+        '$ref': '#/definitions/Node',
     }
     definitions = schema_definitions_validator(
         {
             'Node': {
                 'properties': {
-                    'parent': {'$ref': 'Node'},
+                    'parent': {'$ref': '#/definitions/Node'},
                     'value': {'type': STRING},
                 },
             },

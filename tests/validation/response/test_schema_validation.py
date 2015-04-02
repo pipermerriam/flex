@@ -137,7 +137,7 @@ def test_response_body_schema_validation_with_items_as_reference():
                     'results': {
                         'type': ARRAY,
                         'items':{
-                            '$ref': 'User',
+                            '$ref': '#/definitions/User',
                         },
                     },
                 },
@@ -150,7 +150,7 @@ def test_response_body_schema_validation_with_items_as_reference():
                         200: {
                             'description': 'Success',
                             'schema': {
-                                '$ref': 'UserList',
+                                '$ref': '#/definitions/UserList',
                             },
                         }
                     },
