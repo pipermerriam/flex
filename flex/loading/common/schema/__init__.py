@@ -15,6 +15,9 @@ from .title import (
 from flex.loading.common.default import (
     validate_default_is_of_one_of_declared_types,
 )
+from flex.loading.common.external_docs import (
+    external_docs_validator,
+)
 from .min_properties import (
     min_properties_validator,
     validate_type_for_min_properties,
@@ -53,6 +56,7 @@ schema_field_validators.add_property_validator('maxProperties', max_properties_v
 schema_field_validators.add_property_validator('required', required_validator)
 schema_field_validators.add_property_validator('type', type_validator)
 schema_field_validators.add_property_validator('readOnly', read_only_validator)
+schema_field_validators.add_property_validator('externalDocs', external_docs_validator)
 
 schema_non_field_validators = ValidationDict()
 schema_non_field_validators.update(common_non_field_validators)

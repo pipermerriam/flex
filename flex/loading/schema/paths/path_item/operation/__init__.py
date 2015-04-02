@@ -13,6 +13,9 @@ from flex.validation.common import (
 from flex.loading.common.mimetypes import (
     mimetype_validator,
 )
+from flex.loading.common.external_docs import (
+    external_docs_validator,
+)
 from .parameters import (
     parameters_validator,
 )
@@ -34,9 +37,6 @@ operation_schema = {
             'type': STRING,
         },
         'description': {
-            'type': STRING,
-        },
-        'externalDocs': {
             'type': STRING,
         },
         'operationId': {
@@ -66,6 +66,7 @@ operation_schema = {
 field_validators = ValidationDict()
 field_validators.add_property_validator('parameters', parameters_validator)
 field_validators.add_property_validator('responses', responses_validator)
+field_validators.add_property_validator('externalDocs', external_docs_validator)
 
 non_field_validators = ValidationDict()
 non_field_validators.add_property_validator('consumes', mimetype_validator)
