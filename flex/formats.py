@@ -74,7 +74,11 @@ register = registry.register
 
 @register(URI, STRING)
 def uri_validator(value, **kwargs):
-    parts = rfc3987.parse(value, rule='URI')
+    try:
+        parts = rfc3987.parse(value, rule='URI')
+    except ValueError:
+        raise ValidationError(MESSAGES['format']['invalid_uri'].format(value))
+
     if not parts['scheme'] or not parts['authority']:
         raise ValidationError(MESSAGES['format']['invalid_uri'].format(value))
 
