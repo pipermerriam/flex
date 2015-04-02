@@ -67,7 +67,7 @@ single_parameter_field_validators.add_property_validator(
 single_parameter_non_field_validators = ValidationDict()
 single_parameter_non_field_validators.update(common_non_field_validators)
 single_parameter_non_field_validators.update(common_type_validators)
-single_parameter_non_field_validators.add_property_validator(
+single_parameter_non_field_validators.add_validator(
     'default', validate_default_is_of_one_of_declared_types,
 )
 single_parameter_non_field_validators.add_validator(
