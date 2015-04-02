@@ -1,3 +1,11 @@
+3.5.1
+-----
+
+- Fix bug with how the keyword `default` was being validated for Parameter
+  Objects.
+- Fix how the keyword `externalDocs` was validated on Operation and Schema
+  objects.
+
 3.5.0
 -----
 
