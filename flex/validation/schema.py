@@ -3,6 +3,9 @@ import collections
 import functools
 
 import six
+from six.moves import urllib_parse as urlparse
+
+import jsonpointer
 
 from flex.exceptions import (
     ValidationError,
@@ -175,23 +178,27 @@ class LazyReferenceValidator(object):
     The validator is only constructed if validator is needed.
     """
     def __init__(self, reference, context):
-        # TODO: something better than this assertion
-        assert 'definitions' in context
-        assert reference in context['definitions']
+        # TODO: something better than this which potentiall raises a JsonPointerException
+        self.reference_fragment = urlparse.urlparse(reference).fragment
+        jsonpointer.resolve_pointer(context, self.reference_fragment)
         self.reference = reference
         self.context = context
 
     def __call__(self, value, **kwargs):
         return validate_object(
             value,
-            schema=self.context['definitions'][self.reference],
+            schema=self.schema,
             **kwargs
         )
 
     @property
+    def schema(self):
+        return jsonpointer.resolve_pointer(self.context, self.reference_fragment)
+
+    @property
     def validators(self):
         return construct_schema_validators(
-            self.context['definitions'][self.reference],
+            self.schema,
             self.context,
         )
 

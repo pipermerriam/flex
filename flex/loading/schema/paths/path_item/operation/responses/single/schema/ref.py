@@ -1,3 +1,7 @@
+from six.moves import urllib_parse as urlparse
+
+import jsonpointer
+
 from flex.exceptions import ValidationError
 from flex.error_messages import MESSAGES
 from flex.constants import (
@@ -19,11 +23,10 @@ from flex.decorators import (
 @skip_if_not_of_type(STRING)
 def validate_reference(reference, context, **kwargs):
     try:
-        definitions = context['definitions']
-    except KeyError:
-        raise KeyError(MESSAGES['unknown_reference']['no_definitions'])
-    if reference not in definitions:
-        raise ValidationError(MESSAGES['unknown_reference']['definition'].format(reference))
+        parts = urlparse.urlparse(reference)
+        jsonpointer.resolve_pointer(context, parts.fragment)
+    except jsonpointer.JsonPointerException:
+        raise ValidationError(MESSAGES['reference']['undefined'].format(reference))
 
 
 ref_schema = {

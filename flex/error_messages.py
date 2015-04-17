@@ -160,14 +160,6 @@ PATH_MESSAGES = {
 }
 
 
-UNKNOWN_REFERENCE_MESSAGES = {
-    'security': "Unknown SecurityScheme reference `{0}`",
-    'parameter': "Unknown Parameter reference `{0}`",
-    'definition': 'Unknown definition reference `{0}`',
-    'no_definitions': "No definitions found in context",
-}
-
-
 CONTENT_TYPE_MESSAGES = {
     'invalid': 'Invalid content type `{0}`.  Must be one of `{1}`.',
 }
@@ -201,7 +193,14 @@ MIMETYPE_MESSAGES = {
 
 
 REFERENCE_MESSAGES = {
-    'undefined': "The $ref `{0}` is referenced but never defined",
+    'unsupported': (
+        "Unsupported Reference: `{0}` - $ref validation does not currently "
+        "support references that are anything more than a url fragment."
+    ),
+    'security': "Unknown SecurityScheme reference `{0}`",
+    'parameter': "Unknown Parameter reference `{0}`",
+    'undefined': "The $ref `{0}` was not found in the schema",
+    'no_definitions': "No definitions found in context",
 }
 
 
@@ -239,7 +238,6 @@ MESSAGES = {
     'request': REQUEST_MESSAGES,
     'response': RESPONSE_MESSAGES,
     'path': PATH_MESSAGES,
-    'unknown_reference': UNKNOWN_REFERENCE_MESSAGES,
     'content_type': CONTENT_TYPE_MESSAGES,
     'host': HOST_MESSAGES,
     'schemes': SCHEMES_MESSAGES,

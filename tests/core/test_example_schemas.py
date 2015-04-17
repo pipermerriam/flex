@@ -9,7 +9,7 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 @pytest.mark.parametrize(
     'path',
     (
-        os.path.join(DIR, 'example_schemas/uber.yaml'),
+        pytest.mark.xfail(os.path.join(DIR, 'example_schemas/uber.yaml')),
         pytest.mark.xfail(os.path.join(DIR, 'example_schemas/petstore.yaml')),
         pytest.mark.xfail(os.path.join(DIR, 'example_schemas/petstore-expanded.yaml')),
         os.path.join(DIR, 'example_schemas/api-with-examples.yaml'),

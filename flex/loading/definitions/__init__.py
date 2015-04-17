@@ -1,3 +1,7 @@
+from six.moves import urllib_parse as urlparse
+
+import jsonpointer
+
 from flex.exceptions import ErrorDict
 from flex.error_messages import MESSAGES
 from flex.datastructures import (
@@ -11,7 +15,6 @@ from flex.validation.common import (
 )
 from flex.decorators import (
     skip_if_not_of_type,
-    pull_keys_from_obj,
 )
 
 from .schema_definitions import schema_definitions_validator
@@ -35,8 +38,7 @@ definitions_schema = {
 
 
 @skip_if_not_of_type(OBJECT)
-@pull_keys_from_obj('definitions')
-def validate_references(definitions, context, **kwargs):
+def validate_deferred_references(schema, context, **kwargs):
     try:
         deferred_references = context['deferred_references']
     except:
@@ -44,7 +46,16 @@ def validate_references(definitions, context, **kwargs):
 
     with ErrorDict() as errors:
         for reference in deferred_references:
-            if reference not in definitions:
+            parts = urlparse.urlparse(reference)
+            if any((parts.scheme, parts.netloc, parts.path, parts.params, parts.query)):
+                errors.add_error(
+                    reference,
+                    MESSAGES['reference']['unsupported'].format(reference),
+                )
+                continue
+            try:
+                jsonpointer.resolve_pointer(schema, parts.fragment)
+            except jsonpointer.JsonPointerException:
                 errors.add_error(
                     reference,
                     MESSAGES['reference']['undefined'].format(reference),
@@ -52,12 +63,12 @@ def validate_references(definitions, context, **kwargs):
 
 
 field_validators = ValidationDict()
-field_validators.add_property_validator('definitions', schema_definitions_validator)
 field_validators.add_property_validator('parameters', parameters_validator)
 field_validators.add_property_validator('responses', responses_validator)
+field_validators.add_property_validator('definitions', schema_definitions_validator)
 
 non_field_validators = ValidationDict()
-non_field_validators.add_validator('definitions', validate_references)
+non_field_validators.add_validator('definitions', validate_deferred_references)
 
 
 definitions_validator = generate_object_validator(

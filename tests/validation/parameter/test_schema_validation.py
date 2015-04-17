@@ -35,7 +35,7 @@ def test_parameter_schema_as_reference_validation_for_invalid_value(value, error
             'in': BODY,
             'description': 'id',
             'required': True,
-            'schema': {'$ref': 'UUID'},
+            'schema': {'$ref': '#/definitions/UUID'},
         },
     ], context=context)
     parameter_values = {
