@@ -1,3 +1,10 @@
+4.0.0
+-----
+
+- Breaking Change:  Changes the implementation for how ``$ref`` values were
+  validated and resolved to be compliant with the json pointer spec 
+  (RFC6901  https://tools.ietf.org/html/rfc6901).
+
 3.5.1
 -----
 
