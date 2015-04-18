@@ -1,3 +1,8 @@
+4.0.1
+-----
+
+- Remove the use of pip's internals in the setup.py file.
+
 4.0.0
 -----
 

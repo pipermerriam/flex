@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pip.req import parse_requirements
-from pip.download import PipSession
 import os
 
 DIR = os.path.dirname(os.path.abspath(__file__))
@@ -11,13 +9,9 @@ try:
 except ImportError:
     from distutils.core import setup, find_packages
 
-version = '4.0.0'
+version = '4.0.1'
 
 readme = open(os.path.join(DIR, 'README.md')).read()
-
-requirements = [
-    str(req.req) for req in parse_requirements('requirements.txt', session=PipSession())
-]
 
 
 setup(
@@ -30,7 +24,16 @@ setup(
     url='https://github.com/pipermerriam/flex',
     include_package_data=True,
     py_modules=['flex'],
-    install_requires=requirements,
+    install_requires=[
+        "six>=1.7.3",
+        "PyYAML>=3.11",
+        "iso8601>=0.1.10",
+        "validate-email>=1.2",
+        "rfc3987>=1.3.4",
+        "requests>=2.4.3",
+        "click>=3.3",
+        "jsonpointer>=1.7",
+    ],
     license="BSD",
     zip_safe=False,
     entry_points={
