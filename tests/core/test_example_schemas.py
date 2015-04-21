@@ -14,6 +14,8 @@ DIR = os.path.dirname(os.path.abspath(__file__))
         os.path.join(DIR, 'example_schemas/petstore-minimal.json'),
         os.path.join(DIR, 'example_schemas/petstore-expanded.json'),
         os.path.join(DIR, 'example_schemas/petstore-with-external-docs.json'),
+        # from http://petstore.swagger.io/v2/swagger.json
+        os.path.join(DIR, 'example_schemas/petstore-from-public-example.json'),
     )
 )
 def test_load_and_parse_schema(path):

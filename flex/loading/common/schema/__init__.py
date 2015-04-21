@@ -12,9 +12,6 @@ from flex.loading.common.format import (
 from .title import (
     title_validator,
 )
-from flex.loading.common.default import (
-    validate_default_is_of_one_of_declared_types,
-)
 from flex.loading.common.external_docs import (
     external_docs_validator,
 )
@@ -63,9 +60,6 @@ schema_non_field_validators.update(common_non_field_validators)
 schema_non_field_validators.update(common_type_validators)
 
 
-schema_non_field_validators.add_validator(
-    'default', validate_default_is_of_one_of_declared_types,
-)
 schema_non_field_validators.add_validator(
     'maxProperties', validate_max_properties_is_greater_than_or_equal_to_min_properties,
 )
