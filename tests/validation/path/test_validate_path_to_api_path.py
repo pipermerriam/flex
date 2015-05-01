@@ -26,6 +26,7 @@ def test_basic_request_path_validation():
     request = RequestFactory(url='http://www.example.com/get')
     path = validate_path_to_api_path(
         path=request.path,
+        context=context,
         **context
     )
     assert path == '/get'
@@ -50,6 +51,7 @@ def test_basic_request_path_validation_with_unspecified_paths(request_path):
     with pytest.raises(ValidationError) as err:
         validate_path_to_api_path(
             path=request.path,
+            context=context,
             **context
         )
 
@@ -72,6 +74,7 @@ def test_parametrized_string_path_validation():
     request = RequestFactory(url='http://www.example.com/get/25')
     path = validate_path_to_api_path(
         path=request.path,
+        context=context,
         **context
     )
     assert path == '/get/{id}'
@@ -90,6 +93,7 @@ def test_parametrized_integer_path_validation():
     request = RequestFactory(url='http://www.example.com/get/25')
     path = validate_path_to_api_path(
         path=request.path,
+        context=context,
         **context
     )
     assert path == '/get/{id}'
@@ -109,6 +113,7 @@ def test_parametrized_path_with_multiple_prameters():
     request = RequestFactory(url='http://www.example.com/users/john-smith/posts/47')
     path = validate_path_to_api_path(
         path=request.path,
+        context=context,
         **context
     )
     assert path == '/users/{username}/posts/{id}'
@@ -119,8 +124,7 @@ def test_parametrized_path_with_parameter_definition_as_reference():
         paths={
             '/get/{id}': {
                 'parameters': [
-                    # One very plain id of type string.
-                    'id',
+                    {'$ref': '#/parameters/id'}
                 ],
             },
         },
@@ -138,6 +142,7 @@ def test_parametrized_path_with_parameter_definition_as_reference():
     request = RequestFactory(url='http://www.example.com/get/12345')
     path = validate_path_to_api_path(
         path=request.path,
+        context=context,
         **context
     )
     assert path == '/get/{id}'

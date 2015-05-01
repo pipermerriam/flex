@@ -91,17 +91,18 @@ def path_to_pattern(api_path, parameters):
     return pattern
 
 
-def path_to_regex(api_path, path_parameters, operation_parameters=None, global_parameters=None):
-    if global_parameters is None:
-        global_parameters = {}
+def path_to_regex(api_path, path_parameters, operation_parameters=None,
+                  context=None):
+    if context is None:
+        context = {}
     if operation_parameters is None:
         operation_parameters = []
     pattern = path_to_pattern(
         api_path=api_path,
         parameters=merge_parameter_lists(
-            global_parameters.values(),
-            dereference_parameter_list(path_parameters, global_parameters),
-            dereference_parameter_list(operation_parameters, global_parameters),
+            context.get('parameters', {}).values(),
+            dereference_parameter_list(path_parameters, context),
+            dereference_parameter_list(operation_parameters, context),
         ),
     )
     return re.compile(pattern)
@@ -121,15 +122,15 @@ def extract_operation_parameters(path_definition):
     ))
 
 
-def match_path_to_api_path(path_definitions, target_path, base_path='', global_parameters=None):
+def match_path_to_api_path(path_definitions, target_path, base_path='', context=None):
     """
     Match a request or response path to one of the api paths.
 
     Anything other than exactly one match is an error condition.
     """
-    if global_parameters is None:
-        global_parameters = {}
-    assert isinstance(global_parameters, collections.Mapping)
+    if context is None:
+        context = {}
+    assert isinstance(context, collections.Mapping)
     if target_path.startswith(base_path):
         target_path = target_path[len(base_path):]
 
@@ -139,7 +140,7 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', global_p
             api_path=p,
             path_parameters=extract_path_parameters(v),
             operation_parameters=extract_operation_parameters(v),
-            global_parameters=global_parameters,
+            context=context,
         )
         for p, v in path_definitions.items()
     }

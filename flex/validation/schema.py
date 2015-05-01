@@ -3,9 +3,6 @@ import collections
 import functools
 
 import six
-from six.moves import urllib_parse as urlparse
-
-import jsonpointer
 
 from flex.exceptions import (
     ValidationError,
@@ -18,6 +15,9 @@ from flex.constants import (
     OBJECT,
 )
 from flex.decorators import skip_if_not_of_type
+from flex.validation.reference import (
+    LazyReferenceValidator,
+)
 from flex.validation.common import (
     noop,
     skip_if_empty,
@@ -98,7 +98,7 @@ def construct_items_validators(items, context):
         )
     elif isinstance(items, six.string_types):
         items_validators = {
-            '$ref': LazyReferenceValidator(items, context),
+            '$ref': SchemaReferenceValidator(items, context),
         }
     else:
         assert 'Should not be possible'
@@ -169,43 +169,6 @@ validator_mapping = {
 }
 
 
-class LazyReferenceValidator(object):
-    """
-    This class acts as a lazy validator for references in schemas to prevent an
-    infinite recursion error when a schema references itself, or there is a
-    reference loop between more than one schema.
-
-    The validator is only constructed if validator is needed.
-    """
-    def __init__(self, reference, context):
-        # TODO: something better than this which potentiall raises a JsonPointerException
-        self.reference_fragment = urlparse.urlparse(reference).fragment
-        jsonpointer.resolve_pointer(context, self.reference_fragment)
-        self.reference = reference
-        self.context = context
-
-    def __call__(self, value, **kwargs):
-        return validate_object(
-            value,
-            schema=self.schema,
-            **kwargs
-        )
-
-    @property
-    def schema(self):
-        return jsonpointer.resolve_pointer(self.context, self.reference_fragment)
-
-    @property
-    def validators(self):
-        return construct_schema_validators(
-            self.schema,
-            self.context,
-        )
-
-    def items(self):
-        return self.validators.items()
-
-
 def construct_schema_validators(schema, context):
     """
     Given a schema object, construct a dictionary of validators needed to
@@ -225,7 +188,7 @@ def construct_schema_validators(schema, context):
     validators = ValidationDict()
     if '$ref' in schema:
         validators.add_validator(
-            '$ref', LazyReferenceValidator(schema['$ref'], context),
+            '$ref', SchemaReferenceValidator(schema['$ref'], context),
         )
     if 'properties' in schema:
         for property_, property_schema in schema['properties'].items():
@@ -239,3 +202,14 @@ def construct_schema_validators(schema, context):
         if key in validator_mapping:
             validators.add_validator(key, validator_mapping[key](context=context, **schema))
     return validators
+
+
+class SchemaReferenceValidator(LazyReferenceValidator):
+    """
+    This class acts as a lazy validator for references in schemas to prevent an
+    infinite recursion error when a schema references itself, or there is a
+    reference loop between more than one schema.
+
+    The validator is only constructed if validator is needed.
+    """
+    validators_constructor = construct_schema_validators

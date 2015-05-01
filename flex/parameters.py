@@ -1,6 +1,5 @@
-import collections
-
 from flex.decorators import rewrite_reserved_words
+from flex.utils import dereference_reference
 
 
 @rewrite_reserved_words
@@ -44,8 +43,10 @@ def merge_parameter_lists(*parameter_definitions):
     return merged_parameters.values()
 
 
-def dereference_parameter_list(parameters, parameter_definitions):
-    return [
-        (p if isinstance(p, collections.Mapping) else parameter_definitions[p])
+def dereference_parameter_list(parameters, context):
+    return tuple((
+        dereference_reference(p['$ref'], context)
+        if '$ref' in p
+        else p
         for p in parameters
-    ]
+    ))

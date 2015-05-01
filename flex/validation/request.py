@@ -24,6 +24,7 @@ def validate_request(request, schema):
         try:
             api_path = validate_path_to_api_path(
                 path=request.path,
+                context=schema,
                 **schema
             )
         except ValidationError as err:

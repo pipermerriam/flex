@@ -197,7 +197,7 @@ def test_response_validation_with_parameter_as_reference():
             '/get/{id}': {
                 'get': {'responses': {200: {'description': 'Success'}}},
                 'parameters': [
-                    'id',
+                    {'$ref': '#/parameters/id'},
                 ]
             },
         },
@@ -231,7 +231,7 @@ def test_response_validation_with_parameter_as_reference_for_invalid_value():
             '/get/{id}': {
                 'get': {'responses': {200: {'description': 'Success'}}},
                 'parameters': [
-                    'id',
+                    {'$ref': '#/parameters/id'},
                 ]
             },
         },

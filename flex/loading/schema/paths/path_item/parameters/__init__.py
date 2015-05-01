@@ -7,7 +7,7 @@ from flex.constants import (
 )
 from flex.validation.common import (
     generate_object_validator,
-    apply_validator_to_array,
+    apply_validator_to_object,
 )
 from flex.validation.utils import (
     generate_any_validator,
@@ -27,7 +27,7 @@ parameters_schema = {
 parameters_non_field_validators = ValidationList()
 parameters_non_field_validators.add_validator(
     functools.partial(
-        apply_validator_to_array,
+        apply_validator_to_object,
         validator=generate_any_validator(
             referenceObject=reference_object_validator,
             parameterObject=single_parameter_validator,

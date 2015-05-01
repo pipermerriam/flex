@@ -18,7 +18,10 @@ class ErrorCollectionMixin(object):
             if not issubclass(type_, ValidationError):
                 return False
         if self:
-            raise ValidationError(self)
+            self.raise_()
+
+    def raise_(self):
+        raise ValidationError(self)
 
 
 class ErrorList(ErrorCollectionMixin, list):

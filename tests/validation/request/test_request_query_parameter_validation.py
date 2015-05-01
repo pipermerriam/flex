@@ -35,7 +35,7 @@ def test_request_query_parameter_validation_with_no_declared_parameters():
         paths={
             '/get/{id}/': {
                 'parameters': [
-                    'id',
+                    {'$ref': '#/parameters/id'},
                 ],
                 'get': {
                     'responses': {200: {'description': "Success"}},

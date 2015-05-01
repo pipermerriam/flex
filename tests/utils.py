@@ -48,6 +48,12 @@ def assert_error_message_equal(formatted_msg, unformatted_msg):
         )
 
 
+def _compute_error_path(*values):
+    return '.'.join(
+        (six.text_type(value) for value in values)
+    ).strip('.')
+
+
 def _find_message_in_errors(message, errors, namespace=''):
     if isinstance(errors, six.string_types):
         if check_if_error_message_equal(errors, message):
@@ -57,7 +63,7 @@ def _find_message_in_errors(message, errors, namespace=''):
             for match in _find_message_in_errors(
                 message,
                 error,
-                '.'.join((namespace, key)).strip('.'),
+                _compute_error_path(namespace, key),
             ):
                 yield match
     elif isinstance(errors, list):
@@ -65,7 +71,7 @@ def _find_message_in_errors(message, errors, namespace=''):
             for match in _find_message_in_errors(
                 message,
                 error,
-                '.'.join((namespace, six.text_type(index))).strip('.'),
+                _compute_error_path(namespace, index),
             ):
                 yield match
     else:
@@ -78,8 +84,11 @@ def find_message_in_errors(*args, **kwargs):
 
 
 def _find_matching_paths(target_path, paths):
+    # paths with `.` in them.
     pattern = re.sub('\.', '.+', target_path)
+    # paths with a `^` not at the front
     pattern = re.sub(r'^(.+)\^', r'\1\^', pattern)
+    # paths with a `$` not at the end.
     pattern = re.sub(r'\$(.+)$', r'\$\1', pattern)
     for message_path in paths:
         if re.search(pattern, message_path):
@@ -120,14 +129,14 @@ def _enumerate_error_paths(errors, namespace=''):
         for key, error in errors.items():
             for match in _enumerate_error_paths(
                 error,
-                '.'.join((namespace, key)).strip('.'),
+                _compute_error_path(namespace, key),
             ):
                 yield match
     elif isinstance(errors, list):
         for index, error in enumerate(errors):
             for match in _enumerate_error_paths(
                 error,
-                '.'.join((namespace, six.text_type(index))).strip('.'),
+                _compute_error_path(namespace, index),
             ):
                 yield match
     else:

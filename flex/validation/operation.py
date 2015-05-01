@@ -116,14 +116,13 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     # TODO: figure out how to merge this with the same code in response
     # validation.
     validators = ValidationDict()
-    parameter_definitions = context.get('parameters', {})
     path_level_parameters = dereference_parameter_list(
         path_definition.get('parameters', []),
-        parameter_definitions,
+        context,
     )
     operation_level_parameters = dereference_parameter_list(
         parameters,
-        parameter_definitions,
+        context,
     )
 
     all_parameters = merge_parameter_lists(
