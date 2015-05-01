@@ -430,18 +430,18 @@ def validate_request_method_to_operation(request_method, path_definition):
     return operation_definition
 
 
-def validate_path_to_api_path(path, paths, basePath='', parameters=None, **kwargs):
+def validate_path_to_api_path(path, paths, basePath='', context=None, **kwargs):
     """
     Given a path, find the api_path it matches.
     """
-    if parameters is None:
-        parameters = {}
+    if context is None:
+        context = {}
     try:
         api_path = match_path_to_api_path(
             path_definitions=paths,
             target_path=path,
             base_path=basePath,
-            global_parameters=parameters,
+            context=context,
         )
     except LookupError as err:
         raise ValidationError(str(err))

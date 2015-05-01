@@ -2,7 +2,10 @@ import math
 import collections
 import numbers
 
+from six.moves import urllib_parse as urlparse
 import six
+
+import jsonpointer
 
 from flex.constants import (
     PRIMATIVE_TYPES,
@@ -16,6 +19,7 @@ from flex.constants import (
     TRUE_VALUES,
     FALSE_VALUES,
 )
+from flex.error_messages import MESSAGES
 
 from flex.functional import chain_reduce_partial as _chain_reduce_partial
 
@@ -186,3 +190,12 @@ def format_errors(errors, indent=0, prefix='', suffix=''):
 
 def prettify_errors(errors):
     return '\n'.join(format_errors(errors))
+
+
+def dereference_reference(reference, context):
+    parts = urlparse.urlparse(reference)
+    if any((parts.scheme, parts.netloc, parts.path, parts.params, parts.query)):
+        raise ValueError(
+            MESSAGES['reference']['unsupported'].format(reference),
+        )
+    return jsonpointer.resolve_pointer(context, parts.fragment)

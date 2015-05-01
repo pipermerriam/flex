@@ -114,14 +114,13 @@ def generate_path_validator(api_path, path_definition, parameters,
     """
     Generates a callable for validating the parameters in a response object.
     """
-    global_parameters = context.get('parameters', {})
     path_level_parameters = dereference_parameter_list(
         path_definition.get('parameters', []),
-        global_parameters,
+        context,
     )
     operation_level_parameters = dereference_parameter_list(
         parameters,
-        global_parameters,
+        context,
     )
 
     all_parameters = merge_parameter_lists(
@@ -202,6 +201,7 @@ def validate_response(response, request_method, schema):
         try:
             api_path = validate_path_to_api_path(
                 path=response.path,
+                context=schema,
                 **schema
             )
         except ValidationError as err:

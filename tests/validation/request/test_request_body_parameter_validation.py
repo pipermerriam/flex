@@ -45,7 +45,7 @@ def user_post_schema():
         paths={
             '/post/': {
                 'parameters': [
-                    'user',
+                    {'$ref': '#/parameters/user'},
                 ],
                 'post': {
                     'responses': {200: {'description': "Success"}},

@@ -3,6 +3,9 @@ from flex.utils import is_non_string_iterable
 from flex.exceptions import ValidationError
 from flex.error_messages import MESSAGES
 from flex.context_managers import ErrorCollection
+from flex.validation.reference import (
+    LazyReferenceValidator,
+)
 from flex.validation.common import (
     noop,
     generate_type_validator,
@@ -102,6 +105,10 @@ def construct_parameter_validators(parameter, context):
     definition.
     """
     validators = ValidationDict()
+    if '$ref' in parameter:
+        validators.add_validator(
+            '$ref', ParameterReferenceValidator(parameter['$ref'], context),
+        )
     for key in parameter:
         if key in validator_mapping:
             validators.add_validator(
@@ -151,3 +158,7 @@ def construct_multi_parameter_validators(parameters, context):
         )
 
     return validators
+
+
+class ParameterReferenceValidator(LazyReferenceValidator):
+    validators_constructor = construct_parameter_validators

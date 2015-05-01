@@ -10,10 +10,9 @@ from flex.validation.common import (
 from .operation import (
     operation_validator,
 )
-
-
-def parameters_validator(*args, **kwargs):
-    pass
+from .parameters import (
+    parameters_validator,
+)
 
 
 path_item_schema = {
