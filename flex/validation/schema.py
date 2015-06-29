@@ -13,7 +13,6 @@ from flex.error_messages import MESSAGES
 from flex.constants import (
     ARRAY,
     OBJECT,
-    BOOLEAN,
 )
 from flex.decorators import skip_if_not_of_type
 from flex.validation.reference import (
