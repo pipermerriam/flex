@@ -44,6 +44,11 @@ from flex.loading.common import (
 
 schema_schema = {
     'type': OBJECT,
+    'properties': {
+        'properties': {
+            'type': OBJECT,
+        },
+    }
 }
 
 schema_field_validators = ValidationDict()

@@ -112,6 +112,14 @@ MAX_PROPERTIES_MESSAGES = {
 }
 
 
+ADDITIONAL_PROPERTIES_MESSAGES = {
+    'extra_properties': (
+        "When `additionalProperties` is False, no unspecified properties are "
+        "allowed.  The following unspecified properties were found:\n\t`{0}`"
+    ),
+}
+
+
 ITEMS_MESSAGES = {
     'invalid_type': '`items` must be a reference, a schema, or an array of schemas.',
     'items_required_for_type_array': (
@@ -231,6 +239,7 @@ MESSAGES = {
     'max_items': MAX_ITEMS_MESSAGES,
     'min_properties': MIN_PROPERTIES_MESSAGES,
     'max_properties': MAX_PROPERTIES_MESSAGES,
+    'additional_properties': ADDITIONAL_PROPERTIES_MESSAGES,
     'unique_items': UNIQUE_ITEMS_MESSAGES,
     'enum': ENUM_MESSAGES,
     'pattern': PATTERN_MESSAGES,

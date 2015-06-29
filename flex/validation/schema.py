@@ -13,6 +13,7 @@ from flex.error_messages import MESSAGES
 from flex.constants import (
     ARRAY,
     OBJECT,
+    BOOLEAN,
 )
 from flex.decorators import skip_if_not_of_type
 from flex.validation.reference import (
@@ -149,6 +150,29 @@ def generate_items_validator(items, context, **kwargs):
     )
 
 
+@skip_if_not_of_type(OBJECT)
+@skip_if_empty
+def validate_additional_properties(obj, additional_properties, properties, **kwargs):
+    if additional_properties is False:
+        allowed_properties = set(properties.keys())
+        actual_properties = set(obj.keys())
+        extra_properties = actual_properties.difference(allowed_properties)
+        if extra_properties:
+            raise ValidationError(
+                MESSAGES['additional_properties']['extra_properties'].format(
+                    repr(extra_properties),
+                )
+            )
+
+
+def generate_additional_properties_validator(additionalProperties, properties, **kwargs):
+    return functools.partial(
+        validate_additional_properties,
+        additional_properties=additionalProperties,
+        properties=properties,
+    )
+
+
 validator_mapping = {
     'type': generate_type_validator,
     'multipleOf': generate_multiple_of_validator,
@@ -197,6 +221,11 @@ def construct_schema_validators(schema, context):
                 context=context,
             )
             validators.add_property_validator(property_, property_validator)
+    if schema.get('additionalProperties') is False:
+        validators.add_validator(
+            'additionalProperties',
+            generate_additional_properties_validator(context=context, **schema),
+        )
     assert 'context' not in schema
     for key in schema:
         if key in validator_mapping:
