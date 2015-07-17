@@ -165,7 +165,7 @@ def generate_maximum_validator(maximum, exclusiveMaximum=False, **kwargs):
 @skip_if_not_of_type(STRING)
 def validate_min_length(value, minLength, **kwargs):
     if len(value) < minLength:
-        raise ValidationError(MESSAGES['min_length']['invalid'].format(len(value)))
+        raise ValidationError(MESSAGES['min_length']['invalid'].format(minLength))
 
 
 def generate_min_length_validator(minLength, **kwargs):
@@ -179,7 +179,7 @@ def generate_min_length_validator(minLength, **kwargs):
 @skip_if_not_of_type(STRING)
 def validate_max_length(value, maxLength, **kwargs):
     if len(value) > maxLength:
-        raise ValidationError(MESSAGES['max_length']['invalid'].format(len(value)))
+        raise ValidationError(MESSAGES['max_length']['invalid'].format(maxLength))
 
 
 def generate_max_length_validator(maxLength, **kwargs):
