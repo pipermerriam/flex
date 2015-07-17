@@ -1,3 +1,9 @@
+4.2.1
+-----
+
+- Fix for error message from `minLength` and `maxLength` validation.  See
+  https://github.com/pipermerriam/flex/issues/84
+
 4.2.0
 -----
 
