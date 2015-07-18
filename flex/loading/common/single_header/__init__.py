@@ -22,9 +22,6 @@ from flex.loading.common import (
     non_field_validators as common_non_field_validators,
     type_validators as common_type_validators,
 )
-from flex.loading.common.default import (
-    validate_default_is_of_one_of_declared_types,
-)
 from flex.validation.common import (
     generate_object_validator,
 )
@@ -70,9 +67,6 @@ def validate_items_required_if_type_arraw(type_, items, **kwargs):
 single_header_non_field_validators = ValidationDict()
 single_header_non_field_validators.update(common_non_field_validators)
 single_header_non_field_validators.update(common_type_validators)
-single_header_non_field_validators.add_validator(
-    'default', validate_default_is_of_one_of_declared_types,
-)
 single_header_non_field_validators.add_validator(
     'items', validate_items_required_if_type_arraw,
 )

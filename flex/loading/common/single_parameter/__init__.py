@@ -35,9 +35,6 @@ from .collection_format import (
     collection_format_validator,
     validate_collection_format_based_on_in_value,
 )
-from flex.loading.common.default import (
-    validate_default_is_of_one_of_declared_types,
-)
 from .items import (
     validate_items_required_if_array_type,
 )
@@ -67,9 +64,6 @@ single_parameter_field_validators.add_property_validator(
 single_parameter_non_field_validators = ValidationDict()
 single_parameter_non_field_validators.update(common_non_field_validators)
 single_parameter_non_field_validators.update(common_type_validators)
-single_parameter_non_field_validators.add_validator(
-    'default', validate_default_is_of_one_of_declared_types,
-)
 single_parameter_non_field_validators.add_validator(
     'required', validate_path_parameters_must_be_required,
 )

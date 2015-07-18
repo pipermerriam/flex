@@ -163,9 +163,9 @@ def test_contact_is_not_required():
 
 @pytest.mark.parametrize(
     'value',
-    NON_STRING_VALUES,
+    ('abc', 1, 2.2, ['a', 'b'], None, True),
 )
-def test_contact_must_be_a_string(value):
+def test_contact_must_be_an_object(value):
     data = {
         'contact': value,
     }
@@ -176,6 +176,148 @@ def test_contact_must_be_a_string(value):
         MESSAGES['type']['invalid'],
         err.value.detail,
         'contact.type',
+    )
+
+
+#
+# contact.name
+#
+@pytest.mark.parametrize(
+    'value',
+    NON_STRING_VALUES,
+)
+def test_contact_object_name_type_validation(value):
+    data = {
+        'contact': {'name': value},
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'contact.name.type',
+    )
+
+
+def test_contact_object_name_with_good_value():
+    data = {
+        'contact': {'name': 'Test Name'},
+    }
+    try:
+        info_validator(data)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'contact.name',
+        errors,
+    )
+
+
+#
+# contact.email
+#
+@pytest.mark.parametrize(
+    'value',
+    NON_STRING_VALUES,
+)
+def test_contact_object_email_type_validation(value):
+    data = {
+        'contact': {'email': value},
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'contact.email.type',
+    )
+
+
+def test_contact_object_email_format_validation():
+    data = {
+        'contact': {'email': 'not-a-valid-email'},
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['format']['invalid_email'],
+        err.value.detail,
+        'contact.email.format',
+    )
+
+
+def test_contact_object_email_with_good_value():
+    data = {
+        'contact': {'email': 'test@example.com'},
+    }
+    try:
+        info_validator(data)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'contact.email',
+        errors,
+    )
+
+
+#
+# contact.url
+#
+@pytest.mark.parametrize(
+    'value',
+    NON_STRING_VALUES,
+)
+def test_contact_object_url_type_validation(value):
+    data = {
+        'contact': {'url': value},
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'contact.url.type',
+    )
+
+
+def test_contact_object_url_format_validation():
+    data = {
+        'contact': {'url': 'not-a-valid-url'},
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['format']['invalid_uri'],
+        err.value.detail,
+        'contact.url.format',
+    )
+
+
+def test_contact_object_url_with_good_value():
+    data = {
+        'contact': {'url': 'http://www.example.com'},
+    }
+    try:
+        info_validator(data)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'contact.url',
+        errors,
     )
 
 
@@ -199,9 +341,9 @@ def test_license_is_not_required():
 
 @pytest.mark.parametrize(
     'value',
-    NON_STRING_VALUES,
+    ('abc', 1, 2.2, ['a', 'b'], None, True),
 )
-def test_license_must_be_a_string(value):
+def test_license_must_be_an_object(value):
     data = {
         'license': value,
     }
@@ -212,6 +354,106 @@ def test_license_must_be_a_string(value):
         MESSAGES['type']['invalid'],
         err.value.detail,
         'license.type',
+    )
+
+
+#
+# license.name
+#
+@pytest.mark.parametrize(
+    'value',
+    NON_STRING_VALUES,
+)
+def test_license_name_must_be_a_string(value):
+    data = {
+        'license': {
+            'name': value,
+        },
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'license.name.type',
+    )
+
+
+def test_license_name_with_good_value():
+    data = {
+        'license': {
+            'name': 'MIT',
+        },
+    }
+    try:
+        info_validator(data)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'license.name',
+        errors,
+    )
+
+
+#
+# license.url
+#
+@pytest.mark.parametrize(
+    'value',
+    NON_STRING_VALUES,
+)
+def test_license_url_must_be_a_string(value):
+    data = {
+        'license': {
+            'url': value,
+        },
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['type']['invalid'],
+        err.value.detail,
+        'license.url.type',
+    )
+
+
+def test_license_url_must_be_valid_url():
+    data = {
+        'license': {
+            'url': 'not-a-valid-url',
+        },
+    }
+    with pytest.raises(ValidationError) as err:
+        info_validator(data)
+
+    assert_message_in_errors(
+        MESSAGES['format']['invalid_uri'],
+        err.value.detail,
+        'license.url.format',
+    )
+
+
+def test_license_url_with_good_value():
+    data = {
+        'license': {
+            'url': 'http://www.example.com',
+        },
+    }
+    try:
+        info_validator(data)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        'license.url',
+        errors,
     )
 
 

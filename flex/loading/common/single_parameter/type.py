@@ -3,7 +3,7 @@ from flex.exceptions import (
     ErrorList,
 )
 from flex.constants import (
-    NULL,
+    FILE,
     BOOLEAN,
     INTEGER,
     NUMBER,
@@ -28,12 +28,12 @@ from flex.validation.schema import (
 single_type_schema = {
     'type': STRING,
     'enum': [
-        NULL,
-        BOOLEAN,
-        INTEGER,
-        NUMBER,
         STRING,
+        NUMBER,
+        INTEGER,
+        BOOLEAN,
         ARRAY,
+        FILE,
     ],
 }
 single_type_validators = construct_schema_validators(single_type_schema, {})

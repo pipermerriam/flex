@@ -47,6 +47,9 @@ HEADER_TYPES = (
 )
 
 
+FILE = 'file'
+
+
 PATH = 'path'
 BODY = 'body'
 QUERY = 'query'

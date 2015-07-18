@@ -9,10 +9,13 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 @pytest.mark.parametrize(
     'path',
     (
-        pytest.mark.xfail(os.path.join(DIR, 'example_schemas/uber.yaml')),
-        pytest.mark.xfail(os.path.join(DIR, 'example_schemas/petstore.yaml')),
-        pytest.mark.xfail(os.path.join(DIR, 'example_schemas/petstore-expanded.yaml')),
-        os.path.join(DIR, 'example_schemas/api-with-examples.yaml'),
+        os.path.join(DIR, 'example_schemas/petstore.json'),
+        os.path.join(DIR, 'example_schemas/petstore-simple.json'),
+        os.path.join(DIR, 'example_schemas/petstore-minimal.json'),
+        os.path.join(DIR, 'example_schemas/petstore-expanded.json'),
+        os.path.join(DIR, 'example_schemas/petstore-with-external-docs.json'),
+        # from http://petstore.swagger.io/v2/swagger.json
+        os.path.join(DIR, 'example_schemas/petstore-from-public-example.json'),
     )
 )
 def test_load_and_parse_schema(path):
