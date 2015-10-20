@@ -186,7 +186,7 @@ Flex supports registering your own custom formats for validation.
 
 
 In the example above, we have registered a new format ``title-case`` which is
-applicatble to values of type string.  A validator function needs to take a
+applicable to values of type string.  A validator function needs to take a
 single value and raise a ``ValidationError`` if the value is invalid.
 
 The ``register`` decorator takes the name of the format as it's first argument,
