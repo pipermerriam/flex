@@ -6,7 +6,7 @@ import six
 import requests
 
 from flex.http import (
-    normalize_request,
+    normalize_request, _tornado_available
 )
 
 
@@ -63,6 +63,26 @@ def test_python3_urllib_request_normalization(httpbin):
     raw_request = urllib.request.Request(
         httpbin.url + '/get',
         headers={'Content-Type': 'application/json'},
+    )
+
+    request = normalize_request(raw_request)
+
+    assert request.path == '/get'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/get'
+    assert request.method == 'get'
+
+
+#
+# Test tornado request object
+#
+@pytest.mark.skipif(not _tornado_available, reason="tornado not installed")
+def test_tornado_request_normalization(httpbin):
+    import tornado.httpclient
+
+    raw_request = tornado.httpclient.HTTPRequest(
+        httpbin.url + '/get',
+        headers={'Content-Type': 'application/json'}
     )
 
     request = normalize_request(raw_request)
