@@ -8,6 +8,12 @@ import json
 
 from flex.constants import EMPTY
 
+_tornado_available = True
+try:
+    import tornado.httpclient
+except ImportError:
+    _tornado_available = False
+
 
 class URLMixin(object):
     @property
@@ -120,10 +126,27 @@ def _normalize_python3_urllib_request(request):
     )
 
 
+def _normalize_tornado_request(request):
+    if not _tornado_available:
+        raise TypeError("Tornado is not installed")
+
+    if not isinstance(request, tornado.httpclient.HTTPRequest):
+        raise TypeError("Cannot normalize this request object")
+
+    return Request(
+        url=request.url,
+        body=request.body,
+        method=request.method.lower(),
+        content_type=request.headers.get('Content-Type'),
+        request=request,
+    )
+
+
 REQUEST_NORMALIZERS = (
     _normalize_python2_urllib_request,
     _normalize_python3_urllib_request,
     _normalize_requests_request,
+    _normalize_tornado_request,
 )
 
 
@@ -218,9 +241,27 @@ def _normalize_urllib_response(response, request=None):
     )
 
 
+def _normalize_tornado_response(response, request=None):
+    if not _tornado_available:
+        raise TypeError("Tornado is not installed")
+
+    if not isinstance(response, tornado.httpclient.HTTPResponse):
+        raise TypeError("Cannot normalize this response object")
+
+    return Response(
+        request=request,
+        content=response.body,
+        url=response.effective_url,
+        status_code=response.code,
+        content_type=response.headers.get('Content-Type'),
+        response=response,
+    )
+
+
 RESPONSE_NORMALIZERS = (
     _normalize_urllib_response,
     _normalize_requests_response,
+    _normalize_tornado_response,
 )
 
 

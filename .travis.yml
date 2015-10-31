@@ -6,7 +6,9 @@ env:
     - PIP_DOWNLOAD_CACHE=$HOME/.pip_cache
   matrix:
     - TOX_ENV=py27
+    - TOX_ENV=py27-with-tornado
     - TOX_ENV=py34
+    - TOX_ENV=py34-with-tornado
     - TOX_ENV=flake8
 cache:
   directories:
