@@ -11,10 +11,15 @@ Validation tooling for [Swagger 2.0](https://github.com/wordnik/swagger-spec/blo
 
 [Documentation on ReadTheDocs](http://flex-swagger.readthedocs.org/en/latest/)
 
-
 ## Features
 
 * Validate swagger schemas.
 * JSON Schema Validation
 * Validation of request/response objects against schema.
 * Command Line interface.
+
+
+# CLI Name Change
+
+Starting in version 5.0.0 the CLI interface has been changed to `swagger-flex`
+due to a collission with the Apache Flex project.

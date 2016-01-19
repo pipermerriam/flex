@@ -1,3 +1,9 @@
+5.0.0
+-----
+
+- CLI interface name changed to `swagger-flex` to avoid name collision with
+  Apache Flex project.
+
 4.3.0
 -----
 
