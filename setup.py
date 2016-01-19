@@ -37,7 +37,7 @@ setup(
     license="BSD",
     zip_safe=False,
     entry_points={
-        'console_scripts': ["flex=flex.cli:main"],
+        'console_scripts': ["swagger-flex=flex.cli:main"],
     },
     keywords='rest swagger',
     packages=find_packages(exclude=["tests", "tests.*"]),

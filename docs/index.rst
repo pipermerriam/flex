@@ -200,11 +200,11 @@ can apply to.
 Command line usage
 ------------------
 
-As well as a python API, ``flex`` also provides a commandline validation tool.
+As well as a python API, ``flex`` also provides a commandline validation tool via the ``swagger-flex`` cli.
 
 .. code-block:: bash
-    $ ./flex -s /path/to/swagger.yaml
-    $ ./flex -s http://spec.example.com/swagger.yaml
+    $ ./swagger-flex -s /path/to/swagger.yaml
+    $ ./swagger-flex -s http://spec.example.com/swagger.yaml
 
 
 In the event of a validation error, the commandline program will return 1 and 
