@@ -1,3 +1,8 @@
+5.1.0
+-----
+
+- Fix validation of `contact` to be of type `object`
+
 5.0.0
 -----
 
