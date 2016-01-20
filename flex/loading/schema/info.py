@@ -1,5 +1,5 @@
 from flex.constants import (
-    STRING,
+    STRING, OBJECT
 )
 from flex.validation.common import (
     generate_object_validator,
@@ -16,7 +16,7 @@ info_schema = {
         },
         'description': {'type': STRING},
         'termsOfService': {'type': STRING},
-        'contact': {'type': STRING},
+        'contact': {'type': OBJECT},
         'license': {'type': STRING},
         'version': {'type': STRING},
     }
