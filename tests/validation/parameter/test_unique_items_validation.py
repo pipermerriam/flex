@@ -13,6 +13,7 @@ from flex.constants import (
     STRING,
     NUMBER,
     BOOLEAN,
+    OBJECT
 )
 from flex.error_messages import MESSAGES
 
@@ -28,6 +29,7 @@ from tests.utils import assert_message_in_errors
         [1, 2, 3, 1],
         ['a', 'b', 'c', 'z', 'c'],
         [True, False, True],
+        [{'a': 'b'}, {'a': 'b'}]
     ),
 )
 def test_unique_items_validation_with_duplicates(value):
@@ -39,7 +41,7 @@ def test_unique_items_validation_with_duplicates(value):
             'type': ARRAY,
             'required': True,
             'uniqueItems': True,
-            'items': {'type': [STRING, NUMBER, BOOLEAN]},
+            'items': {'type': [STRING, NUMBER, BOOLEAN, OBJECT]},
         },
     ])
     parameter_values = {
@@ -63,6 +65,7 @@ def test_unique_items_validation_with_duplicates(value):
         [False, 0, ''],
         ['1', 1],
         ['a', 'b', 'A', 'B'],
+        [{'a': 'b'}, {'A': 'B'}]
     ),
 )
 def test_unique_items_validation_with_no_duplicates(value):
@@ -74,7 +77,7 @@ def test_unique_items_validation_with_no_duplicates(value):
             'type': ARRAY,
             'required': True,
             'uniqueItems': True,
-            'items': {'type': [STRING, NUMBER, BOOLEAN]},
+            'items': {'type': [STRING, NUMBER, BOOLEAN, OBJECT]},
         },
     ])
     parameter_values = {

@@ -5,6 +5,7 @@ import operator
 import functools
 import collections
 import itertools
+import json
 
 import six
 
@@ -240,11 +241,12 @@ def validate_unique_items(value, **kwargs):
     Validator for ARRAY types to enforce that all array items must be unique.
     """
     # we can't just look at the items themselves since 0 and False are treated
-    # the same as dictionary keys.
+    # the same as dictionary keys, and objects aren't hashable.
+
     counter = collections.Counter((
-        (v, type(v)) for v in value
+        json.dumps(v) for v in value
     ))
-    dupes = [v[0] for v, count in counter.items() if count > 1]
+    dupes = [json.loads(v) for v, count in counter.items() if count > 1]
     if dupes:
         raise ValidationError(
             MESSAGES['unique_items']['invalid'].format(
