@@ -55,7 +55,7 @@ def test_regex_character_escaping(input_, expected):
 
 def test_path_to_pattern_with_single_parameter():
     input_ = '/get/{id}'
-    expected = '^/get/(?P<id>.+)$'
+    expected = '^/get/(?P<id>[^/]+)$'
 
     parameters = parameters_validator([{
         'required': True,
@@ -70,7 +70,7 @@ def test_path_to_pattern_with_single_parameter():
 
 def test_path_to_pattern_with_multiple_parameters():
     input_ = '/get/{first_id}/then/{second_id}/'
-    expected = '^/get/(?P<first_id>.+)/then/(?P<second_id>.+)/$'
+    expected = '^/get/(?P<first_id>[^/]+)/then/(?P<second_id>[^/]+)/$'
 
     parameters = parameters_validator([
         {'required': True, 'name': 'first_id', 'in': 'path', 'type': STRING},

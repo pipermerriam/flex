@@ -1,3 +1,5 @@
+import re
+
 from flex.loading.schema.paths.path_item.operation.parameters import (
     parameters_validator,
 )
@@ -47,4 +49,14 @@ def test_undeclared_api_path_parameters_are_skipped():
     path = '/get/{username}/posts/{id}/'
     parameters = parameters_validator([ID_IN_PATH])
     pattern = path_to_pattern(path, parameters)
-    assert pattern == '^/get/\{username\}/posts/(?P<id>.+)/$'
+    assert pattern == '^/get/\{username\}/posts/(?P<id>[^/]+)/$'
+
+def test_params_do_not_match_across_slashes():
+    path = '/get/{username}/posts/{id}'
+    parameters = parameters_validator([USERNAME_IN_PATH, ID_IN_PATH])
+    pattern = path_to_pattern(path, parameters)
+
+    assert re.match(pattern, '/get/simon/posts/123')
+
+    # {id} should not expand to "/123/unread".
+    assert not re.match(pattern, '/get/simon/posts/123/unread')

@@ -48,7 +48,7 @@ def construct_parameter_pattern(parameter):
     """
     name = parameter['name']
 
-    return "(?P<{name}>.+)".format(name=name)
+    return "(?P<{name}>[^/]+)".format(name=name)
 
 
 def process_path_part(part, parameters):
