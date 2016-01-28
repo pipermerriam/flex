@@ -41,8 +41,13 @@ def validate_status_code_to_response_definition(response, operation_definition):
     """
     status_code = response.status_code
     operation_responses = operation_definition['responses']
+
+    key = status_code
+    if key not in operation_responses:
+        key = 'default'
+
     try:
-        response_definition = operation_responses[status_code]
+        response_definition = operation_responses[key]
     except KeyError:
         raise ValidationError(
             MESSAGES['response']['invalid_status_code'].format(

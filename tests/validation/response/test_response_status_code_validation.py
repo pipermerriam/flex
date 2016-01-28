@@ -43,3 +43,31 @@ def test_response_parameter_validation():
         err.value.messages[0]['status_code'][0],
         MESSAGES['response']['invalid_status_code'],
     )
+
+def test_response_paramater_uses_default():
+    """
+    Test that a `default` key is used if one exists and no matching response is found.
+
+    See http://swagger.io/specification/#responsesObject.
+    """
+
+    schema = SchemaFactory(
+        paths={
+            '/get': {
+                'get': {
+                    'responses': {
+                        200: {'description': 'Success'},
+                        'default': {'description': 'Unexpected error.'}
+                    },
+                },
+            },
+        },
+    )
+
+    response = ResponseFactory(url='http://www.example.com/get', status_code=301)
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
