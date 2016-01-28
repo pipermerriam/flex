@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import pytest
 
 from flex.exceptions import ValidationError
@@ -29,7 +31,7 @@ from tests.utils import assert_message_in_errors
         [1, 2, 3, 1],
         ['a', 'b', 'c', 'z', 'c'],
         [True, False, True],
-        [{'a': 'b'}, {'a': 'b'}]
+        [OrderedDict([('a', 1), ('b', 2)]), OrderedDict([('b', 2), ('a', 1)])]
     ),
 )
 def test_unique_items_validation_with_duplicates(value):

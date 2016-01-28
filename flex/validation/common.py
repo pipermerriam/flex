@@ -244,7 +244,7 @@ def validate_unique_items(value, **kwargs):
     # the same as dictionary keys, and objects aren't hashable.
 
     counter = collections.Counter((
-        json.dumps(v) for v in value
+        json.dumps(v, sort_keys=True) for v in value
     ))
     dupes = [json.loads(v) for v, count in counter.items() if count > 1]
     if dupes:
