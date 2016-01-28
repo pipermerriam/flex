@@ -47,8 +47,8 @@ docs:
 	open docs/_build/html/index.html
 
 release: clean
-	python setup.py sdist bdist bdist_wheel upload
+	python setup.py sdist bdist_wheel upload
 
 sdist: clean
-	python setup.py sdist
+	python setup.py sdist bdist_wheel
 	ls -l dist
