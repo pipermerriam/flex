@@ -1,3 +1,10 @@
+5.2.0
+-----
+
+- Fix bug with uniqueness enforcement with unhashable types.
+- Fix request/response validation not falling back to the "default" response.
+- Fix path matching to not match parameters across slashes
+
 5.1.0
 -----
 
