@@ -132,15 +132,15 @@ def _normalize_tornado_request(request):
         raise TypeError("Tornado is not installed")
 
     if isinstance(request, tornado.httpclient.HTTPRequest):
-        url_attr = 'url'
+        url = request.url
     elif isinstance(request, tornado.httpserver.HTTPRequest):
         # This is the only difference in their api that we care about.
-        url_attr = 'uri'
+        url = request.uri
     else:
         raise TypeError("Cannot normalize this request object")
 
     return Request(
-        url=getattr(request, url_attr),
+        url=url,
         body=request.body,
         method=request.method.lower(),
         content_type=request.headers.get('Content-Type'),
