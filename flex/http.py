@@ -11,6 +11,7 @@ from flex.constants import EMPTY
 _tornado_available = True
 try:
     import tornado.httpclient
+    import tornado.httpserver
 except ImportError:
     _tornado_available = False
 
@@ -130,11 +131,16 @@ def _normalize_tornado_request(request):
     if not _tornado_available:
         raise TypeError("Tornado is not installed")
 
-    if not isinstance(request, tornado.httpclient.HTTPRequest):
+    if isinstance(request, tornado.httpclient.HTTPRequest):
+        url_attr = 'url'
+    elif isinstance(request, tornado.httpserver.HTTPRequest):
+        # This is the only difference in their api that we care about.
+        url_attr = 'uri'
+    else:
         raise TypeError("Cannot normalize this request object")
 
     return Request(
-        url=request.url,
+        url=getattr(request, url_attr),
         body=request.body,
         method=request.method.lower(),
         content_type=request.headers.get('Content-Type'),
