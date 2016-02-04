@@ -1,3 +1,3 @@
-VERSION = '5.2.0'
+VERSION = '5.2.1'
 
 from flex.core import load  # NOQA
