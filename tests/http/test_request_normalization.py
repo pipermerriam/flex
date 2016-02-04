@@ -77,11 +77,11 @@ def test_python3_urllib_request_normalization(httpbin):
 # Test tornado request object
 #
 @pytest.mark.skipif(not _tornado_available, reason="tornado not installed")
-def test_tornado_request_normalization(httpbin):
+def test_tornado_client_request_normalization(httpbin):
     import tornado.httpclient
 
     raw_request = tornado.httpclient.HTTPRequest(
-        httpbin.url + '/get',
+        httpbin.url + '/get?key=val',
         headers={'Content-Type': 'application/json'}
     )
 
@@ -89,5 +89,22 @@ def test_tornado_request_normalization(httpbin):
 
     assert request.path == '/get'
     assert request.content_type == 'application/json'
-    assert request.url == httpbin.url + '/get'
+    assert request.url == httpbin.url + '/get?key=val'
+    assert request.method == 'get'
+
+@pytest.mark.skipif(not _tornado_available, reason="tornado not installed")
+def test_tornado_server_request_normalization(httpbin):
+    import tornado.httpserver
+
+    raw_request = tornado.httpserver.HTTPRequest(
+        'GET',
+        httpbin.url + '/get?key=val',
+        headers={'Content-Type': 'application/json'}
+    )
+
+    request = normalize_request(raw_request)
+
+    assert request.path == '/get'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/get?key=val'
     assert request.method == 'get'
