@@ -35,6 +35,8 @@ from flex.validation.common import (
     generate_enum_validator,
     validate_object,
     generate_object_validator,
+    generate_allof_validator,
+    generate_anyof_validator,
 )
 from flex.datastructures import (
     ValidationDict,
@@ -189,6 +191,8 @@ validator_mapping = {
     'format': generate_format_validator,
     'required': generate_required_validator,
     'items': generate_items_validator,
+    'allOf': generate_allof_validator,
+    'anyOf': generate_anyof_validator,
 }
 
 

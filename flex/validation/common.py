@@ -293,6 +293,38 @@ def generate_enum_validator(enum, **kwargs):
     return functools.partial(validate_enum, options=enum)
 
 
+@skip_if_empty
+def validate_allof_anyof(value, sub_schemas, context, method, **kwargs):
+    from flex.validation.schema import (
+        construct_schema_validators,
+    )
+
+    messages = []
+    success = []
+    for schema in sub_schemas:
+        schema_validators = construct_schema_validators(schema, context)
+        try:
+            schema_validators.validate_object(value, context=context)
+        except ValidationError as err:
+            messages.append(err.messages)
+            success.append(False)
+        else:
+            success.append(True)
+
+    if not method(success):
+        raise ValidationError(messages)
+
+    return value
+
+
+def generate_allof_validator(allOf, context, **kwargs):
+    return functools.partial(validate_allof_anyof, sub_schemas=allOf, context=context, method=all)
+
+
+def generate_anyof_validator(anyOf, context, **kwargs):
+    return functools.partial(validate_allof_anyof, sub_schemas=anyOf, context=context, method=any)
+
+
 def validate_object(obj, field_validators=None, non_field_validators=None,
                     schema=None, context=None):
     """
