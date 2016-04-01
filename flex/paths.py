@@ -133,20 +133,21 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', context=
     assert isinstance(context, collections.Mapping)
     if target_path.startswith(base_path):
         target_path = target_path[len(base_path):]
+        # Convert all of the api paths into Path instances for easier regex matching.
+        paths = {
+            p: path_to_regex(
+                api_path=p,
+                path_parameters=extract_path_parameters(v),
+                operation_parameters=extract_operation_parameters(v),
+                context=context,
+            )
+            for p, v in path_definitions.items()
+        }
 
-    # Convert all of the api paths into Path instances for easier regex matching.
-    paths = {
-        p: path_to_regex(
-            api_path=p,
-            path_parameters=extract_path_parameters(v),
-            operation_parameters=extract_operation_parameters(v),
-            context=context,
-        )
-        for p, v in path_definitions.items()
-    }
-
-    matching_api_paths = [(p, r.match(target_path))
-                          for p, r in paths.items() if r.match(target_path)]
+        matching_api_paths = [(p, r.match(target_path))
+                              for p, r in paths.items() if r.match(target_path)]
+    else:
+        matching_api_paths = []
 
     if not matching_api_paths:
         raise LookupError(MESSAGES['path']['no_matching_paths_found'].format(target_path))
