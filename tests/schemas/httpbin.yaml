@@ -1,7 +1,6 @@
 swagger: '2.0'
 produces: [application/json]
 schemes: [http]
-basePath: /v3
 info: {title: Engagement API, version: 3.0.0}
 paths:
   /get:

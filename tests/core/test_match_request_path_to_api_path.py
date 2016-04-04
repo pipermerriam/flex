@@ -143,6 +143,24 @@ def test_match_target_path_to_api_path(path, schema_path):
     assert path == schema_path
 
 
+def test_match_target_path_missing_base_path():
+    target_path = '/path'
+    base_path = '/api'
+    schema = SchemaFactory(
+        paths={
+            target_path: {},
+        },
+        basePath=base_path,
+    )
+
+    with pytest.raises(LookupError):
+        path = match_path_to_api_path(
+            path_definitions=schema['paths'],
+            target_path=target_path,
+            base_path=base_path,
+        )
+
+
 def test_match_path_with_parameter_defined_in_operation():
     schema = SchemaFactory(
         paths={
