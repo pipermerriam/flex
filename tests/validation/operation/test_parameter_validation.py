@@ -54,7 +54,7 @@ def test_operation_parameter_validation_uses_correct_parameter_definitions():
                     },
                 ],
                 'get': {
-                    'responses': {200: {'description': 'Success'}},
+                    'responses': {'200': {'description': 'Success'}},
                     'parameters': [
                         {
                             'name': 'id',

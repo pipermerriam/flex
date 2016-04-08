@@ -6,7 +6,7 @@ paths:
   /get:
     get:
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: "#/definitions/Get"
@@ -17,7 +17,7 @@ paths:
   /post:
     post:
       responses:
-        200:
+        '200':
           description: Successful response
           schema:
             $ref: "#/definitions/Post"

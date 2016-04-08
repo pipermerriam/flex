@@ -27,7 +27,7 @@ def test_consumes_validation_valid_mimetype_from_global_definition():
     schema = SchemaFactory(
         consumes=['application/json'],
         paths={
-            '/get': {'get': {'responses': {200: {'description': 'Success'}}}},
+            '/get': {'get': {'responses': {'200': {'description': 'Success'}}}},
         },
     )
 
@@ -51,7 +51,7 @@ def test_consumes_validation_invalid_mimetype_from_global_definition():
     schema = SchemaFactory(
         consumes=['text/xml', 'application/xml'],
         paths={
-            '/get': {'get': {'responses': {200: {'description': 'Success'}}}},
+            '/get': {'get': {'responses': {'200': {'description': 'Success'}}}},
         },
     )
 
@@ -77,7 +77,7 @@ def test_consumes_validation_for_valid_mimetype_from_operation_definition():
         consumes=['application/xml'],
         paths={
             '/get': {'get': {
-                'responses': {200: {'description': 'Success'}},
+                'responses': {'200': {'description': 'Success'}},
                 'consumes': ['application/json'],
             }},
         },
@@ -104,7 +104,7 @@ def test_consumes_validation_for_invalid_mimetype_from_operation_definition():
         consumes=['application/xml'],
         paths={
             '/get': {'get': {
-                'responses': {200: {'description': 'Success'}},
+                'responses': {'200': {'description': 'Success'}},
                 'consumes': ['application/json'],
             }},
         },

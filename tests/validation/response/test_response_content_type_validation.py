@@ -14,7 +14,7 @@ def test_response_validation_with_invalid_operation_on_path():
         paths={
             '/get': {
                 'get': {
-                    'responses': {200: {'description': 'Success'}},
+                    'responses': {'200': {'description': 'Success'}},
                 }
             },
         },

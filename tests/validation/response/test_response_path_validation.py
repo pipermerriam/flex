@@ -50,7 +50,7 @@ def test_response_validation_with_valid_path():
     schema = SchemaFactory(
         paths={
             '/get': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
             },
         }
     )
@@ -73,7 +73,7 @@ def test_response_validation_with_valid_path_and_base_path():
         basePath='/api/v1',
         paths={
             '/get': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
             },
         }
     )
@@ -94,7 +94,7 @@ def test_response_validation_with_parametrized_path():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {
                         'name': 'id',
@@ -126,7 +126,7 @@ def test_response_validation_with_parametrized_path_and_api_base_path():
         basePath='/api/v1',
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {
                         'name': 'id',
@@ -157,7 +157,7 @@ def test_response_validation_with_parametrized_path_and_invalid_value():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {
                         'name': 'id',
@@ -195,7 +195,7 @@ def test_response_validation_with_parameter_as_reference():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {'$ref': '#/parameters/id'},
                 ]
@@ -229,7 +229,7 @@ def test_response_validation_with_parameter_as_reference_for_invalid_value():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {'$ref': '#/parameters/id'},
                 ]

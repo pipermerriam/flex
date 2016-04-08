@@ -47,7 +47,7 @@ def test_request_validation_with_valid_path():
     schema = SchemaFactory(
         paths={
             '/get': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
             },
         },
     )
@@ -67,7 +67,7 @@ def test_request_validation_with_parametrized_path():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {
                         'name': 'id',
@@ -97,7 +97,7 @@ def test_request_validation_with_parametrized_path_with_invalid_value():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {
                         'name': 'id',
@@ -134,7 +134,7 @@ def test_request_validation_with_parameter_as_reference():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {'$ref': '#/parameters/id'},
                 ]
@@ -169,7 +169,7 @@ def test_request_validation_with_valid_path_and_base_path():
         paths={
             '/get': {
                 'get': {
-                    'responses': {200: {'description': "Success"}},
+                    'responses': {'200': {'description': "Success"}},
                 },
             },
         },
@@ -191,7 +191,7 @@ def test_request_validation_with_parameter_as_reference_for_invalid_value():
     schema = SchemaFactory(
         paths={
             '/get/{id}': {
-                'get': {'responses': {200: {'description': 'Success'}}},
+                'get': {'responses': {'200': {'description': 'Success'}}},
                 'parameters': [
                     {'$ref': '#/parameters/id'},
                 ]

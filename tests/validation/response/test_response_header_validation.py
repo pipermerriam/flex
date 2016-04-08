@@ -27,7 +27,7 @@ def test_response_header_validation():
         paths={
             '/get': {
                 'get': {
-                    'responses': {200: {
+                    'responses': {'200': {
                         'description': "Success",
                         'headers': {
                             'Foo': {'type': INTEGER},
@@ -76,7 +76,7 @@ def test_response_header_validation_for_non_strings(type_, value):
         paths={
             '/get': {
                 'get': {
-                    'responses': {200: {
+                    'responses': {'200': {
                         'description': "Success",
                         'headers': {
                             'Foo': {'type': type_},
