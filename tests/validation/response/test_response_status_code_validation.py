@@ -23,7 +23,7 @@ def test_response_parameter_validation():
         paths={
             '/get': {
                 'get': {
-                    'responses': {200: {'description': 'Success'}},
+                    'responses': {'200': {'description': 'Success'}},
                 },
             },
         },
@@ -56,7 +56,7 @@ def test_response_paramater_uses_default():
             '/get': {
                 'get': {
                     'responses': {
-                        200: {'description': 'Success'},
+                        '200': {'description': 'Success'},
                         'default': {'description': 'Unexpected error.'}
                     },
                 },

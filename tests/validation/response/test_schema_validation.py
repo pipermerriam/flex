@@ -26,7 +26,7 @@ def test_basic_response_body_schema_validation_with_invalid_value():
             '/get': {
                 'get': {
                     'responses': {
-                        200: {
+                        '200': {
                             'description': 'Success',
                             'schema': {'type': INTEGER},
                         }
@@ -68,7 +68,7 @@ def test_basic_response_body_schema_validation_with_type_mismatch():
             '/get': {
                 'get': {
                     'responses': {
-                        200: {
+                        '200': {
                             'description': 'Success',
                             'schema': {
                                 'type': OBJECT,
@@ -147,7 +147,7 @@ def test_response_body_schema_validation_with_items_as_reference():
             '/get': {
                 'get': {
                     'responses': {
-                        200: {
+                        '200': {
                             'description': 'Success',
                             'schema': {
                                 '$ref': '#/definitions/UserList',

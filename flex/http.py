@@ -186,7 +186,7 @@ class Response(URLMixin):
         self.request = request
         self.content = content
         self.url = url
-        self.status_code = status_code
+        self.status_code = str(status_code)
         self.content_type = content_type
         self.headers = headers or {}
 

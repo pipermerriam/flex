@@ -29,7 +29,7 @@ def test_produces_validation_is_noop_when_produces_not_declared():
 
     schema = SchemaFactory(
         paths={
-            '/get': {'get': {'responses': {200: {'description': 'Success'}}}},
+            '/get': {'get': {'responses': {'200': {'description': 'Success'}}}},
         },
     )
 
@@ -53,7 +53,7 @@ def test_produces_validation_valid_mimetype_from_global_definition():
     schema = SchemaFactory(
         produces=['application/json'],
         paths={
-            '/get': {'get': {'responses': {200: {'description': 'Success'}}}},
+            '/get': {'get': {'responses': {'200': {'description': 'Success'}}}},
         },
     )
 
@@ -77,7 +77,7 @@ def test_produces_validation_invalid_mimetype_from_global_definition():
     schema = SchemaFactory(
         produces=['application/xml'],
         paths={
-            '/get': {'get': {'responses': {200: {'description': 'Success'}}}},
+            '/get': {'get': {'responses': {'200': {'description': 'Success'}}}},
         },
     )
 
@@ -103,7 +103,7 @@ def test_produces_validation_for_valid_mimetype_from_operation_definition():
         produces=['application/xml'],
         paths={
             '/get': {'get': {
-                'responses': {200: {'description': 'Success'}},
+                'responses': {'200': {'description': 'Success'}},
                 'produces': ['application/json'],
             }},
         },
@@ -130,7 +130,7 @@ def test_produces_validation_for_invalid_mimetype_from_operation_definition():
         produces=['application/xml'],
         paths={
             '/get': {'get': {
-                'responses': {200: {'description': 'Success'}},
+                'responses': {'200': {'description': 'Success'}},
                 'produces': ['application/json'],
             }},
         },

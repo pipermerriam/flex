@@ -22,7 +22,7 @@ def test_response_normalization(httpbin):
     assert response.path == '/get'
     assert response.content_type == 'application/json'
     assert response.url == httpbin.url + '/get'
-    assert response.status_code == 200
+    assert response.status_code == '200'
 
 
 #
@@ -39,7 +39,7 @@ def test_urllib_response_normalization(httpbin):
     assert response.path == '/get'
     assert response.content_type == 'application/json'
     assert response.url == httpbin.url + '/get'
-    assert response.status_code == 200
+    assert response.status_code == '200'
 
 
 #
@@ -55,7 +55,7 @@ def test_urllib2_response_normalization(httpbin):
     assert response.path == '/get'
     assert response.content_type == 'application/json'
     assert response.url == httpbin.url + '/get'
-    assert response.status_code == 200
+    assert response.status_code == '200'
 
 
 #
@@ -76,4 +76,4 @@ def test_tornado_response_normalization(httpbin):
     assert response.path == '/get'
     assert response.content_type == 'application/json'
     assert response.url == httpbin.url + '/get'
-    assert response.status_code == 200
+    assert response.status_code == '200'
