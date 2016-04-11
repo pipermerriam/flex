@@ -38,6 +38,7 @@ def user_post_schema():
                     'properties': {
                         'username': {'type': STRING},
                         'email': {'type': STRING, 'format': 'email'},
+                        'age': {'type': INTEGER, 'x-nullable': True},
                     },
                 },
             },
@@ -64,6 +65,23 @@ def test_request_body_parameter_validation_with_valid_value(user_post_schema):
         url='http://www.example.com/post/',
         content_type='application/json',
         body=json.dumps({'username': 'Test User', 'email': 'test@example.com'}),
+        method=POST,
+    )
+
+    validate_request(
+        request=request,
+        schema=user_post_schema,
+    )
+
+
+def test_request_body_parameter_validation_with_nullable_field(user_post_schema):
+    """
+    Test validating the request body with a valid post.
+    """
+    request = RequestFactory(
+        url='http://www.example.com/post/',
+        content_type='application/json',
+        body=json.dumps({'username': 'Test User', 'email': 'test@example.com', 'age': None}),
         method=POST,
     )
 
