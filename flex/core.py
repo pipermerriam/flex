@@ -105,10 +105,10 @@ def validate(raw_schema, target=None, **kwargs):
     spec, validate that the schema complies to spec.  If `target` is provided,
     that target will be validated against the provided schema.
     """
-    schema = schema_validator(raw_schema)
+    schema = schema_validator(raw_schema, **kwargs)
 
     if target is not None:
-        validate_object(target, schema=schema)
+        validate_object(target, schema=schema, **kwargs)
 
 
 def validate_api_call(schema, raw_request, raw_response):
