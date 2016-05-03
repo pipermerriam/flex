@@ -100,5 +100,6 @@ class MultiplePathsFound(ValueError):
 class NoParameterFound(ValueError):
     pass
 
+
 class MultipleParametersFound(ValueError):
     pass
