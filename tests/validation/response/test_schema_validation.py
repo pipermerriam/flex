@@ -66,7 +66,7 @@ def test_basic_response_body_schema_validation_with_nullable_value():
             '/get': {
                 'get': {
                     'responses': {
-                        200: {
+                        '200': {
                             'description': 'Success',
                             'schema': {
                                 'type': INTEGER,
