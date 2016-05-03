@@ -1,3 +1,9 @@
+5.5.0
+-----
+
+- Path matching regexes will now differentiate between integer path parameters
+  and non-integer path parameters.
+
 5.4.1
 -----
 
