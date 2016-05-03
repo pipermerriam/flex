@@ -6,6 +6,8 @@ from flex.validation.request import (
 )
 from flex.error_messages import MESSAGES
 from flex.constants import (
+    ARRAY,
+    CSV,
     PATH,
     QUERY,
     STRING,
@@ -97,6 +99,45 @@ def test_request_parameter_validation_with_base_path():
     )
 
     request = RequestFactory(url='http://www.example.com/api/v1/get/32/')
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
+
+
+def test_request_parameter_validation_typecasting():
+    """
+    Test that request validation does parameter validation for all parameters that require
+    typecasting or array split since query params are generally treated as strings.
+    """
+    schema = SchemaFactory(
+        paths={
+            '/get/': {
+                'parameters': [
+                    {
+                        'name': 'id',
+                        'in': QUERY,
+                        'type': INTEGER,
+                    },
+                    {
+                        'name': 'usernames',
+                        'in': QUERY,
+                        'type': ARRAY,
+                        'items': {
+                            'type': STRING
+                        },
+                        'collectionFormat': CSV
+                    },
+                ],
+                'get': {
+                    'responses': {200: {'description': "Success"}},
+                },
+            },
+        },
+    )
+
+    request = RequestFactory(url='http://www.example.com/get/?id=32&usernames=abc,def')
 
     validate_request(
         request=request,
