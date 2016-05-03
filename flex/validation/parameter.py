@@ -3,7 +3,6 @@ from flex.utils import is_non_string_iterable
 from flex.exceptions import ValidationError
 from flex.error_messages import MESSAGES
 from flex.context_managers import ErrorCollection
-from flex.functional import chain_reduce_partial
 from flex.validation.reference import (
     LazyReferenceValidator,
 )
