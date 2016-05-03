@@ -49,7 +49,7 @@ def test_undeclared_api_path_parameters_are_skipped():
     path = '/get/{username}/posts/{id}/'
     parameters = parameters_validator([ID_IN_PATH])
     pattern = path_to_pattern(path, parameters)
-    assert pattern == '^/get/\{username\}/posts/(?P<id>[^/]+)/$'
+    assert pattern == r'^/get/\{username\}/posts/(?P<id>\d+)/$'
 
 def test_params_do_not_match_across_slashes():
     path = '/get/{username}/posts/{id}'
