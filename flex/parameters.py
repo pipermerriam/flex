@@ -1,4 +1,8 @@
 from flex.decorators import rewrite_reserved_words
+from flex.exceptions import (
+    MultipleParametersFound,
+    NoParameterFound,
+)
 from flex.utils import dereference_reference
 
 
@@ -26,8 +30,8 @@ def find_parameter(parameters, **kwargs):
     if len(matching_parameters) == 1:
         return matching_parameters[0]
     elif len(matching_parameters) > 1:
-        raise ValueError("More than 1 parameter matched")
-    raise ValueError("No parameters matched")
+        raise NoParameterFound()
+    raise MultipleParametersFound()
 
 
 def merge_parameter_lists(*parameter_definitions):

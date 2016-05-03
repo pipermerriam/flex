@@ -1,6 +1,10 @@
 from flex.datastructures import ValidationDict
 from flex.utils import is_non_string_iterable
-from flex.exceptions import ValidationError
+from flex.exceptions import (
+    ValidationError,
+    MultipleParametersFound,
+    NoParameterFound,
+)
 from flex.error_messages import MESSAGES
 from flex.context_managers import ErrorCollection
 from flex.validation.reference import (
@@ -49,9 +53,7 @@ def type_cast_parameters(parameter_values, parameter_definitions, context):
     for key in parameter_values.keys():
         try:
             parameter_definition = find_parameter(parameter_definitions, name=key)
-        except KeyError:
-            continue
-        except ValueError:
+        except (KeyError, MultipleParametersFound, NoParameterFound):
             continue
         value = parameter_values[key]
         value_processor = generate_value_processor(context=context, **parameter_definition)

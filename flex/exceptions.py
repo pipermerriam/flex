@@ -95,3 +95,10 @@ class ValidationError(ValueError):
 
 class MultiplePathsFound(ValueError):
     pass
+
+
+class NoParameterFound(ValueError):
+    pass
+
+class MultipleParametersFound(ValueError):
+    pass

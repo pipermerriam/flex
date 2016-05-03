@@ -7,11 +7,15 @@ from flex.validation.request import (
 from flex.error_messages import MESSAGES
 from flex.constants import (
     ARRAY,
+    BOOLEAN,
     CSV,
-    PATH,
-    QUERY,
-    STRING,
     INTEGER,
+    PATH,
+    PIPES,
+    QUERY,
+    SSV,
+    STRING,
+    TSV,
 )
 
 from tests.factories import (
@@ -106,10 +110,17 @@ def test_request_parameter_validation_with_base_path():
     )
 
 
-def test_request_parameter_validation_typecasting():
+@pytest.mark.parametrize(
+    'type_,value',
+    (
+        (BOOLEAN, 'true'),
+        (INTEGER, '123'),
+    )
+)
+def test_request_parameter_validation_typecasting(type_, value):
     """
     Test that request validation does parameter validation for all parameters that require
-    typecasting or array split since query params are generally treated as strings.
+    typecasting since query params are generally treated as strings.
     """
     schema = SchemaFactory(
         paths={
@@ -118,26 +129,60 @@ def test_request_parameter_validation_typecasting():
                     {
                         'name': 'id',
                         'in': QUERY,
-                        'type': INTEGER,
-                    },
-                    {
-                        'name': 'usernames',
-                        'in': QUERY,
-                        'type': ARRAY,
-                        'items': {
-                            'type': STRING
-                        },
-                        'collectionFormat': CSV
-                    },
+                        'type': type_,
+                    }
                 ],
                 'get': {
-                    'responses': {200: {'description': "Success"}},
+                    'responses': {"200": {'description': "Success"}},
                 },
             },
         },
     )
 
-    request = RequestFactory(url='http://www.example.com/get/?id=32&usernames=abc,def')
+    request = RequestFactory(url='http://www.example.com/get/?id={}'.format(value))
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
+
+
+@pytest.mark.parametrize(
+    'format_,value',
+    (
+        (CSV, '1,2,3'),
+        (SSV, '1 2 3'),
+        (TSV, '1\t2\t3'),
+        (PIPES, '1|2|3'),
+    ),
+)
+def test_request_parameter_array_extraction(format_, value):
+    schema = SchemaFactory(
+        paths={
+            '/get/': {
+                'get': {
+                    'responses': {'200': {'description': "Success"}},
+                    'parameters': [
+                        {
+                            'name': 'id',
+                            'in': QUERY,
+                            'type': ARRAY,
+                            'collectionFormat': format_,
+                            'minItems': 3,
+                            'maxItems': 3,
+                            'items': {
+                                'type': INTEGER,
+                                'minimum': 1,
+                                'maximum': 3,
+                            },
+                        },
+                    ],
+                },
+            },
+        },
+    )
+
+    request = RequestFactory(url='http://www.example.com/get/?id={}'.format(value))
 
     validate_request(
         request=request,
