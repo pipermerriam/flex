@@ -181,9 +181,9 @@ def test_response_validation_with_parametrized_path_and_invalid_value():
         )
 
     assert_message_in_errors(
-        MESSAGES['type']['invalid'],
+        MESSAGES['path']['no_matching_paths_found'],
         err.value.detail,
-        'path.id.type',
+        'path',
     )
 
 
@@ -256,7 +256,7 @@ def test_response_validation_with_parameter_as_reference_for_invalid_value():
         )
 
     assert_message_in_errors(
-        MESSAGES['type']['invalid'],
+        MESSAGES['path']['no_matching_paths_found'],
         err.value.detail,
-        'path.id.type',
+        'path',
     )

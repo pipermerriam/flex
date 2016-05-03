@@ -47,8 +47,14 @@ def construct_parameter_pattern(parameter):
     part of the path.
     """
     name = parameter['name']
+    type = parameter['type']
 
-    return "(?P<{name}>[^/]+)".format(name=name)
+    repeated = '[^/]'
+
+    if type == 'integer':
+        repeated = '\d'
+
+    return "(?P<{name}>{repeated}+)".format(name=name, repeated=repeated)
 
 
 def process_path_part(part, parameters):
