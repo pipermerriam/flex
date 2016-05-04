@@ -57,6 +57,42 @@ def test_basic_response_body_schema_validation_with_invalid_value():
     )
 
 
+def test_basic_response_body_schema_validation_with_nullable_value():
+    """
+    Ensure objects marked with x-nullable: true attribute are treated as nullable.
+    """
+    schema = SchemaFactory(
+        paths={
+            '/get': {
+                'get': {
+                    'responses': {
+                        '200': {
+                            'description': 'Success',
+                            'schema': {
+                                'type': INTEGER,
+                                'x-nullable': True
+                            },
+                        }
+                    },
+                },
+            },
+        },
+    )
+
+    response = ResponseFactory(
+        url='http://www.example.com/get',
+        status_code=200,
+        content_type='application/json',
+        content=json.dumps(None),
+    )
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
+
+
 def test_basic_response_body_schema_validation_with_type_mismatch():
     """
     Ensure that when the expected response type is an object, and some other
