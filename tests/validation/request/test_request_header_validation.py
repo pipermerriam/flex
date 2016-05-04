@@ -27,7 +27,7 @@ def test_request_header_validation():
         paths={
             '/get/': {
                 'get': {
-                    'responses': {200: {'description': "Success"}},
+                    'responses': {'200': {'description': "Success"}},
                     'parameters': [
                         {
                             'name': 'Authorization',
@@ -57,6 +57,16 @@ def test_request_header_validation():
         'method.parameters.headers.Authorization.type',
     )
 
+    # integers within strings since headers are strings + undeclared parameters:
+    request = RequestFactory(
+        url='http://www.example.com/get/?foo=1',
+        headers={'Authorization': '123'},
+    )
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
 
 @pytest.mark.parametrize(
     'format_,value',
