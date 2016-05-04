@@ -6,10 +6,16 @@ from flex.validation.request import (
 )
 from flex.error_messages import MESSAGES
 from flex.constants import (
-    PATH,
-    QUERY,
-    STRING,
+    ARRAY,
+    BOOLEAN,
+    CSV,
     INTEGER,
+    PATH,
+    PIPES,
+    QUERY,
+    SSV,
+    STRING,
+    TSV,
 )
 
 from tests.factories import (
@@ -97,6 +103,86 @@ def test_request_parameter_validation_with_base_path():
     )
 
     request = RequestFactory(url='http://www.example.com/api/v1/get/32/')
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
+
+
+@pytest.mark.parametrize(
+    'type_,value',
+    (
+        (BOOLEAN, 'true'),
+        (INTEGER, '123'),
+    )
+)
+def test_request_parameter_validation_typecasting(type_, value):
+    """
+    Test that request validation does parameter validation for all parameters that require
+    typecasting since query params are generally treated as strings.
+    """
+    schema = SchemaFactory(
+        paths={
+            '/get/': {
+                'parameters': [
+                    {
+                        'name': 'id',
+                        'in': QUERY,
+                        'type': type_,
+                    }
+                ],
+                'get': {
+                    'responses': {"200": {'description': "Success"}},
+                },
+            },
+        },
+    )
+
+    request = RequestFactory(url='http://www.example.com/get/?id={}'.format(value))
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
+
+
+@pytest.mark.parametrize(
+    'format_,value',
+    (
+        (CSV, '1,2,3'),
+        (SSV, '1 2 3'),
+        (TSV, '1\t2\t3'),
+        (PIPES, '1|2|3'),
+    ),
+)
+def test_request_parameter_array_extraction(format_, value):
+    schema = SchemaFactory(
+        paths={
+            '/get/': {
+                'get': {
+                    'responses': {'200': {'description': "Success"}},
+                    'parameters': [
+                        {
+                            'name': 'id',
+                            'in': QUERY,
+                            'type': ARRAY,
+                            'collectionFormat': format_,
+                            'minItems': 3,
+                            'maxItems': 3,
+                            'items': {
+                                'type': INTEGER,
+                                'minimum': 1,
+                                'maximum': 3,
+                            },
+                        },
+                    ],
+                },
+            },
+        },
+    )
+
+    request = RequestFactory(url='http://www.example.com/get/?id={}'.format(value))
 
     validate_request(
         request=request,

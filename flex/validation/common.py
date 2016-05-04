@@ -32,6 +32,7 @@ from flex.paths import (
     match_path_to_api_path,
 )
 from flex.constants import (
+    NULL,
     NUMBER,
     STRING,
     ARRAY,
@@ -67,6 +68,10 @@ def generate_type_validator(type_, **kwargs):
         types = type_
     else:
         types = (type_,)
+    # support x-nullable since Swagger 2.0 doesn't support null type
+    # (see https://github.com/OAI/OpenAPI-Specification/issues/229)
+    if kwargs.get('x-nullable', False) and NULL not in types:
+        types = types + (NULL,)
     return functools.partial(validate_type, types=types)
 
 
