@@ -1,3 +1,10 @@
+5.6.0
+-----
+
+- Bugfix: query parameters were not be correctly typecast to their appropriate
+  types during validation.
+- Add null support via `x-nullable` option.
+
 5.5.0
 -----
 
