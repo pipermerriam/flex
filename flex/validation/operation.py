@@ -1,9 +1,9 @@
 import functools
-import operator
 
 from flex.datastructures import ValidationDict
 from flex.exceptions import ValidationError
 from flex.utils import chain_reduce_partial
+from flex.functional import attrgetter
 from flex.context_managers import ErrorCollection
 from flex.http import (
     Request,
@@ -135,7 +135,7 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     validators.add_validator(
         'path',
         chain_reduce_partial(
-            operator.attrgetter('path'),
+            attrgetter('path'),
             generate_path_parameters_validator(api_path, in_path_parameters, context),
         ),
     )
@@ -145,7 +145,7 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     validators.add_validator(
         'query',
         chain_reduce_partial(
-            operator.attrgetter('query_data'),
+            attrgetter('query_data'),
             functools.partial(
                 validate_query_parameters,
                 query_parameters=in_query_parameters,
@@ -159,7 +159,7 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     validators.add_validator(
         'headers',
         chain_reduce_partial(
-            operator.attrgetter('headers'),
+            attrgetter('headers'),
             generate_header_validator(in_header_parameters, context),
         ),
     )
@@ -169,7 +169,7 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     # validators.add_validator(
     #     'form_data',
     #     chain_reduce_partial(
-    #         operator.attrgetter('data'),
+    #         attrgetter('data'),
     #         generate_form_data_validator(in_form_data_parameters, context),
     #     )
     # )
@@ -179,7 +179,7 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     validators.add_validator(
         'request_body',
         chain_reduce_partial(
-            operator.attrgetter('data'),
+            attrgetter('data'),
             generate_request_body_validator(in_request_body_parameters, context),
         )
     )

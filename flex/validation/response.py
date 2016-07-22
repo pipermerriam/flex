@@ -1,9 +1,9 @@
 import functools
-import operator
 
 from flex.datastructures import ValidationDict
 from flex.exceptions import ValidationError
 from flex.utils import chain_reduce_partial
+from flex.functional import attrgetter, methodcaller
 from flex.context_managers import ErrorCollection
 from flex.validation.common import (
     validate_object,
@@ -59,7 +59,7 @@ def validate_status_code_to_response_definition(response, operation_definition):
 
 def generate_response_body_validator(schema, context, **kwargs):
     return chain_reduce_partial(
-        operator.attrgetter('data'),
+        attrgetter('data'),
         functools.partial(
             validate_object,
             schema=schema,
@@ -87,12 +87,12 @@ def generate_response_header_validator(headers, context, **kwargs):
         # `response.headers.get(header_name, EMPTY)` and then feed that into
         # the type casting function and then into the validation function.
         validators.add_validator(key, chain_reduce_partial(
-            operator.methodcaller('get', key, EMPTY),
+            methodcaller('get', key, EMPTY),
             header_processor,
             header_validator,
         ))
     return chain_reduce_partial(
-        operator.attrgetter('headers'),
+        attrgetter('headers'),
         functools.partial(validate_object, field_validators=validators),
     )
 
@@ -136,7 +136,7 @@ def generate_path_validator(api_path, path_definition, parameters,
     # PATH
     in_path_parameters = filter_parameters(all_parameters, in_=PATH)
     return chain_reduce_partial(
-        operator.attrgetter('path'),
+        attrgetter('path'),
         generate_path_parameters_validator(api_path, in_path_parameters, context),
     )
 
