@@ -1,3 +1,9 @@
+5.7.0
+-----
+
+- Bugfix: Workaround for operator.attrgetter and operator.itemgetter
+  https://bugs.python.org/issue26822
+
 5.6.0
 -----
 
