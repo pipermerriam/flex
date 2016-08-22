@@ -17,7 +17,7 @@ from tests.factories import (
 
 
 NON_STRING_VALUES = (1, 1.1, True, ['a', 'b'], None, {'a': 'b'})
-NON_OBJECT_VALUES = NON_STRING_VALUES[:-1] + ('a',) 
+NON_OBJECT_VALUES = NON_STRING_VALUES[:-1] + ('a',)
 
 
 def test_info_field_is_required():
@@ -200,9 +200,9 @@ def test_license_is_not_required():
 
 @pytest.mark.parametrize(
     'value',
-    NON_STRING_VALUES,
+    NON_OBJECT_VALUES,
 )
-def test_license_must_be_a_string(value):
+def test_license_must_be_an_object(value):
     data = {
         'license': value,
     }
