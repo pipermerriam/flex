@@ -24,6 +24,9 @@ from flex.decorators import (
 def validate_reference(reference, context, **kwargs):
     try:
         parts = urlparse.urlparse(reference)
+        if parts.path:
+            from flex.core import load_source
+            context = load_source(parts.path)
         jsonpointer.resolve_pointer(context, parts.fragment)
     except jsonpointer.JsonPointerException:
         raise ValidationError(MESSAGES['reference']['undefined'].format(reference))

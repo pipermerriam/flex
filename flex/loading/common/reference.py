@@ -37,11 +37,14 @@ reference_object_schema = {
 @skip_if_not_of_type(STRING)
 def validate_reference_pointer(reference, context, **kwargs):
     parts = urlparse.urlparse(reference)
-    if any((parts.scheme, parts.netloc, parts.path, parts.params, parts.query)):
+    if any((parts.scheme, parts.netloc, parts.params, parts.query)):
         raise ValidationError(
             MESSAGES['reference']['unsupported'].format(reference),
         )
 
+    if parts.path:
+        from flex.core import load_source
+        context = load_source(parts.path)
     try:
         jsonpointer.resolve_pointer(context, parts.fragment)
     except jsonpointer.JsonPointerException:

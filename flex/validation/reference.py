@@ -1,5 +1,4 @@
 from six.moves import urllib_parse as urlparse
-
 import jsonpointer
 
 from flex.validation.common import (
@@ -24,7 +23,14 @@ class LazyReferenceValidator(object):
                 "`validators_constructor` function"
             )
 
-        self.reference_fragment = urlparse.urlparse(reference).fragment
+        parsed_ref = urlparse.urlparse(reference)
+        self.reference_path = parsed_ref.path
+        self.reference_fragment = parsed_ref.fragment
+
+        if self.reference_path:
+            from flex.core import load_source
+            context = load_source(self.reference_path)
+
         # TODO: something better than this which potentiall raises a
         # JsonPointerException
         jsonpointer.resolve_pointer(context, self.reference_fragment)

@@ -194,8 +194,12 @@ def prettify_errors(errors):
 
 def dereference_reference(reference, context):
     parts = urlparse.urlparse(reference)
-    if any((parts.scheme, parts.netloc, parts.path, parts.params, parts.query)):
+    if any((parts.scheme, parts.netloc, parts.params, parts.query)):
         raise ValueError(
             MESSAGES['reference']['unsupported'].format(reference),
         )
+
+    if parts.path:
+        from flex.core import load_source
+        context = load_source(parts.path)
     return jsonpointer.resolve_pointer(context, parts.fragment)
