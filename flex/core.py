@@ -111,6 +111,13 @@ def validate(raw_schema, target=None, **kwargs):
         validate_object(target, schema=schema, **kwargs)
 
 
+def validate_api_request(schema, raw_request):
+    request = normalize_request(raw_request)
+
+    with ErrorCollection():
+        validate_request(request=request, schema=schema)
+
+
 def validate_api_call(schema, raw_request, raw_response):
     """
     Validate the request/response cycle of an api call against a swagger
