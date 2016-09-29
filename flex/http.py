@@ -9,18 +9,20 @@ import json
 
 from flex.constants import EMPTY
 
-_tornado_available = True
 try:
     import tornado.httpclient
     import tornado.httpserver
 except ImportError:
     _tornado_available = False
+else:
+    _tornado_available = True
 
-_falcon_available = True
 try:
     import falcon  # noqa
 except ImportError:
     _falcon_available = False
+else:
+    _falcon_available = True
 
 
 class URLMixin(object):
