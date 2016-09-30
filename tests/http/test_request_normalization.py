@@ -6,7 +6,7 @@ import six
 import requests
 
 from flex.http import (
-    normalize_request, _tornado_available
+    normalize_request, _tornado_available, _falcon_available
 )
 
 
@@ -92,6 +92,7 @@ def test_tornado_client_request_normalization(httpbin):
     assert request.url == httpbin.url + '/get?key=val'
     assert request.method == 'get'
 
+
 @pytest.mark.skipif(not _tornado_available, reason="tornado not installed")
 def test_tornado_server_request_normalization(httpbin):
     import tornado.httpserver
@@ -108,3 +109,28 @@ def test_tornado_server_request_normalization(httpbin):
     assert request.content_type == 'application/json'
     assert request.url == httpbin.url + '/get?key=val'
     assert request.method == 'get'
+
+
+@pytest.mark.skipif(not _falcon_available, reason="falcon not installed")
+def test_falcon_request_normalization(httpbin):
+    import falcon
+    from falcon.testing.helpers import create_environ
+
+    env = create_environ(
+        path='/put',
+        query_string='key=val',
+        host=httpbin.host,
+        port=httpbin.port,
+        headers={'Content-Type': 'application/json'},
+        body=b'{"key2": "val2"}',
+        method='PUT',
+    )
+    raw_request = falcon.Request(env)
+
+    request = normalize_request(raw_request)
+
+    assert request.path == '/put'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/put?key=val'
+    assert request.method == 'put'
+    assert request.body == '{"key2": "val2"}'
