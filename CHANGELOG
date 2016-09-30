@@ -1,3 +1,8 @@
+5.9.0
+-----
+
+- Support for parsing Falcon request objects.
+
 5.8.0
 -----
 
