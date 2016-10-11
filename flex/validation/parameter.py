@@ -69,7 +69,7 @@ def get_path_parameter_values(target_path, api_path, path_parameters, context):
     return type_cast_parameters(raw_values, path_parameters, context=context)
 
 
-def validate_path_parameters(target_path, api_path, path_parameters, context):
+def validate_path_parameters(target_path, api_path, path_parameters, context, **kwargs):
     """
     Helper function for validating a request path
     """
@@ -79,10 +79,10 @@ def validate_path_parameters(target_path, api_path, path_parameters, context):
     parameter_values = get_path_parameter_values(
         target_path, api_path, path_parameters, context,
     )
-    validate_parameters(parameter_values, path_parameters, context=context)
+    validate_parameters(parameter_values, path_parameters, context=context, **kwargs)
 
 
-def validate_query_parameters(raw_query_data, query_parameters, context):
+def validate_query_parameters(raw_query_data, query_parameters, context, **kwargs):
     query_data = {}
     for key, value in raw_query_data.items():
         if is_non_string_iterable(value) and len(value) == 1:
@@ -90,10 +90,10 @@ def validate_query_parameters(raw_query_data, query_parameters, context):
         else:
             query_data[key] = value
     query_data = type_cast_parameters(query_data, query_parameters, context)
-    validate_parameters(query_data, query_parameters, context)
+    validate_parameters(query_data, query_parameters, context, **kwargs)
 
 
-def validate_parameters(parameter_values, parameters, context):
+def validate_parameters(parameter_values, parameters, context, **kwargs):
     validators = construct_multi_parameter_validators(parameters, context=context)
 
     with ErrorCollection() as errors:
@@ -104,7 +104,7 @@ def validate_parameters(parameter_values, parameters, context):
                 errors[key].add_error(err.detail)
 
 
-def construct_parameter_validators(parameter, context):
+def construct_parameter_validators(parameter, context, **kwargs):
     """
     Constructs a dictionary of validator functions for the provided parameter
     definition.
@@ -112,7 +112,7 @@ def construct_parameter_validators(parameter, context):
     validators = ValidationDict()
     if '$ref' in parameter:
         validators.add_validator(
-            '$ref', ParameterReferenceValidator(parameter['$ref'], context),
+            '$ref', ParameterReferenceValidator(parameter['$ref'], context, **kwargs),
         )
     for key in parameter:
         if key in validator_mapping:
@@ -121,7 +121,7 @@ def construct_parameter_validators(parameter, context):
                 validator_mapping[key](context=context, **parameter),
             )
     if 'schema' in parameter:
-        schema_validators = construct_schema_validators(parameter['schema'], context=context)
+        schema_validators = construct_schema_validators(parameter['schema'], context=context, **kwargs)
         for key, value in schema_validators.items():
             validators.setdefault(key, value)
     return validators

@@ -1,3 +1,4 @@
+import os
 import math
 import collections
 import numbers
@@ -192,7 +193,7 @@ def prettify_errors(errors):
     return '\n'.join(format_errors(errors))
 
 
-def dereference_reference(reference, context):
+def dereference_reference(reference, context, **kwargs):
     parts = urlparse.urlparse(reference)
     if any((parts.scheme, parts.netloc, parts.params, parts.query)):
         raise ValueError(
@@ -201,5 +202,8 @@ def dereference_reference(reference, context):
 
     if parts.path:
         from flex.core import load_source
-        context = load_source(parts.path)
+        if parts.path.startswith('/'):
+            context = load_source(parts.path)
+        elif 'base_path' in kwargs:
+            context = load_source(os.path.join(kwargs['base_path'], parts.path))
     return jsonpointer.resolve_pointer(context, parts.fragment)

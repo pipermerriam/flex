@@ -122,10 +122,12 @@ def generate_path_validator(api_path, path_definition, parameters,
     path_level_parameters = dereference_parameter_list(
         path_definition.get('parameters', []),
         context,
+        **kwargs
     )
     operation_level_parameters = dereference_parameter_list(
         parameters,
         context,
+        **kwargs
     )
 
     all_parameters = merge_parameter_lists(

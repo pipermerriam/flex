@@ -98,7 +98,7 @@ def path_to_pattern(api_path, parameters):
 
 
 def path_to_regex(api_path, path_parameters, operation_parameters=None,
-                  context=None):
+                  context=None, **kwargs):
     if context is None:
         context = {}
     if operation_parameters is None:
@@ -107,8 +107,8 @@ def path_to_regex(api_path, path_parameters, operation_parameters=None,
         api_path=api_path,
         parameters=merge_parameter_lists(
             context.get('parameters', {}).values(),
-            dereference_parameter_list(path_parameters, context),
-            dereference_parameter_list(operation_parameters, context),
+            dereference_parameter_list(path_parameters, context, **kwargs),
+            dereference_parameter_list(operation_parameters, context, **kwargs),
         ),
     )
     return re.compile(pattern)

@@ -47,9 +47,9 @@ def merge_parameter_lists(*parameter_definitions):
     return merged_parameters.values()
 
 
-def dereference_parameter_list(parameters, context):
+def dereference_parameter_list(parameters, context, **kwargs):
     return tuple((
-        dereference_reference(p['$ref'], context)
+        dereference_reference(p['$ref'], context, **kwargs)
         if '$ref' in p
         else p
         for p in parameters

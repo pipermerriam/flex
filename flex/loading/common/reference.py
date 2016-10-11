@@ -1,3 +1,5 @@
+import os
+
 from six.moves import urllib_parse as urlparse
 
 import jsonpointer
@@ -44,7 +46,10 @@ def validate_reference_pointer(reference, context, **kwargs):
 
     if parts.path:
         from flex.core import load_source
-        context = load_source(parts.path)
+        if parts.path.startswith('/'):
+            context = load_source(parts.path)
+        elif 'base_path' in kwargs:
+            context = load_source(os.path.join(kwargs['base_path'], parts.path))
     try:
         jsonpointer.resolve_pointer(context, parts.fragment)
     except jsonpointer.JsonPointerException:

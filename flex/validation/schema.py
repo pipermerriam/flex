@@ -92,15 +92,16 @@ def generate_max_properties_validator(maxProperties, **kwargs):
     return functools.partial(validate_max_properties, maximum=maxProperties)
 
 
-def construct_items_validators(items, context):
+def construct_items_validators(items, context, **kwargs):
     if isinstance(items, collections.Mapping):
         items_validators = construct_schema_validators(
             schema=items,
             context=context,
+            **kwargs
         )
     elif isinstance(items, six.string_types):
         items_validators = {
-            '$ref': SchemaReferenceValidator(items, context),
+            '$ref': SchemaReferenceValidator(items, context, **kwargs),
         }
     else:
         assert 'Should not be possible'
@@ -133,6 +134,7 @@ def generate_items_validator(items, context, **kwargs):
         items_validators = itertools.repeat(construct_items_validators(
             items,
             context,
+            **kwargs
         ))
     elif isinstance(items, collections.Sequence):
         # We generate a list of validator dictionaries and then chain it
@@ -141,7 +143,7 @@ def generate_items_validator(items, context, **kwargs):
         # validators, then the extra elements will always validate since
         # they will be validated against an empty schema.
         items_validators = itertools.chain(
-            map(functools.partial(construct_items_validators, context=context), items),
+            map(functools.partial(construct_items_validators, context=context, **kwargs), items),
             itertools.repeat({}),
         )
     else:
@@ -196,7 +198,7 @@ validator_mapping = {
 }
 
 
-def construct_schema_validators(schema, context):
+def construct_schema_validators(schema, context, **kwargs):
     """
     Given a schema object, construct a dictionary of validators needed to
     validate a response matching the given schema.
@@ -215,7 +217,7 @@ def construct_schema_validators(schema, context):
     validators = ValidationDict()
     if '$ref' in schema:
         validators.add_validator(
-            '$ref', SchemaReferenceValidator(schema['$ref'], context),
+            '$ref', SchemaReferenceValidator(schema['$ref'], context, **kwargs),
         )
     if 'properties' in schema:
         for property_, property_schema in schema['properties'].items():

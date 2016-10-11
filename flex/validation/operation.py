@@ -97,7 +97,9 @@ def generate_request_body_validator(body_parameters, context, **kwargs):
     elif not body_parameters:
         return noop
     body_validators = construct_parameter_validators(
-        body_parameters[0], context=context,
+        body_parameters[0],
+        context=context,
+        **kwargs
     )
     return generate_object_validator(field_validators=body_validators)
 
@@ -119,10 +121,12 @@ def generate_parameters_validator(api_path, path_definition, parameters,
     path_level_parameters = dereference_parameter_list(
         path_definition.get('parameters', []),
         context,
+        **kwargs
     )
     operation_level_parameters = dereference_parameter_list(
         parameters,
         context,
+        **kwargs
     )
 
     all_parameters = merge_parameter_lists(
