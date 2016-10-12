@@ -1,3 +1,5 @@
+import os.path
+
 import pytest
 
 from flex.exceptions import ValidationError
@@ -16,6 +18,9 @@ from flex.constants import (
 from flex.error_messages import MESSAGES
 
 from tests.utils import assert_message_in_errors
+
+
+DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 @pytest.mark.parametrize(
@@ -44,6 +49,40 @@ def test_parameter_schema_as_reference_validation_for_invalid_value(value, error
 
     with pytest.raises(ValidationError) as err:
         validate_parameters(parameter_values, parameters, context=context)
+
+    assert_message_in_errors(
+        MESSAGES[error_key][message_key],
+        err.value.messages,
+        'id.{0}'.format(error_key),
+    )
+
+
+@pytest.mark.parametrize(
+    'value,error_key,message_key',
+    (
+        ('not-a-uuid', 'format', 'invalid_uuid'), # not a valid uuid.
+        (1234, 'type', 'invalid'), # not a string.
+    ),
+)
+def test_parameter_schema_as_external_reference_validation_for_invalid_value(value, error_key, message_key):
+    context = {
+        'definitions': {'UUID': {'type': STRING, 'format': 'uuid'}},
+    }
+    parameters = parameters_validator([
+        {
+            'name': 'id',
+            'in': BODY,
+            'description': 'id',
+            'required': True,
+            'schema': {'$ref': 'jsonschemas/uuid.json#/definitions/UUID'},
+        },
+    ], context=context, base_path=DIR)
+    parameter_values = {
+        'id': value,
+    }
+
+    with pytest.raises(ValidationError) as err:
+        validate_parameters(parameter_values, parameters, context=context, base_path=DIR)
 
     assert_message_in_errors(
         MESSAGES[error_key][message_key],
