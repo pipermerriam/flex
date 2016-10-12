@@ -121,7 +121,11 @@ def construct_parameter_validators(parameter, context, **kwargs):
                 validator_mapping[key](context=context, **parameter),
             )
     if 'schema' in parameter:
-        schema_validators = construct_schema_validators(parameter['schema'], context=context, **kwargs)
+        schema_validators = construct_schema_validators(
+            parameter['schema'],
+            context=context,
+            **kwargs
+        )
         for key, value in schema_validators.items():
             validators.setdefault(key, value)
     return validators

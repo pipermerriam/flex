@@ -236,7 +236,10 @@ def construct_schema_validators(schema, context, **kwargs):
     for key in schema:
         if key in validator_mapping:
             base_path = kwargs.get('base_path')
-            validators.add_validator(key, validator_mapping[key](context=context, base_path=base_path, **schema))
+            validators.add_validator(
+                key,
+                validator_mapping[key](context=context, base_path=base_path, **schema)
+            )
     return validators
 
 
