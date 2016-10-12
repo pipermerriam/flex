@@ -25,13 +25,15 @@ class LazyReferenceValidator(object):
                 "`validators_constructor` function"
             )
 
+        self._kwargs = kwargs
+
         parsed_ref = urlparse.urlparse(reference)
         self.reference_path = parsed_ref.path
         self.reference_fragment = parsed_ref.fragment
 
         if self.reference_path:
             from flex.core import load_source
-            if self.reference_path.path.startswith('/'):
+            if self.reference_path.startswith('/'):
                 context = load_source(self.reference_path)
             elif 'base_path' in kwargs:
                 context = load_source(os.path.join(kwargs['base_path'], self.reference_path))
@@ -58,6 +60,7 @@ class LazyReferenceValidator(object):
         return self.validators_constructor(
             self.schema,
             self.context,
+            **self._kwargs
         )
 
     def items(self):

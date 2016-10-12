@@ -26,7 +26,7 @@ class ValidationList(list):
         if value:
             self.add_validator(value)
 
-    def add_validator(self, validator):
+    def add_validator(self, validator, **kwargs):
         if is_non_string_iterable(validator)\
            and not isinstance(validator, collections.Mapping):
             for value in validator:
@@ -55,8 +55,8 @@ class ValidationDict(collections.defaultdict):
             for key, validator in validators.items():
                 self.add_validator(key, validator)
 
-    def add_validator(self, key, validator):
-        self[key].add_validator(validator)
+    def add_validator(self, key, validator, **kwargs):
+        self[key].add_validator(validator, **kwargs)
 
     def add_property_validator(self, key, validator):
         self.add_validator(

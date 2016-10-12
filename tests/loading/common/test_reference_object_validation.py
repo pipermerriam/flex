@@ -18,7 +18,7 @@ from flex.loading.common.reference import (
 )
 
 
-DIR = os.path.dirname(os.path.abspath(__file__))
+DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def test_ref_is_required():
@@ -75,7 +75,7 @@ def test_valid_reference():
 
 
 def test_external_relative_reference():
-    schema = {'$ref': 'reference_schemas/ext_relative.json#'}
+    schema = {'$ref': 'jsonschemas/ext_relative.json#'}
 
     try:
         reference_object_validator(schema, context={}, base_path=DIR)
@@ -91,7 +91,7 @@ def test_external_relative_reference():
 
 
 def test_external_absolute_reference():
-    absolute_path = os.path.join(DIR, 'reference_schemas/ext_relative.json')
+    absolute_path = os.path.join(DIR, 'jsonschemas/ext_relative.json')
     schema = {'$ref': '{}#'.format(absolute_path)}
 
     try:

@@ -224,6 +224,7 @@ def construct_schema_validators(schema, context, **kwargs):
             property_validator = generate_object_validator(
                 schema=property_schema,
                 context=context,
+                **kwargs
             )
             validators.add_property_validator(property_, property_validator)
     if schema.get('additionalProperties') is False:
@@ -234,7 +235,8 @@ def construct_schema_validators(schema, context, **kwargs):
     assert 'context' not in schema
     for key in schema:
         if key in validator_mapping:
-            validators.add_validator(key, validator_mapping[key](context=context, **schema))
+            base_path = kwargs.get('base_path')
+            validators.add_validator(key, validator_mapping[key](context=context, base_path=base_path, **schema))
     return validators
 
 
