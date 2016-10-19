@@ -67,7 +67,7 @@ class Request(URLMixin):
             return self.body
         elif self.body is EMPTY:
             return EMPTY
-        elif self.content_type == 'application/json':
+        elif self.content_type.startswith('application/json'):
             return json.loads(self.body)
         else:
             raise NotImplementedError("No parser for content type")
