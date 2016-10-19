@@ -60,6 +60,8 @@ class Request(URLMixin):
             return EMPTY
         elif self.content_type == 'application/json':
             return json.loads(self.body)
+        elif self.content_type == 'application/x-www-form-urlencoded':
+            return dict(urlparse.parse_qsl(self.body))
         else:
             raise NotImplementedError("No parser for content type")
 
