@@ -24,10 +24,18 @@ def test_empty_body_returns_empty():
 
 def test_json_content_type_with_json_body():
     request = RequestFactory(
-        body=json.dumps({'key': 'value'}),
+        body=json.dumps({'key': 'value', 'key2': 'value2', 'key[1]': 'subvalue1', 'key[2]': 'subvalue2'}),
         content_type='application/json',
     )
-    assert request.data == {'key': 'value'}
+    assert request.data == {'key': 'value', 'key2': 'value2', 'key[1]': 'subvalue1', 'key[2]': 'subvalue2'}
+
+
+def test_form_content_type_with_body():
+    request = RequestFactory(
+        body="key=value&key2=value2&arr[1]=subvalue1&arr[2]=subvalue2",
+        content_type='application/x-www-form-urlencoded',
+    )
+    assert request.data == {'key': 'value', 'key2': 'value2', 'arr[1]': 'subvalue1', 'arr[2]': 'subvalue2'}
 
 
 def test_unsupported_content_type():
