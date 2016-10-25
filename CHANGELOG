@@ -1,7 +1,7 @@
-5.9.0
+6.0.0
 -----
 
-- Support for parsing Falcon request objects.
+- Support for `x-www-form-urlencoded` request data.
 
 5.8.0
 -----
