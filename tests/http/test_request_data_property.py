@@ -31,7 +31,8 @@ def test_json_content_type_with_json_body():
 
 
 def test_json_content_type_with_json_bytes_body():
-    body = bytes(json.dumps({'key': 'value', 'key2': 'value2', 'key[1]': 'subvalue1', 'key[2]': 'subvalue2'}), 'utf-8')
+    body = json.dumps({'key': 'value', 'key2': 'value2', 'key[1]': 'subvalue1', 'key[2]': 'subvalue2'}).encode('utf-8')
+    assert type(body) == bytes
     request = RequestFactory(
         body=body,
         content_type='application/json',

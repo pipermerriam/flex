@@ -69,7 +69,7 @@ class Request(URLMixin):
             return EMPTY
         elif self.content_type.startswith('application/json'):
             if type(self.body) == bytes:
-                return json.loads(str(self.body, 'utf-8'))
+                return json.loads(self.body.decode('utf-8'))
             else:
                 return json.loads(self.body)
         elif self.content_type == 'application/x-www-form-urlencoded':
