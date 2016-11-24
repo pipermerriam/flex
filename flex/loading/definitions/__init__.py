@@ -1,3 +1,5 @@
+import os
+
 from six.moves import urllib_parse as urlparse
 
 import jsonpointer
@@ -47,12 +49,18 @@ def validate_deferred_references(schema, context, **kwargs):
     with ErrorDict() as errors:
         for reference in deferred_references:
             parts = urlparse.urlparse(reference)
-            if any((parts.scheme, parts.netloc, parts.path, parts.params, parts.query)):
+            if any((parts.scheme, parts.netloc, parts.params, parts.query)):
                 errors.add_error(
                     reference,
                     MESSAGES['reference']['unsupported'].format(reference),
                 )
                 continue
+            if parts.path:
+                from flex.core import load_source
+                if parts.path.startswith('/'):
+                    schema = load_source(parts.path)
+                elif 'base_path' in kwargs:
+                    schema = load_source(os.path.join(kwargs['base_path'], parts.path))
             try:
                 jsonpointer.resolve_pointer(schema, parts.fragment)
             except jsonpointer.JsonPointerException:

@@ -1,3 +1,5 @@
+import os.path
+
 import pytest
 
 from flex.error_messages import MESSAGES
@@ -7,6 +9,9 @@ from flex.exceptions import (
 from flex.loading.schema.paths.path_item.operation.responses import (
     responses_validator,
 )
+
+
+DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../../')
 
 
 def test_description_is_required(msg_assertions):
@@ -35,6 +40,23 @@ def test_response_as_reference_missing_description(msg_assertions):
     }
     try:
         responses_validator(responses, context=context)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    msg_assertions.assert_path_not_in_errors('200', errors)
+
+
+def test_response_as_external_reference_missing_description(msg_assertions):
+    responses = {
+        200: {
+            '$ref': 'jsonschemas/responses_description.json#'
+        },
+    }
+    context = {}
+    try:
+        responses_validator(responses, context=context, base_path=DIR)
     except ValidationError as err:
         errors = err.detail
     else:

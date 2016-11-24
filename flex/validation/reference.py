@@ -1,5 +1,6 @@
-from six.moves import urllib_parse as urlparse
+import os
 
+from six.moves import urllib_parse as urlparse
 import jsonpointer
 
 from flex.validation.common import (
@@ -17,14 +18,26 @@ class LazyReferenceValidator(object):
     """
     validators_constructor = None
 
-    def __init__(self, reference, context):
+    def __init__(self, reference, context, **kwargs):
         if self.validators_constructor is None:
             raise NotImplementedError(
                 "Subclasses of LazyReferenceValidator must specify a "
                 "`validators_constructor` function"
             )
 
-        self.reference_fragment = urlparse.urlparse(reference).fragment
+        self._kwargs = kwargs
+
+        parsed_ref = urlparse.urlparse(reference)
+        self.reference_path = parsed_ref.path
+        self.reference_fragment = parsed_ref.fragment
+
+        if self.reference_path:
+            from flex.core import load_source
+            if self.reference_path.startswith('/'):
+                context = load_source(self.reference_path)
+            elif 'base_path' in kwargs:
+                context = load_source(os.path.join(kwargs['base_path'], self.reference_path))
+
         # TODO: something better than this which potentiall raises a
         # JsonPointerException
         jsonpointer.resolve_pointer(context, self.reference_fragment)
@@ -47,6 +60,7 @@ class LazyReferenceValidator(object):
         return self.validators_constructor(
             self.schema,
             self.context,
+            **self._kwargs
         )
 
     def items(self):

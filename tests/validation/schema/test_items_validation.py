@@ -1,3 +1,5 @@
+import os.path
+
 import pytest
 
 from flex.exceptions import ValidationError
@@ -11,6 +13,9 @@ from tests.utils import (
     generate_validator_from_schema,
     assert_path_in_errors,
 )
+
+
+DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 @pytest.mark.parametrize(
@@ -114,3 +119,28 @@ def test_items_past_the_number_of_schemas_provided_are_skipped():
         [0, 5, 10, 20, 30, 40],
         # 20, 30, and 40 don't conform, but are beyond the declared number of schemas.
     )
+
+
+@pytest.mark.parametrize(
+    'items',
+    (
+        [1, 2, 3, 4, -1, -2, 8, 9],  # -1 and -2 are less than minimum
+        [1, 2, 3, 4, 15, 16, 5, 6, 7],  # 15 and 16 are greater than maximum
+        [1, 2, 3, '4', '5', 6],  # string not allowed.
+    )
+)
+def test_invalid_values_against_schema_external_reference(items):
+    schema = {
+        'type': ARRAY,
+        'items': {
+            '$ref': 'jsonschemas/definitions.json#/definitions/SomeReference',
+        },
+    }
+    context = {}
+
+    validator = generate_validator_from_schema(schema, context=context, base_path=DIR)
+
+    with pytest.raises(ValidationError) as err:
+        validator(items, context=context, base_path=DIR)
+
+    assert_path_in_errors('items', err.value.detail)

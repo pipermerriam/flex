@@ -1,3 +1,5 @@
+import os.path
+
 import pytest
 
 from flex.constants import (
@@ -16,6 +18,7 @@ from flex.loading.common.reference import (
 )
 
 
+DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def test_ref_is_required():
@@ -60,6 +63,39 @@ def test_valid_reference():
 
     try:
         reference_object_validator(schema, context=context)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        '$ref',
+        errors,
+    )
+
+
+def test_external_relative_reference():
+    schema = {'$ref': 'jsonschemas/ext_relative.json#'}
+
+    try:
+        reference_object_validator(schema, context={}, base_path=DIR)
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    assert_path_not_in_errors(
+        '$ref',
+        errors,
+    )
+
+
+def test_external_absolute_reference():
+    absolute_path = os.path.join(DIR, 'jsonschemas/ext_relative.json')
+    schema = {'$ref': '{}#'.format(absolute_path)}
+
+    try:
+        reference_object_validator(schema, context={})
     except ValidationError as err:
         errors = err.detail
     else:

@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "test_property": {
+      "type": "string"
+    },
+    "another_property": {
+      "type": "integer"
+    }
+  }
+}

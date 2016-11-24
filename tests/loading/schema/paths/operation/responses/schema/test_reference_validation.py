@@ -1,3 +1,5 @@
+import os.path
+
 import pytest
 
 from flex.constants import (
@@ -8,6 +10,9 @@ from flex.exceptions import ValidationError
 from flex.loading.schema.paths.path_item.operation.responses.single.schema import (
     schema_validator,
 )
+
+
+DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../../../')
 
 
 @pytest.mark.parametrize(
@@ -48,6 +53,23 @@ def test_with_valid_reference(msg_assertions):
                     'SomeReference': {'type': OBJECT},
                 },
             },
+        )
+    except ValidationError as err:
+        errors = err.detail
+    else:
+        errors = {}
+
+    msg_assertions.assert_path_not_in_errors(
+        '$ref', errors,
+    )
+
+
+def test_with_valid_external_reference(msg_assertions):
+    try:
+        schema_validator(
+            {'$ref': 'jsonschemas/ext.json#'},
+            context={},
+            base_path=DIR
         )
     except ValidationError as err:
         errors = err.detail

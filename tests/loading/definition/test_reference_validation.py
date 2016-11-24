@@ -1,3 +1,5 @@
+import os.path
+
 import pytest
 
 from flex.exceptions import ValidationError
@@ -12,6 +14,9 @@ from flex.loading.definitions import (
 from tests.utils import (
     assert_message_in_errors,
 )
+
+
+DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def test_references_end_up_in_deferred_referrences():
@@ -61,3 +66,26 @@ def test_deferred_references_are_validated():
         err.value.detail,
         'definitions.Address',
     )
+
+
+def test_references_end_up_in_external_deferred_references():
+    deferred_references = set()
+    context = {'deferred_references': deferred_references}
+
+    definitions = {
+        'definitions': {
+            'SomeReference': {
+                'type': OBJECT,
+                'properties': {
+                    'address': {
+                        '$ref': 'jsonschemas/ext.json#',
+                    }
+                }
+            },
+            'Address': {
+                'type': STRING,
+            }
+        }
+    }
+    definitions_validator(definitions, context=context, base_path=DIR)
+    assert 'jsonschemas/ext.json#' in deferred_references

@@ -1,3 +1,5 @@
+import os
+
 from six.moves import urllib_parse as urlparse
 
 import jsonpointer
@@ -24,6 +26,12 @@ from flex.decorators import (
 def validate_reference(reference, context, **kwargs):
     try:
         parts = urlparse.urlparse(reference)
+        if parts.path:
+            from flex.core import load_source
+            if parts.path.startswith('/'):
+                context = load_source(parts.path)
+            elif 'base_path' in kwargs:
+                context = load_source(os.path.join(kwargs['base_path'], parts.path))
         jsonpointer.resolve_pointer(context, parts.fragment)
     except jsonpointer.JsonPointerException:
         raise ValidationError(MESSAGES['reference']['undefined'].format(reference))

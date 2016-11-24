@@ -307,7 +307,7 @@ def validate_allof_anyof(value, sub_schemas, context, method, **kwargs):
     messages = []
     success = []
     for schema in sub_schemas:
-        schema_validators = construct_schema_validators(schema, context)
+        schema_validators = construct_schema_validators(schema, context, **kwargs)
         try:
             schema_validators.validate_object(value, context=context)
         except ValidationError as err:
@@ -331,7 +331,7 @@ def generate_anyof_validator(anyOf, context, **kwargs):
 
 
 def validate_object(obj, field_validators=None, non_field_validators=None,
-                    schema=None, context=None):
+                    schema=None, context=None, base_path=None):
     """
     Takes a mapping and applies a mapping of validator functions to it
     collecting and reraising any validation errors that occur.
@@ -348,7 +348,7 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
     from flex.validation.schema import (
         construct_schema_validators,
     )
-    schema_validators = construct_schema_validators(schema, context)
+    schema_validators = construct_schema_validators(schema, context, base_path=base_path)
 
     if '$ref' in schema_validators and hasattr(schema_validators['$ref'], 'validators'):
         ref_ = field_validators.pop('$ref')
@@ -358,8 +358,8 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
 
     schema_validators.update(field_validators)
 
-    schema_validators.validate_object(obj, context=context)
-    non_field_validators.validate_object(obj, context=context)
+    schema_validators.validate_object(obj, context=context, base_path=base_path)
+    non_field_validators.validate_object(obj, context=context, base_path=base_path)
 
     return obj
 
