@@ -210,4 +210,3 @@ def exactly_one(iterable):
     # check that one is True, then check that none is True in rest of the
     # iterator
     return any(it) and not any(it)
-
