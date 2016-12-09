@@ -6,7 +6,7 @@ from flex.constants import (
     STRING,
     INTEGER,
 )
-from flex.error_messages import MULTIPLE_OF_MESSAGES
+from flex.error_messages import MESSAGES
 
 from tests.utils import (
     generate_validator_from_schema,
@@ -42,7 +42,7 @@ def test_one_of_complex_failure():
         validator(2)
 
     assert_message_in_errors(
-        MULTIPLE_OF_MESSAGES['invalid'],
+        MESSAGES['multiple_of']['invalid'],
         err.value.detail,
     )
 
@@ -50,7 +50,7 @@ def test_one_of_complex_failure():
         validator(15)
 
     assert_message_in_errors(
-        MULTIPLE_OF_MESSAGES['invalid'],
+        MESSAGES['one_of']['multiple_valid'],
         err.value.detail,
     )
 

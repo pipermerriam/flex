@@ -229,6 +229,9 @@ COLLECTION_FORMAT_MESSAGES = {
     ),
 }
 
+ONE_OF_MESSAGES = {
+    'multiple_valid': "Exactly one schema should validate. More than one matched.",
+}
 
 MESSAGES = {
     'type': TYPE_MESSAGES,
@@ -259,4 +262,5 @@ MESSAGES = {
     'reference': REFERENCE_MESSAGES,
     'schema': SCHEMA_MESSAGES,
     'collection_format': COLLECTION_FORMAT_MESSAGES,
+    'one_of': ONE_OF_MESSAGES,
 }
