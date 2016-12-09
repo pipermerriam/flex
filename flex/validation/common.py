@@ -27,6 +27,7 @@ from flex.utils import (
     get_type_for_value,
     cast_value_to_type,
     deep_equal,
+    exactly_one
 )
 from flex.functional import chain_reduce_partial
 from flex.paths import (
@@ -301,7 +302,7 @@ def generate_enum_validator(enum, **kwargs):
 
 
 @skip_if_empty
-def validate_allof_anyof(value, sub_schemas, context, method, **kwargs):
+def validate_allof_anyof_oneof(value, sub_schemas, context, method, **kwargs):
     from flex.validation.schema import (
         construct_schema_validators,
     )
@@ -336,12 +337,16 @@ def generate_allof_validator(allOf, context, **kwargs):
         else:
             unresolved_refs.append(ref)
 
-    return functools.partial(validate_allof_anyof, sub_schemas=unresolved_refs,
+    return functools.partial(validate_allof_anyof_oneof, sub_schemas=unresolved_refs,
                              context=context, method=all)
 
 
 def generate_anyof_validator(anyOf, context, **kwargs):
-    return functools.partial(validate_allof_anyof, sub_schemas=anyOf, context=context, method=any)
+    return functools.partial(validate_allof_anyof_oneof, sub_schemas=anyOf, context=context, method=any)
+
+
+def generate_oneof_validator(oneOf, context, **kwargs):
+    return functools.partial(validate_allof_anyof_oneof, sub_schemas=oneOf, context=context, method=exactly_one)
 
 
 def add_polymorphism_requirements(obj, schema, context, schema_validators):
