@@ -302,7 +302,7 @@ def generate_enum_validator(enum, **kwargs):
 
 
 @skip_if_empty
-def validate_allof_anyof_oneof(value, sub_schemas, context, method, **kwargs):
+def validate_composition(value, sub_schemas, context, method, **kwargs):
     from flex.validation.schema import (
         construct_schema_validators,
     )
@@ -342,11 +342,11 @@ def generate_allof_validator(allOf, context, **kwargs):
 
 
 def generate_anyof_validator(anyOf, context, **kwargs):
-    return functools.partial(validate_allof_anyof_oneof, sub_schemas=anyOf, context=context, method=any)
+    return functools.partial(validate_composition, sub_schemas=anyOf, context=context, method=any)
 
 
 def generate_oneof_validator(oneOf, context, **kwargs):
-    return functools.partial(validate_allof_anyof_oneof, sub_schemas=oneOf, context=context, method=exactly_one)
+    return functools.partial(validate_composition, sub_schemas=oneOf, context=context, method=exactly_one)
 
 
 def add_polymorphism_requirements(obj, schema, context, schema_validators):
