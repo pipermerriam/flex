@@ -22,6 +22,7 @@ NUMBER = 'number'
 STRING = 'string'
 ARRAY = 'array'
 OBJECT = 'object'
+FILE = 'file'
 
 PRIMATIVE_TYPES = {
     '': (type(None),),
