@@ -9,6 +9,7 @@ from flex.constants import (
     NUMBER,
     INTEGER,
     BOOLEAN,
+    FILE,
 )
 from flex.decorators import (
     skip_if_empty,
@@ -18,7 +19,7 @@ from flex.validation.common import (
     generate_object_validator,
 )
 
-ALLOWED_TYPES = [STRING, NUMBER, INTEGER, BOOLEAN, ARRAY]
+ALLOWED_TYPES = [STRING, NUMBER, INTEGER, BOOLEAN, ARRAY, FILE]
 
 type_schema = {
     'type': [STRING, ARRAY],
