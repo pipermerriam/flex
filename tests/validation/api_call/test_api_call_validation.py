@@ -29,12 +29,13 @@ def test_validate_api_call_with_polymorphism():
         "events": [
             {
                 "eventType": "Impression",
-                "timestamp": 12312312
+                "timestamp": 12312312,
+                "advertisementId": "babel42"
             }
         ]
     }"""
     responses.add(responses.POST, "http://test.com/poly/report",
-                  body="OK", status=200, content_type="application/json")
+                  body="{}", status=200, content_type="application/json")
 
     response = requests.post("http://test.com/poly/report",
                              json=json.loads(request_payload))
