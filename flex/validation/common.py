@@ -341,7 +341,11 @@ def generate_anyof_validator(anyOf, context, **kwargs):
 
 def add_polymorphism_requirements(object, schema, context, schema_validators):
     object_type = object[schema['discriminator']]
-    object_schema = context['definitions'][object_type]
+    try:
+        object_schema = context['definitions'][object_type]
+    except KeyError:
+        raise ValidationError("No definition for class [{}]".format(object_type))
+
     from flex.validation.schema import (
         construct_schema_validators,
     )

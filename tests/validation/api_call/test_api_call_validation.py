@@ -29,8 +29,7 @@ def test_validate_api_call_with_polymorphism():
         "events": [
             {
                 "eventType": "Impression",
-                "timestamp": 12312312,
-                "advertisementId": "babel42"
+                "timestamp": 12312312
             }
         ]
     }"""
