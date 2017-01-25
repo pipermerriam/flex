@@ -344,7 +344,12 @@ def generate_anyof_validator(anyOf, context, **kwargs):
 
 
 def add_polymorphism_requirements(object, schema, context, schema_validators):
-    object_type = object[schema['discriminator']]
+    object_type = None
+    try:
+        object_type = object[schema['discriminator']]
+    except KeyError:
+        raise ValidationError("No discriminator found on instance.".format(object_type))
+
     try:
         object_schema = context['definitions'][object_type]
     except KeyError:
@@ -363,7 +368,6 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
     Takes a mapping and applies a mapping of validator functions to it
     collecting and reraising any validation errors that occur.
     """
-
     if schema is None:
         schema = {}
     if context is None:

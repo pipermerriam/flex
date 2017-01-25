@@ -106,7 +106,6 @@ def validate(raw_schema, target=None, **kwargs):
     that target will be validated against the provided schema.
     """
     schema = schema_validator(raw_schema, **kwargs)
-
     if target is not None:
         validate_object(target, schema=schema, **kwargs)
 
@@ -125,7 +124,9 @@ def validate_api_call(schema, raw_request, raw_response):
     are supported.
     """
     request = normalize_request(raw_request)
-    response = normalize_response(raw_response)
+    response = None
+    if raw_response is not None:
+        response = normalize_response(raw_response)
 
     with ErrorCollection() as errors:
         try:
@@ -138,10 +139,11 @@ def validate_api_call(schema, raw_request, raw_response):
             return
 
         try:
-            validate_response(
-                response=response,
-                request_method=request.method,
-                schema=schema,
-            )
+            if response is not None:
+                validate_response(
+                    response=response,
+                    request_method=request.method,
+                    schema=schema,
+                )
         except ValidationError as err:
             errors['response'].add_error(err.messages or getattr(err, 'detail'))
