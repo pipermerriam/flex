@@ -328,9 +328,13 @@ def generate_allof_validator(allOf, context, **kwargs):
 
     unresolved_refs = []
     for ref in allOf:
-        if ref not in context['resolved_refs']:
-            unresolved_refs.append(ref)
-            context['resolved_refs'].append(ref)
+        if isinstance(ref, dict):
+            schema = ref['$ref']
+            if schema not in context['resolved_refs']:
+                unresolved_refs.append(ref)
+                context['resolved_refs'].append(schema)
+        else:
+            raise ValidationError("allOf must be a list dicts.")
 
     return functools.partial(validate_allof_anyof, sub_schemas=unresolved_refs, context=context, method=all)
 
