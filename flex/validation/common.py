@@ -323,11 +323,43 @@ def validate_allof_anyof(value, sub_schemas, context, method, **kwargs):
 
 
 def generate_allof_validator(allOf, context, **kwargs):
-    return functools.partial(validate_allof_anyof, sub_schemas=allOf, context=context, method=all)
+    if 'resolved_refs' not in context:
+        context['resolved_refs'] = []
+
+    unresolved_refs = []
+    for ref in allOf:
+        if isinstance(ref, dict):
+            schema = ref['$ref']
+            if schema not in context['resolved_refs']:
+                unresolved_refs.append(ref)
+                context['resolved_refs'].append(schema)
+        else:
+            raise ValidationError("allOf must be a list dicts.")
+
+    return functools.partial(validate_allof_anyof, sub_schemas=unresolved_refs, context=context, method=all)
 
 
 def generate_anyof_validator(anyOf, context, **kwargs):
     return functools.partial(validate_allof_anyof, sub_schemas=anyOf, context=context, method=any)
+
+
+def add_polymorphism_requirements(object, schema, context, schema_validators):
+    object_type = None
+    try:
+        object_type = object[schema['discriminator']]
+    except KeyError:
+        raise ValidationError("No discriminator found on instance.".format(object_type))
+
+    try:
+        object_schema = context['definitions'][object_type]
+    except KeyError:
+        raise ValidationError("No definition for class [{}]".format(object_type))
+
+    from flex.validation.schema import (
+        construct_schema_validators,
+    )
+    subtype_validators = construct_schema_validators(object_schema, context)
+    schema_validators.update(subtype_validators)
 
 
 def validate_object(obj, field_validators=None, non_field_validators=None,
@@ -349,18 +381,18 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
         construct_schema_validators,
     )
     schema_validators = construct_schema_validators(schema, context)
-
     if '$ref' in schema_validators and hasattr(schema_validators['$ref'], 'validators'):
         ref_ = field_validators.pop('$ref')
         for k, v in ref_.validators.items():
             if k not in schema_validators:
                 schema_validators.add_validator(k, v)
 
-    schema_validators.update(field_validators)
+    if 'discriminator' in schema:
+        add_polymorphism_requirements(obj, schema, context, schema_validators)
 
+    schema_validators.update(field_validators)
     schema_validators.validate_object(obj, context=context)
     non_field_validators.validate_object(obj, context=context)
-
     return obj
 
 
