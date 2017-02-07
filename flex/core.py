@@ -107,7 +107,10 @@ def validate(raw_schema, target=None, **kwargs):
     """
     schema = schema_validator(raw_schema, **kwargs)
     if target is not None:
-        validate_object(target, schema=schema, **kwargs)
+        try:
+            validate_object(target, schema=schema, **kwargs)
+        except ValidationError as err:
+            print err
 
 
 def validate_api_request(schema, raw_request):
