@@ -29,7 +29,7 @@ def test_validate_api_call(httpbin):
 
 
 @responses.activate
-def test_validate_api_call_with_polymorphism():
+def test_invalid_api_call_with_polymorphism():
     request_payload = """{
         "events": [
             {
@@ -54,3 +54,21 @@ def test_validate_api_call_with_polymorphism():
         err.value.detail,
     )
 
+
+@responses.activate
+def test_valid_api_call_with_polymorphism():
+    request_payload = """{
+        "events": [
+            {
+                "eventType": "Impression",
+                "advertisementId" : "ad7",
+                "timestamp": 12312312
+            }
+        ]
+    }"""
+    responses.add(responses.POST, "http://test.com/poly/report",
+                  body="{}", status=200, content_type="application/json")
+    response = requests.post("http://test.com/poly/report",
+                             json=json.loads(request_payload))
+    schema = load(os.path.join(BASE_DIR, 'schemas', 'polymorphism.yaml'))
+    validate_api_call(schema, raw_request=response.request, raw_response=response)
