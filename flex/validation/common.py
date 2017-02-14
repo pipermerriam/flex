@@ -359,6 +359,7 @@ def add_polymorphism_requirements(obj, schema, context, schema_validators):
     )
     subtype_validators = construct_schema_validators(object_schema, context)
     schema_validators.update(subtype_validators)
+    return schema_validators
 
 
 def validate_object(obj, field_validators=None, non_field_validators=None,
@@ -387,7 +388,7 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
                 schema_validators.add_validator(k, v)
 
     if 'discriminator' in schema:
-        add_polymorphism_requirements(obj, schema, context, schema_validators)
+        schema_validators = add_polymorphism_requirements(obj, schema, context, schema_validators)
 
     schema_validators.update(field_validators)
     schema_validators.validate_object(obj, context=context)
