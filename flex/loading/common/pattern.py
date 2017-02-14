@@ -27,6 +27,7 @@ def regex_validator(value, **kwargs):
             MESSAGES['pattern']['invalid_regex'].format(value)
         )
 
+
 pattern_schema = {
     'type': STRING,
 }
