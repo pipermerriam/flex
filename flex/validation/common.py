@@ -324,9 +324,7 @@ def validate_allof_anyof(value, sub_schemas, context, method, **kwargs):
 
 
 def generate_allof_validator(allOf, context, **kwargs):
-    if 'resolved_refs' not in context:
-        context['resolved_refs'] = []
-
+    context.setdefault('resolved_refs', [])
     unresolved_refs = []
     for ref in allOf:
         if isinstance(ref, dict) and '$ref' in ref:
@@ -345,17 +343,16 @@ def generate_anyof_validator(anyOf, context, **kwargs):
     return functools.partial(validate_allof_anyof, sub_schemas=anyOf, context=context, method=any)
 
 
-def add_polymorphism_requirements(object, schema, context, schema_validators):
-    object_type = None
+def add_polymorphism_requirements(obj, schema, context, schema_validators):
     try:
-        object_type = object[schema['discriminator']]
+        object_type = obj[schema['discriminator']]
     except KeyError:
-        raise ValidationError("No discriminator found on instance.".format(object_type))
+        raise ValidationError("No discriminator found on instance [{0}].".format(obj))
 
     try:
         object_schema = context['definitions'][object_type]
     except KeyError:
-        raise ValidationError("No definition for class [{}]".format(object_type))
+        raise ValidationError("No definition for class [{0}]".format(object_type))
 
     from flex.validation.schema import (
         construct_schema_validators,

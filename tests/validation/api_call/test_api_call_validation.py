@@ -3,11 +3,12 @@ from six.moves import urllib_parse as urlparse
 import requests
 import responses
 import json
-import pytest
-from flex.exceptions import ValidationError
 
+from flex.exceptions import ValidationError
 from flex.core import load, validate_api_call, validate_api_request
 from flex.error_messages import MESSAGES
+
+import pytest
 import tests
 from tests.utils import (
     assert_message_in_errors
