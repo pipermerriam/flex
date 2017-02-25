@@ -203,6 +203,7 @@ Command line usage
 As well as a python API, ``flex`` also provides a commandline validation tool via the ``swagger-flex`` cli.
 
 .. code-block:: bash
+
     $ ./swagger-flex -s /path/to/swagger.yaml
     $ ./swagger-flex -s http://spec.example.com/swagger.yaml
 
