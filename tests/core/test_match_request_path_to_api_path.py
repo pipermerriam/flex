@@ -154,7 +154,7 @@ def test_match_target_path_missing_base_path():
     )
 
     with pytest.raises(LookupError):
-        path = match_path_to_api_path(
+        match_path_to_api_path(
             path_definitions=schema['paths'],
             target_path=target_path,
             base_path=base_path,
@@ -276,7 +276,7 @@ def test_matching_with_full_nested_list_resource():
     schema = SchemaFactory(
         paths={
             '/get/main/':{
-                'get':{},
+                'get': {},
             },
             '/get/main/{id}': {
                 'get': {
@@ -309,3 +309,60 @@ def test_matching_with_full_nested_list_resource():
         target_path='/get/main/1234/nested/',
     )
     assert path == '/get/main/{id}/nested/'
+
+
+def test_matching_with_baseline_path_being_slash():
+    schema = SchemaFactory(
+        base_path='/',
+        paths={
+            '/get/main': {
+                'get': {},
+            },
+        }
+    )
+
+    path = match_path_to_api_path(
+        path_definitions=schema['paths'],
+        target_path='/get/main',
+        base_path=schema['base_path'],
+    )
+    assert path == '/get/main'
+
+
+def test_matching_with_no_path_when_base_path_is_not_just_a_slash():
+    # Since the base_path isn't /, we do expect the specification
+    # to be correct. So, this is expected to fail
+    # The target path that should work is /foo/foo/get/main
+    schema = SchemaFactory(
+        base_path='/foo',
+        paths={
+            '/foo/get/main': {
+                'get': {},
+            },
+        }
+    )
+
+    with pytest.raises(LookupError):
+        match_path_to_api_path(
+            path_definitions=schema['paths'],
+            target_path='/foo/get/main',
+            base_path=schema['base_path'],
+        )
+
+
+def test_matching_target_path_with_multiple_slashes():
+    schema = SchemaFactory(
+        base_path='/',
+        paths={
+            '/get/main': {
+                'get': {},
+            },
+        }
+    )
+
+    path = match_path_to_api_path(
+        path_definitions=schema['paths'],
+        target_path='/get/////main',
+        base_path=schema['base_path'],
+    )
+    assert path == '/get/main'
