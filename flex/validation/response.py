@@ -40,7 +40,8 @@ def validate_status_code_to_response_definition(response, operation_definition):
     If so, return the response definition that corresponds to the status code.
     """
     status_code = response.status_code
-    operation_responses = operation_definition['responses']
+    operation_responses = {str(code): val for code, val
+                           in operation_definition['responses'].items()}
 
     key = status_code
     if key not in operation_responses:
@@ -51,7 +52,7 @@ def validate_status_code_to_response_definition(response, operation_definition):
     except KeyError:
         raise ValidationError(
             MESSAGES['response']['invalid_status_code'].format(
-                status_code, operation_responses.keys(),
+                status_code, ', '.join(operation_responses.keys()),
             ),
         )
     return response_definition

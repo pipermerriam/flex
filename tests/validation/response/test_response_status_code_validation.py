@@ -71,3 +71,31 @@ def test_response_paramater_uses_default():
         request_method='get',
         schema=schema,
     )
+
+def test_response_parameter_with_yaml():
+    """
+    Test that when flex is asked to load YAML file, a response value that was
+    an integer, is converted to a string
+    """
+    schema = SchemaFactory(
+        paths={
+            '/get': {
+                'get': {
+                    'responses': {
+                        200: {'description': 'Success'},
+                        404: {'description': 'Failure'},
+                        'default': {'description': 'Unexpected error.'}
+                    },
+                },
+            },
+        },
+    )
+
+    response = ResponseFactory(url='http://www.example.com/get',
+                               status_code=404)
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
