@@ -24,6 +24,12 @@ except ImportError:
 else:
     _falcon_available = True
 
+try:
+    import webob
+except ImportError:
+    _webob_available = False
+else:
+    _webob_available = True
 
 class URLMixin(object):
     @property
@@ -178,14 +184,29 @@ def _normalize_falcon_request(request):
     )
 
 
+def _normalize_webob_request(request):
+    if not _webob_available:
+        raise TypeError("webob is not installed")
+
+    if not isinstance(request, webob.Request):
+            raise TypeError("Cannot normalize this request object")
+
+    return Request(
+        url=request.url,
+        body=request.body,
+        method=request.method.lower(),
+        content_type=request.content_type,
+        request=request,
+    )
+
 REQUEST_NORMALIZERS = (
     _normalize_python2_urllib_request,
     _normalize_python3_urllib_request,
     _normalize_requests_request,
+    _normalize_webob_request,
     _normalize_tornado_request,
     _normalize_falcon_request,
 )
-
 
 def normalize_request(request):
     """
@@ -294,10 +315,32 @@ def _normalize_tornado_response(response, request=None):
         response=response,
     )
 
+def _normalize_webob_response(response, request=None):
+    if not _webob_available:
+        raise TypeError("webob is not installed")
+
+    if not isinstance(response, webob.Response):
+        raise TypeError("Cannot normalize this response object")
+
+    if request:
+        url = request.url
+    else:
+        url = None
+
+    return Response(
+        request=request,
+        content=response.body,
+        url=url,
+        status_code=response.status.split()[0],
+        content_type=response.content_type,
+        response=response,
+    )
+
 
 RESPONSE_NORMALIZERS = (
     _normalize_urllib_response,
     _normalize_requests_response,
+    _normalize_webob_response,
     _normalize_tornado_response,
 )
 

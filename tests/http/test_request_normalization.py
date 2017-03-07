@@ -6,7 +6,7 @@ import six
 import requests
 
 from flex.http import (
-    normalize_request, _tornado_available, _falcon_available
+    normalize_request, _tornado_available, _falcon_available, _webob_available
 )
 
 
@@ -134,3 +134,36 @@ def test_falcon_request_normalization(httpbin):
     assert request.url == httpbin.url + '/put?key=val'
     assert request.method == 'put'
     assert request.body == '{"key2": "val2"}'
+
+@pytest.mark.skipif(not _tornado_available, reason="tornado not installed")
+def test_tornado_server_request_normalization(httpbin):
+    import tornado.httpserver
+
+    raw_request = tornado.httpserver.HTTPRequest(
+        'GET',
+        httpbin.url + '/get?key=val',
+        headers={'Content-Type': 'application/json'}
+    )
+
+    request = normalize_request(raw_request)
+
+    assert request.path == '/get'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/get?key=val'
+    assert request.method == 'get'
+
+@pytest.mark.skipif(not _webob_available, reason="webob not installed")
+def test_webob_client_request_normalization(httpbin):
+    import webob
+
+    raw_request = webob.Request.blank(httpbin.url + '/get')
+    raw_request.query_string = 'key=val'
+    raw_request.method = 'GET'
+    raw_request.content_type = 'application/json'
+
+    request = normalize_request(raw_request)
+
+    assert request.path == '/get'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/get?key=val'
+    assert request.method == 'get'

@@ -7,7 +7,7 @@ import urllib
 import requests
 
 from flex.http import (
-    normalize_response, _tornado_available
+    normalize_response, _tornado_available, _webob_available
 )
 
 
@@ -76,4 +76,27 @@ def test_tornado_response_normalization(httpbin):
     assert response.path == '/get'
     assert response.content_type == 'application/json'
     assert response.url == httpbin.url + '/get'
+    assert response.status_code == '200'
+
+
+#
+# Test webob response object
+#
+@pytest.mark.skipif(not _webob_available, reason="webob not installed")
+def test_webob_response_normalization(httpbin):
+    import webob
+
+    raw_request = webob.Request.blank(httpbin.url + '/get')
+    raw_request.query_string = 'key=val'
+    raw_request.method = 'GET'
+    raw_request.content_type = 'application/json'
+
+    raw_response = webob.Response()
+    raw_response.content_type = 'application/json'
+
+    response = normalize_response(raw_response, raw_request)
+
+    assert response.path == '/get'
+    assert response.content_type == 'application/json'
+    assert response.url == httpbin.url + '/get?key=val'
     assert response.status_code == '200'
