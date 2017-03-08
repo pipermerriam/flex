@@ -322,10 +322,14 @@ def _normalize_webob_response(response, request=None):
     if not isinstance(response, webob.Response):
         raise TypeError("Cannot normalize this response object")
 
+    url = None
+
     if request:
         url = request.url
+    elif response.request:
+        url = response.request.url
     else:
-        url = None
+        raise TypeError("Normalized webob object needs a path")
 
     return Response(
         request=request,
