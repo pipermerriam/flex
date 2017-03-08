@@ -188,7 +188,7 @@ def _normalize_webob_request(request):
     if not _webob_available:
         raise TypeError("webob is not installed")
 
-    if not isinstance(request, webob.Request):
+    if not isinstance(request, webob.BaseRequest):
             raise TypeError("Cannot normalize this request object")
 
     return Request(
