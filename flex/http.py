@@ -31,6 +31,7 @@ except ImportError:
 else:
     _webob_available = True
 
+
 class URLMixin(object):
     @property
     def url_components(self):
@@ -199,6 +200,7 @@ def _normalize_webob_request(request):
         request=request,
     )
 
+
 REQUEST_NORMALIZERS = (
     _normalize_python2_urllib_request,
     _normalize_python3_urllib_request,
@@ -207,6 +209,7 @@ REQUEST_NORMALIZERS = (
     _normalize_tornado_request,
     _normalize_falcon_request,
 )
+
 
 def normalize_request(request):
     """
@@ -314,6 +317,7 @@ def _normalize_tornado_response(response, request=None):
         content_type=response.headers.get('Content-Type'),
         response=response,
     )
+
 
 def _normalize_webob_response(response, request=None):
     if not _webob_available:
