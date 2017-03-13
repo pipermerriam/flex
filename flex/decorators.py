@@ -73,8 +73,8 @@ RESERVED_WORDS = (
 
 def rewrite_reserved_words(func):
     """
-    Given a function whos kwargs need to contain a reserved word such as 'in',
-    allow calling that function with the keyword as 'in_', such that function
+    Given a function whos kwargs need to contain a reserved word such as `in`,
+    allow calling that function with the keyword as `in_`, such that function
     kwargs are rewritten to use the reserved word.
     """
     @partial_safe_wraps(func)
