@@ -1,3 +1,12 @@
+6.2.0
+-----
+
+- Bugfix for `base_path` starting with `/` or paths with multiple concurrent slashes.
+- Add `file` type for request parameters.
+- Documentation fixes.
+- Support for integer status codes.
+- Support for `application-json` content types with encodings.
+
 6.1.0
 -----
 
