@@ -229,7 +229,7 @@ class Response(URLMixin):
     def data(self):
         if self.content is EMPTY:
             return self.content
-        elif self.content_type == 'application/json':
+        elif self.content_type.startswith('application/json'):
             if isinstance(self.content, six.binary_type):
                 return json.loads(six.text_type(self.content, encoding='utf-8'))
             else:
