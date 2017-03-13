@@ -128,7 +128,13 @@ def extract_operation_parameters(path_definition):
     ))
 
 
-def match_path_to_api_path(path_definitions, target_path, base_path='', context=None):
+# Change multiple / to one /
+# e.g., foo///bar//fiz/bar -> foo/bar/fiz/bar
+NORMALIZE_SLASH_REGEX = re.compile(r"/+")
+
+
+def match_path_to_api_path(path_definitions, target_path, base_path='',
+                           context=None):
     """
     Match a request or response path to one of the api paths.
 
@@ -138,25 +144,32 @@ def match_path_to_api_path(path_definitions, target_path, base_path='', context=
         context = {}
     assert isinstance(context, collections.Mapping)
     if target_path.startswith(base_path):
-        target_path = target_path[len(base_path):]
-        # Convert all of the api paths into Path instances for easier regex matching.
-        paths = {
-            p: path_to_regex(
-                api_path=p,
+        # Convert all of the api paths into Path instances for easier regex
+        # matching.
+        normalized_target_path = re.sub(NORMALIZE_SLASH_REGEX, '/',
+                                        target_path)
+        matching_api_paths = list()
+        for p, v in path_definitions.items():
+            # Doing this to help with case where we might have base_path
+            # being just /, and then the path starts with / as well.
+            full_path = re.sub(NORMALIZE_SLASH_REGEX, '/', base_path + p)
+            r = path_to_regex(
+                api_path=full_path,
                 path_parameters=extract_path_parameters(v),
                 operation_parameters=extract_operation_parameters(v),
                 context=context,
             )
-            for p, v in path_definitions.items()
-        }
+            if r.match(normalized_target_path):
+                matching_api_paths.append((p, r.match(normalized_target_path)))
 
-        matching_api_paths = [(p, r.match(target_path))
-                              for p, r in paths.items() if r.match(target_path)]
+        # Keep it consistent with the previous behavior
+        target_path = target_path[len(base_path):]
     else:
         matching_api_paths = []
 
     if not matching_api_paths:
-        raise LookupError(MESSAGES['path']['no_matching_paths_found'].format(target_path))
+        fstr = MESSAGES['path']['no_matching_paths_found'].format(target_path)
+        raise LookupError(fstr)
     elif len(matching_api_paths) > 1:
         # TODO: This area needs improved logic.
         # We check to see if any of the matched paths is longers than
