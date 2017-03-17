@@ -204,7 +204,7 @@ def match_path_to_api_path(path_definitions, target_path, base_path='',
             return matches_by_path_size[longest_match][0]
         raise MultiplePathsFound(
             MESSAGES['path']['multiple_paths_found'].format(
-                target_path, [v[0] for v in matching_api_paths],
+                target_path, [v[0] for v in matching_api_paths_regex],
             )
         )
     else:
