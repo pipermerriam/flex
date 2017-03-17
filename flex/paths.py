@@ -68,7 +68,11 @@ def process_path_part(part, parameters):
     if PARAMETER_REGEX.match(part):
         parameter_name = part.strip('{}')
         try:
-            parameter = find_parameter(parameters, name=parameter_name, in_=PATH)
+            parameter = find_parameter(
+                parameters,
+                name=parameter_name,
+                in_=PATH
+            )
         except ValueError:
             pass
         else:
@@ -163,7 +167,8 @@ def match_path_to_api_path(path_definitions, target_path, base_path='',
             if full_path == normalized_target_path:
                 matching_api_paths.append(p)
             elif r.match(normalized_target_path):
-                matching_api_paths_regex.append((p, r.match(normalized_target_path)))
+                matching_api_paths_regex.\
+                    append((p, r.match(normalized_target_path)))
 
         # Keep it consistent with the previous behavior
         target_path = target_path[len(base_path):]
