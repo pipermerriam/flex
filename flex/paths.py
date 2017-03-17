@@ -149,6 +149,7 @@ def match_path_to_api_path(path_definitions, target_path, base_path='',
         normalized_target_path = re.sub(NORMALIZE_SLASH_REGEX, '/',
                                         target_path)
         matching_api_paths = list()
+        matching_api_paths_regex = list()
         for p, v in path_definitions.items():
             # Doing this to help with case where we might have base_path
             # being just /, and then the path starts with / as well.
@@ -159,24 +160,39 @@ def match_path_to_api_path(path_definitions, target_path, base_path='',
                 operation_parameters=extract_operation_parameters(v),
                 context=context,
             )
-            if r.match(normalized_target_path):
-                matching_api_paths.append((p, r.match(normalized_target_path)))
+            if full_path == normalized_target_path:
+                matching_api_paths.append(p)
+            elif r.match(normalized_target_path):
+                matching_api_paths_regex.append((p, r.match(normalized_target_path)))
 
         # Keep it consistent with the previous behavior
         target_path = target_path[len(base_path):]
     else:
         matching_api_paths = []
+        matching_api_paths_regex = []
 
-    if not matching_api_paths:
+    print("Matching API PATHS:" + str(len(matching_api_paths)))
+
+    if not matching_api_paths and not matching_api_paths_regex:
         fstr = MESSAGES['path']['no_matching_paths_found'].format(target_path)
         raise LookupError(fstr)
+    elif len(matching_api_paths) == 1:
+        return matching_api_paths[0]
     elif len(matching_api_paths) > 1:
+        raise MultiplePathsFound(
+            MESSAGES['path']['multiple_paths_found'].format(
+                target_path, [v[0] for v in matching_api_paths],
+            )
+        )
+    elif len(matching_api_paths_regex) == 1:
+        return matching_api_paths_regex[0][0]
+    elif len(matching_api_paths_regex) > 1:
         # TODO: This area needs improved logic.
         # We check to see if any of the matched paths is longers than
         # the others.  If so, we *assume* it is the correct match.  This is
         # going to be prone to false positives. in certain cases.
         matches_by_path_size = collections.defaultdict(list)
-        for path, match in matching_api_paths:
+        for path, match in matching_api_paths_regex:
             matches_by_path_size[len(path)].append(path)
         longest_match = max(matches_by_path_size.keys())
         if len(matches_by_path_size[longest_match]) == 1:
@@ -187,4 +203,4 @@ def match_path_to_api_path(path_definitions, target_path, base_path='',
             )
         )
     else:
-        return matching_api_paths[0][0]
+        return matching_api_paths_regex[0][0]
