@@ -77,11 +77,7 @@ def validate_path_parameters(target_path, api_path, path_parameters, context):
     Helper function for validating a request path
     """
     base_path = context.get('basePath', '')
-    if base_path == '':
-        full_api_path = re.sub(NORMALIZE_SLASH_REGEX, '/', api_path)
-    else:
-        full_api_path = re.sub(NORMALIZE_SLASH_REGEX, '/',
-                               base_path + api_path)
+    full_api_path = re.sub(NORMALIZE_SLASH_REGEX, '/', base_path + api_path)
     parameter_values = get_path_parameter_values(
         target_path, full_api_path, path_parameters, context,
     )
