@@ -89,6 +89,36 @@ def test_request_validation_with_parametrized_path():
     )
 
 
+def test_request_validation_with_parametrized_path_with_base_path():
+    """
+    Test that request validation finds and validates parametrized paths.
+    """
+    schema = SchemaFactory(
+        basePath='/api/v1/',
+        paths={
+            '/get/{id}': {
+                'get': {'responses': {'200': {'description': 'Success'}}},
+                'parameters': [
+                    {
+                        'name': 'id',
+                        'in': PATH,
+                        'description': 'The Primary Key',
+                        'type': INTEGER,
+                        'required': True,
+                    }
+                ]
+            },
+        }
+    )
+
+    request = RequestFactory(url='http://www.example.com/api/v1/get/1234')
+
+    validate_request(
+        request=request,
+        schema=schema,
+    )
+
+
 def test_request_validation_with_parametrized_path_with_invalid_value():
     """
     Test that request validation finds and validates parametrized paths.

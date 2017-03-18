@@ -1,3 +1,6 @@
+# Standard libraries
+import re
+
 from flex.datastructures import ValidationDict
 from flex.utils import is_non_string_iterable
 from flex.exceptions import (
@@ -32,7 +35,7 @@ from flex.validation.schema import (
     generate_items_validator,
 )
 from flex.parameters import find_parameter
-from flex.paths import path_to_regex
+from flex.paths import NORMALIZE_SLASH_REGEX, path_to_regex
 from flex.constants import EMPTY
 
 
@@ -74,10 +77,13 @@ def validate_path_parameters(target_path, api_path, path_parameters, context):
     Helper function for validating a request path
     """
     base_path = context.get('basePath', '')
-    if target_path.startswith(base_path):
-        target_path = target_path[len(base_path):]
+    if base_path == '':
+        full_api_path = re.sub(NORMALIZE_SLASH_REGEX, '/', api_path)
+    else:
+        full_api_path = re.sub(NORMALIZE_SLASH_REGEX, '/',
+                               base_path + api_path)
     parameter_values = get_path_parameter_values(
-        target_path, api_path, path_parameters, context,
+        target_path, full_api_path, path_parameters, context,
     )
     validate_parameters(parameter_values, path_parameters, context=context)
 
