@@ -176,7 +176,6 @@ def match_path_to_api_path(path_definitions, target_path, base_path='',
         matching_api_paths = []
         matching_api_paths_regex = []
 
-
     if not matching_api_paths and not matching_api_paths_regex:
         fstr = MESSAGES['path']['no_matching_paths_found'].format(target_path)
         raise LookupError(fstr)
