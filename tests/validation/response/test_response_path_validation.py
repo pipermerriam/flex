@@ -260,3 +260,67 @@ def test_response_validation_with_parameter_as_reference_for_invalid_value():
         err.value.detail,
         'path',
     )
+
+
+def test_response_validation_with_parametrized_path_and_simple_api_base_path():
+    """
+    Test that request validation finds and validates parametrized paths even
+    when the api has a base path being /.
+    """
+    schema = SchemaFactory(
+        basePath='/',
+        paths={
+            '/api/v1/get/{id}': {
+                'get': {'responses': {'200': {'description': 'Success'}}},
+                'parameters': [
+                    {
+                        'name': 'id',
+                        'in': PATH,
+                        'description': 'The Primary Key',
+                        'type': INTEGER,
+                        'required': True,
+                    }
+                ]
+            },
+        }
+    )
+
+    response = ResponseFactory(url='http://www.example.com/api/v1/get/1234')
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
+
+
+def test_response_validation_with_parametrized_path_and_base_path_slash_end():
+    """
+    Test that request validation finds and validates parametrized paths even
+    when the api has a base path being /.
+    """
+    schema = SchemaFactory(
+        basePath='/api/v1/',
+        paths={
+            '/get/{id}': {
+                'get': {'responses': {'200': {'description': 'Success'}}},
+                'parameters': [
+                    {
+                        'name': 'id',
+                        'in': PATH,
+                        'description': 'The Primary Key',
+                        'type': INTEGER,
+                        'required': True,
+                    }
+                ]
+            },
+        }
+    )
+
+    response = ResponseFactory(url='http://www.example.com/api/v1/get/1234')
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
