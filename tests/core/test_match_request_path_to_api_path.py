@@ -366,3 +366,24 @@ def test_matching_target_path_with_multiple_slashes():
         base_path=schema['base_path'],
     )
     assert path == '/get/main'
+
+def test_matching_target_path_with_simple_comparison_proceeding():
+    schema = SchemaFactory(
+        base_path='/',
+        paths={
+            '/api/v1/search/' : {
+                'get': {},
+            },
+            '/api/v1/{longer_id}/' : {
+                'post': {},
+            }
+        }
+    )
+
+    path = match_path_to_api_path(
+        path_definitions=schema['paths'],
+        target_path='/api/v1/search/',
+        base_path=schema['base_path']
+    )
+    assert path == '/api/v1/search/'
+
