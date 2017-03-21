@@ -1,3 +1,9 @@
+6.4.0
+-----
+
+- Prioritize exact path matches over regex path matches.
+- Bugfix for path matching.
+
 6.3.0
 -----
 
