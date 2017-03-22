@@ -38,7 +38,7 @@ coverage:
 	coverage html
 	open htmlcov/index.html
 
-docs:
+docs: sdist
 	rm -f docs/flex.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ flex
