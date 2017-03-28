@@ -1,6 +1,7 @@
 6.5.0
 -----
 
+- Support collectionFormat multi in params.
 - Support for validation of django request and response objects
 - Standalone function for response validation.
 - Bugfix for incorrect exception being raised.
@@ -10,7 +11,6 @@
 
 - Prioritize exact path matches over regex path matches.
 - Bugfix for path matching.
-- Support collectionFormat multi in params.
 
 6.3.0
 -----
