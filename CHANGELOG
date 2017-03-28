@@ -10,6 +10,7 @@
 
 - Prioritize exact path matches over regex path matches.
 - Bugfix for path matching.
+- Support collectionFormat multi in params.
 
 6.3.0
 -----
@@ -134,7 +135,7 @@
 -----
 
 - Breaking Change:  Changes the implementation for how ``$ref`` values were
-  validated and resolved to be compliant with the json pointer spec 
+  validated and resolved to be compliant with the json pointer spec
   (RFC6901  https://tools.ietf.org/html/rfc6901).
 
 3.5.1
