@@ -10,6 +10,14 @@ import json
 from flex.constants import EMPTY
 
 try:
+    import django.http.request
+    import django.http.response
+except ImportError as e:
+    _django_available = False
+else:
+    _django_available = True
+
+try:
     import tornado.httpclient
     import tornado.httpserver
 except ImportError:
@@ -83,6 +91,22 @@ class Request(URLMixin):
             return dict(urlparse.parse_qsl(self.body))
         else:
             raise NotImplementedError("No parser for content type")
+
+
+def _normalize_django_request(request):
+    if not _django_available:
+        raise TypeError("django is not installed")
+
+    if not isinstance(request, (django.http.request.HttpRequest)):
+        raise TypeError("Cannot normalize this request object")
+
+    return Request(
+        request.build_absolute_uri(),
+        request.method.lower(),
+        content_type=request.META.get('CONTENT_TYPE'),
+        body=request.body,
+        request=request,
+    )
 
 
 def _normalize_requests_request(request):
@@ -202,6 +226,7 @@ def _normalize_webob_request(request):
 
 
 REQUEST_NORMALIZERS = (
+    _normalize_django_request,
     _normalize_python2_urllib_request,
     _normalize_python3_urllib_request,
     _normalize_requests_request,
@@ -259,6 +284,31 @@ class Response(URLMixin):
             else:
                 return json.loads(self.content)
         raise NotImplementedError("No content negotiation for this content type")
+
+
+def _normalize_django_response(response, request=None):
+    if not _django_available:
+        raise TypeError("django is not installed")
+
+    if not isinstance(response, (django.http.response.HttpResponse)):
+        raise TypeError("Cannot normalize this request object")
+
+    url = None
+
+    if isinstance(response, django.http.response.HttpResponseRedirect):
+        url = response.url
+    elif request:
+        url = request.url
+    else:
+        raise TypeError("Normalized django object needs a path")
+
+    return Response(
+        request=request,
+        content=response.content,
+        url=url,
+        status_code=response.status_code,
+        content_type=response['Content-Type'],
+        response=response)
 
 
 def _normalize_requests_response(response, request=None):
@@ -346,6 +396,7 @@ def _normalize_webob_response(response, request=None):
 
 
 RESPONSE_NORMALIZERS = (
+    _normalize_django_response,
     _normalize_urllib_response,
     _normalize_requests_response,
     _normalize_webob_response,
