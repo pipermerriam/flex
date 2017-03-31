@@ -1,3 +1,10 @@
+6.5.0
+-----
+
+- Support for validation of django request and response objects
+- Standalone function for response validation.
+- Bugfix for incorrect exception being raised.
+
 6.4.0
 -----
 
