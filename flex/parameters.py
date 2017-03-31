@@ -30,8 +30,8 @@ def find_parameter(parameters, **kwargs):
     if len(matching_parameters) == 1:
         return matching_parameters[0]
     elif len(matching_parameters) > 1:
-        raise NoParameterFound()
-    raise MultipleParametersFound()
+        raise MultipleParametersFound()
+    raise NoParameterFound()
 
 
 def merge_parameter_lists(*parameter_definitions):
