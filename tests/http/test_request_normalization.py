@@ -2,11 +2,13 @@ import pytest
 import urllib
 
 import six
+from six.moves import urllib_parse as urlparse
 
 import requests
 
 from flex.http import (
-    normalize_request, _tornado_available, _falcon_available, _webob_available
+    normalize_request, _tornado_available, _falcon_available, _webob_available,
+    _django_available
 )
 
 
@@ -144,6 +146,31 @@ def test_webob_client_request_normalization(httpbin):
     raw_request.query_string = 'key=val'
     raw_request.method = 'GET'
     raw_request.content_type = 'application/json'
+
+    request = normalize_request(raw_request)
+
+    assert request.path == '/get'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/get?key=val'
+    assert request.method == 'get'
+
+
+@pytest.mark.skipif(not _django_available, reason="django not installed")
+def test_django_request_normalization(httpbin):
+    from django.conf import settings
+    if not settings.configured:
+        settings.configure()
+        settings.ALLOWED_HOSTS.append('127.0.0.1')
+
+    import django.http.request
+
+    url = urlparse.urlparse(httpbin.url + '/get')
+
+    raw_request = django.http.request.HttpRequest()
+    raw_request.method = 'GET'
+    raw_request.path = url.path
+    raw_request._body = None
+    raw_request.META = {'CONTENT_TYPE': 'application/json', 'HTTP_HOST': url.netloc, 'QUERY_STRING': 'key=val'}
 
     request = normalize_request(raw_request)
 

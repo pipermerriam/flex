@@ -1,13 +1,14 @@
 from contextlib import closing
 import pytest
 import six
+from six.moves import urllib_parse as urlparse
 
 import urllib
 
 import requests
 
 from flex.http import (
-    normalize_response, _tornado_available, _webob_available
+    normalize_response, _tornado_available, _webob_available, _django_available
 )
 
 
@@ -100,3 +101,38 @@ def test_webob_response_normalization(httpbin):
     assert response.content_type == 'application/json'
     assert response.url == httpbin.url + '/get?key=val'
     assert response.status_code == '200'
+
+
+@pytest.mark.skipif(not _django_available, reason="django not installed")
+def test_django_response_normalization(httpbin):
+    from django.conf import settings
+    if not settings.configured:
+        settings.configure()
+        settings.ALLOWED_HOSTS.append('127.0.0.1')
+
+    import django.http.request
+    import django.http.response
+
+    url = urlparse.urlparse(httpbin.url + '/get')
+
+    raw_request = django.http.request.HttpRequest()
+    raw_request.method = 'GET'
+    raw_request.path = url.path
+    raw_request._body = None
+    raw_request.META = {'CONTENT_TYPE': 'application/json', 'HTTP_HOST': url.netloc, 'QUERY_STRING': 'key=val'}
+
+    raw_response = django.http.response.HttpResponse(b'', content_type='application/json', status=200)
+
+    response = normalize_response(raw_response, raw_request)
+
+    assert response.path == '/get'
+    assert response.content_type == 'application/json'
+    assert response.url == httpbin.url + '/get?key=val'
+    assert response.status_code == '200'
+
+    redirect_url = 'http://www.example.org'
+    raw_response = django.http.response.HttpResponseRedirect(redirect_url)
+
+    response = normalize_response(raw_response)
+
+    assert response.url == redirect_url
