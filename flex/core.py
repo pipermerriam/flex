@@ -117,6 +117,22 @@ def validate_api_request(schema, raw_request):
         validate_request(request=request, schema=schema)
 
 
+def validate_api_response(schema, raw_response, request_method='get'):
+    """
+    Validate the response of an api call against a swagger schema.
+    """
+    response = None
+    if raw_response is not None:
+        response = normalize_response(raw_response)
+
+    if response is not None:
+        validate_response(
+            response=response,
+            request_method=request_method,
+            schema=schema
+        )
+
+
 def validate_api_call(schema, raw_request, raw_response):
     """
     Validate the request/response cycle of an api call against a swagger
@@ -124,9 +140,6 @@ def validate_api_call(schema, raw_request, raw_response):
     are supported.
     """
     request = normalize_request(raw_request)
-    response = None
-    if raw_response is not None:
-        response = normalize_response(raw_response)
 
     with ErrorCollection() as errors:
         try:
@@ -139,11 +152,10 @@ def validate_api_call(schema, raw_request, raw_response):
             return
 
         try:
-            if response is not None:
-                validate_response(
-                    response=response,
-                    request_method=request.method,
-                    schema=schema,
-                )
+            validate_api_response(
+                raw_response=raw_response,
+                request_method=request.method,
+                schema=schema
+            )
         except ValidationError as err:
             errors['response'].add_error(err.messages or getattr(err, 'detail'))

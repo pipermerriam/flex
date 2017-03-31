@@ -5,7 +5,7 @@ import responses
 import json
 
 from flex.exceptions import ValidationError
-from flex.core import load, validate_api_call, validate_api_request
+from flex.core import load, validate_api_call, validate_api_request, validate_api_response
 from flex.error_messages import MESSAGES
 
 import pytest
@@ -21,6 +21,12 @@ def test_validate_api_request(httpbin):
     schema = load(os.path.join(BASE_DIR, 'schemas', 'httpbin.yaml'))
     response = requests.get(urlparse.urljoin(httpbin.url, '/get'))
     validate_api_request(schema, raw_request=response.request)
+
+
+def test_validate_api_response(httpbin):
+    schema = load(os.path.join(BASE_DIR, 'schemas', 'httpbin.yaml'))
+    response = requests.get(urlparse.urljoin(httpbin.url, '/get'))
+    validate_api_response(schema, raw_response=response)
 
 
 def test_validate_api_call(httpbin):
