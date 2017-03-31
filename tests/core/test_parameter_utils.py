@@ -14,6 +14,10 @@ from flex.constants import (
     PATH,
     QUERY,
 )
+from flex.exceptions import (
+    NoParameterFound,
+    MultipleParametersFound,
+)
 
 
 ID_IN_PATH = {
@@ -94,7 +98,7 @@ def test_find_parameter_errors_when_multiple_found():
     sanity = filter_parameters(parameters, in_=PATH)
     assert len(sanity) == 2
 
-    with pytest.raises(ValueError):
+    with pytest.raises(MultipleParametersFound):
         find_parameter(parameters, in_=PATH)
 
 
@@ -109,7 +113,7 @@ def test_find_parameter_errors_when_no_match_found():
     #sanity check
     assert not filter_parameters(parameters, name='not-in-parameters')
 
-    with pytest.raises(ValueError):
+    with pytest.raises(NoParameterFound):
         find_parameter(parameters, name='not-in-parameters')
 
 
