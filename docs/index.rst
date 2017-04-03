@@ -147,12 +147,14 @@ Request validation supports the following request objects.
 * ``requests.Request`` and ``requests.PreparedRequest`` from Kenneth Reitz'
   ``requests`` library.
 * ``urllib2.Request`` from the ``urllib2`` module of the standard library.
+* ``django.http.request.HttpRequest`` from ``django``
 
 Response valdation supports the following respone objects.
 
 * ``requests.Response`` from Kenneth Reitz' ``requests`` library.
 * The return value of ``urllib.urlopen`` and ``urllib2.urlopen`` from the
   standard library urllib modules.
+* ``django.http.response.HttpResponse`` from ``django``
 
 
 Formats
