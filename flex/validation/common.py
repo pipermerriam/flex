@@ -436,7 +436,7 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
     if is_non_string_iterable(type_):
         assert False, "This should not be possible"
     else:
-        if type_ == ARRAY:
+        if type_ == ARRAY and collectionFormat:
             if collectionFormat in DELIMETERS:
                 delimeter = DELIMETERS[collectionFormat]
                 # split the string based on the delimeter specified by the
