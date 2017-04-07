@@ -126,6 +126,7 @@ being present.
 EMPTY = Empty()
 
 UUID = 'uuid'
+DATE = 'date'
 DATETIME = 'date-time'
 EMAIL = 'email'
 INT32 = 'int32'
