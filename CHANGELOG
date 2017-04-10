@@ -1,6 +1,7 @@
 6.5.0
 -----
 
+- Support collectionFormat multi in params.
 - Support for validation of django request and response objects
 - Standalone function for response validation.
 - Bugfix for incorrect exception being raised.
@@ -134,7 +135,7 @@
 -----
 
 - Breaking Change:  Changes the implementation for how ``$ref`` values were
-  validated and resolved to be compliant with the json pointer spec 
+  validated and resolved to be compliant with the json pointer spec
   (RFC6901  https://tools.ietf.org/html/rfc6901).
 
 3.5.1

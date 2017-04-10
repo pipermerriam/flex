@@ -14,6 +14,7 @@ from flex.constants import (
     SSV,
     TSV,
     PIPES,
+    MULTI,
 )
 
 
@@ -109,6 +110,7 @@ def test_boolean_header_type_for_invalid_value():
         (TSV, '1\t 2\t 3'),
         (PIPES, '1|2|3'),
         (PIPES, '1| 2| 3'),
+        (MULTI, ('1', '2', '3')),
     )
 )
 def test_array_header_type_casting_with_single_tems(format_, input_):

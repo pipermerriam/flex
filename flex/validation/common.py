@@ -37,6 +37,7 @@ from flex.constants import (
     NUMBER,
     STRING,
     ARRAY,
+    MULTI,
     OBJECT,
     DELIMETERS,
     REQUEST_METHODS,
@@ -436,10 +437,14 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
         assert False, "This should not be possible"
     else:
         if type_ == ARRAY and collectionFormat:
-            delimeter = DELIMETERS[collectionFormat]
-            # split the string based on the delimeter specified by the
-            # `collectionFormat`
-            processors.append(operator.methodcaller('split', delimeter))
+            if collectionFormat in DELIMETERS:
+                delimeter = DELIMETERS[collectionFormat]
+                # split the string based on the delimeter specified by the
+                # `collectionFormat`
+                processors.append(operator.methodcaller('split', delimeter))
+            else:
+                if collectionFormat != MULTI:
+                    raise TypeError("collectionFormat not implemented")
             # remove any Falsy values like empty strings.
             processors.append(functools.partial(filter, bool))
             # strip off any whitespace
