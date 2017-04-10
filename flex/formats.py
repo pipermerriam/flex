@@ -1,3 +1,4 @@
+import datetime
 import re
 
 import six
@@ -12,6 +13,7 @@ from flex.constants import (
     STRING,
     INTEGER,
     UUID,
+    DATE,
     DATETIME,
     INT32,
     INT64,
@@ -120,6 +122,14 @@ def date_time_format_validator(value, **kwargs):
         iso8601.parse_date(value)
     except iso8601.ParseError:
         raise ValidationError(MESSAGES['format']['invalid_datetime'].format(value))
+
+
+@register(DATE, STRING)
+def date_format_validator(value, **kwargs):
+    try:
+        datetime.datetime.strptime(value, '%Y-%m-%d')
+    except ValueError:
+        raise ValidationError(MESSAGES['format']['invalid_date'].format(value))
 
 
 UUID_PATTERN = re.compile(
