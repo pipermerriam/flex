@@ -443,7 +443,8 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
                 # `collectionFormat`
                 processors.append(operator.methodcaller('split', delimeter))
             else:
-                assert collectionFormat == MULTI, "Unsupported collectionFormat"
+                if collectionFormat != MULTI:
+                    raise TypeError("collectionFormat not implemented")
             # remove any Falsy values like empty strings.
             processors.append(functools.partial(filter, bool))
             # strip off any whitespace
