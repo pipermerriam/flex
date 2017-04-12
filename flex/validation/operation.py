@@ -33,6 +33,7 @@ from flex.validation.common import (
     noop,
     generate_value_processor,
     generate_object_validator,
+    validate_content_type,
 )
 
 
@@ -47,13 +48,7 @@ def validate_operation(request, validators, **kwargs):
 
 def validate_request_content_type(request, content_types, **kwargs):
     assert isinstance(request, Request)
-    # TODO: is it correct to skip validation for a null content_type?
-    if request.content_type and request.content_type not in content_types:
-        raise ValidationError(
-            'Invalid content type `{0}`.  Must be one of `{1}`.'.format(
-                request.content_type, content_types,
-            ),
-        )
+    validate_content_type(request.content_type, content_types, **kwargs)
 
 
 def generate_request_content_type_validator(consumes, **kwargs):

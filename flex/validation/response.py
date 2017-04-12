@@ -28,6 +28,7 @@ from flex.validation.path import (
 )
 from flex.validation.common import (
     generate_value_processor,
+    validate_content_type,
 )
 from flex.http import Response
 
@@ -100,12 +101,7 @@ def generate_response_header_validator(headers, context, **kwargs):
 
 def validate_response_content_type(response, content_types, **kwargs):
     assert isinstance(response, Response)  # TODO: remove this sanity check
-    if response.content_type and response.content_type not in content_types:
-        raise ValidationError(
-            MESSAGES['content_type']['invalid'].format(
-                response.content_type, content_types,
-            ),
-        )
+    validate_content_type(response.content_type, content_types)
 
 
 def generate_response_content_type_validator(produces, **kwargs):

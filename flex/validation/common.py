@@ -525,3 +525,13 @@ def validate_path_to_api_path(path, paths, basePath='', context=None, **kwargs):
         raise ValidationError(str(err))
 
     return api_path
+
+
+def validate_content_type(content_type, content_types, **kwargs):
+    # TODO: is it correct to skip validation for a null content_type?
+    if content_type and content_type not in content_types:
+        raise ValidationError(
+            MESSAGES['content_type']['invalid'].format(
+                content_type, content_types,
+            ),
+        )
