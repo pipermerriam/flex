@@ -1,3 +1,8 @@
+import pytest
+
+from flex.error_messages import MESSAGES
+from flex.exceptions import ValidationError
+
 from flex.validation.response import (
     validate_response,
 )
@@ -6,9 +11,34 @@ from tests.factories import (
     SchemaFactory,
     ResponseFactory,
 )
+from tests.utils import assert_message_in_errors
 
 
-def test_response_validation_with_invalid_operation_on_path():
+def test_response_content_type_validation():
+    schema = SchemaFactory(
+        produces=['application/json'],
+        paths={
+            '/get': {
+                'get': {
+                    'responses': {'200': {'description': 'Success'}},
+                }
+            },
+        },
+    )
+
+    response = ResponseFactory(
+        url='http://www.example.com/get',
+        content_type='application/json',
+    )
+
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
+    )
+
+
+def test_response_content_type_validation_when_no_content_type_specified():
     schema = SchemaFactory(
         produces=['application/json'],
         paths={
@@ -24,10 +54,39 @@ def test_response_validation_with_invalid_operation_on_path():
         url='http://www.example.com/get',
         content_type=None,
     )
+    with pytest.raises(ValidationError) as err:
+        validate_response(
+            response=response,
+            request_method='get',
+            schema=schema,
+        )
+
+    assert_message_in_errors(
+        MESSAGES['content_type']['not_specified'],
+        err.value.detail,
+        'body.produces',
+    )
+
+
+def test_response_content_type_validation_ignores_parameters():
+    schema = SchemaFactory(
+        produces=['application/json'],
+        paths={
+            '/get': {
+                'get': {
+                    'responses': {'200': {'description': 'Success'}},
+                }
+            },
+        },
+    )
+
+    response = ResponseFactory(
+        url='http://www.example.com/get',
+        content_type='application/json; charset=UTF-8',
+    )
 
     validate_response(
         response=response,
         request_method='get',
         schema=schema,
     )
-
