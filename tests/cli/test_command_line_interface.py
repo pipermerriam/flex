@@ -48,4 +48,4 @@ def test_flex_cli_schema_validation_with_invalid_schema():
     )
 
     assert result.exit_code == 1
-    assert "Invalid value.  2.1 is not one of the available options (['2.0'])" in result.output
+    assert "Invalid value. 2.1 is not one of the available options (['2.0'])" in result.output
