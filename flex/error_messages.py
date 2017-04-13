@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 
 TYPE_MESSAGES = {
     'unknown': 'Unknown type: {0}',
-    'invalid': "Got value `{0}` of type `{1}`.  Value must be of type(s): `{2}`",
+    'invalid': "Got value `{0}` of type `{1}`. Value must be of type(s): `{2}`",
     'invalid_header_type': (
-        "Invalid type for header: `{0}`.  Must be one of 'string', 'number', "
+        "Invalid type for header: `{0}`. Must be one of 'string', 'number', "
         "'integer', 'boolean', or 'array'."
     ),
     'invalid_type_for_minimum': '`minimum` can only be used for json number types',
@@ -28,7 +28,7 @@ FORMAT_MESSAGES = {
     'invalid_uuid': "{0} is not a valid uuid",
     'invalid_date': "{0} is not a valid RFC3339/ISO8601 full-date",
     'invalid_datetime': "{0} is not a valid RFC3339/ISO8601 date-time",
-    'too_many_bits': "Integer {0} has {1} bits.  Must be no more than {2} bits",
+    'too_many_bits': "Integer {0} has {1} bits. Must be no more than {2} bits",
     'invalid_uri': "The value `{0}` is not valid according to RFC3987.",
     'invalid_email': "The email address `{0}` is invalid according to RFC5322.",
 }
@@ -41,7 +41,7 @@ REQUIRED_MESSAGES = {
 }
 
 MULTIPLE_OF_MESSAGES = {
-    'invalid': "Value must be a multiple of {0}.  Got {1} which is not.",
+    'invalid': "Value must be a multiple of {0}. Got {1} which is not.",
 }
 
 MINIMUM_AND_MAXIMUM_MESSAGES = {
@@ -72,7 +72,7 @@ MAX_LENGTH_MESSAGES = {
 
 
 MIN_ITEMS_MESSAGES = {
-    'invalid': "Array must have at least {0} items.  It had only had {1} items.",
+    'invalid': "Array must have at least {0} items. It had only had {1} items.",
 }
 
 
@@ -80,17 +80,17 @@ MAX_ITEMS_MESSAGES = {
     'must_be_greater_than_min_items': (
         "The value of `maxItems` must be greater than or equal to the value of `minItems`"
     ),
-    'invalid': "Array must have no more than {0} items.  It had {1} items.",
+    'invalid': "Array must have no more than {0} items. It had {1} items.",
 }
 
 
 UNIQUE_ITEMS_MESSAGES = {
-    'invalid': "Array items must be unique.  The following items appeard more than once: {0}",
+    'invalid': "Array items must be unique. The following items appeard more than once: {0}",
 }
 
 
 ENUM_MESSAGES = {
-    'invalid': "Invalid value.  {0} is not one of the available options ({1})",
+    'invalid': "Invalid value. {0} is not one of the available options ({1})",
 }
 
 
@@ -101,12 +101,12 @@ PATTERN_MESSAGES = {
 
 
 MIN_PROPERTIES_MESSAGES = {
-    'invalid': "Object must have more than {0} properties.  It had {1}",
+    'invalid': "Object must have more than {0} properties. It had {1}",
 }
 
 
 MAX_PROPERTIES_MESSAGES = {
-    'invalid': "Object must have less than {0} properties.  It had {1}",
+    'invalid': "Object must have less than {0} properties. It had {1}",
     'must_be_greater_than_min_properties': (
         "The value of `maxProperties` must be greater than or equal to `minProperties`."
     ),
@@ -116,7 +116,7 @@ MAX_PROPERTIES_MESSAGES = {
 ADDITIONAL_PROPERTIES_MESSAGES = {
     'extra_properties': (
         "When `additionalProperties` is False, no unspecified properties are "
-        "allowed.  The following unspecified properties were found:\n\t`{0}`"
+        "allowed. The following unspecified properties were found:\n\t`{0}`"
     ),
 }
 
@@ -132,14 +132,14 @@ ITEMS_MESSAGES = {
 DEFAULT_MESSAGES = {
     'invalid_type': (
         "The value of `default` must be of one of the declared types for the "
-        "schema.  `{0}` is not one of `{1}`"
+        "schema. `{0}` is not one of `{1}`"
     ),
 }
 
 
 REQUEST_MESSAGES = {
     'invalid_method': (
-        'Request was not one of the allowed request methods.  Got '
+        'Request was not one of the allowed request methods. Got '
         '`{0}`: Expected one of: `{1}`'
     ),
 }
@@ -147,7 +147,7 @@ REQUEST_MESSAGES = {
 
 RESPONSE_MESSAGES = {
     'invalid_status_code': (
-        "Request status code was not found in the known response codes.  Got "
+        "Request status code was not found in the known response codes. Got "
         "`{0}`: Expected one of: `{1}`"
     )
 }
@@ -156,12 +156,12 @@ RESPONSE_MESSAGES = {
 PATH_MESSAGES = {
     'no_matching_paths_found': 'No paths found for {0}',
     'multiple_paths_found': (
-        'Unable to determine path for {0}.  Found multiple matches: `{1}`'
+        'Unable to determine path for {0}. Found multiple matches: `{1}`'
     ),
     'unknown_path': 'Request path did not match any of the known api paths.',
     'missing_parameter': (
         "The parameter named `{0}` is declared to be a PATH parameter but does "
-        "not appear in the api path `{1}`.  All path parameters must exist as a "
+        "not appear in the api path `{1}`. All path parameters must exist as a "
         "parameter in the api path"
     ),
     'must_start_with_slash': "Path must start with a '/'",
@@ -170,7 +170,7 @@ PATH_MESSAGES = {
 
 
 CONTENT_TYPE_MESSAGES = {
-    'invalid': 'Invalid content type `{0}`.  Must be one of `{1}`.',
+    'invalid': 'Invalid content type `{0}`. Must be one of `{1}`.',
 }
 
 
@@ -182,11 +182,11 @@ HOST_MESSAGES = {
         "the port)"
     ),
     'may_not_include_path': (
-        "Invalid host: {0}.  Includes the path component.  The host value "
+        "Invalid host: {0}. Includes the path component. The host value "
         "should be the host only, without path or scheme."
     ),
     'may_not_include_scheme': (
-        "Invalid host: {0}.  Includes the scheme component.  The host value "
+        "Invalid host: {0}. Includes the scheme component. The host value "
         "should be the host only, without path or scheme."
     ),
 }
