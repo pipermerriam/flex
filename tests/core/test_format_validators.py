@@ -79,10 +79,10 @@ def test_uuid5_matches():
         uuid_format_validator(str(uuid.uuid5(uuid.uuid1(), 'test-1')))
 
 
-MAX_INT32 = 2 ** 32 - 1
-MIN_INT32 = -1 * 2 ** 32 + 1
-MAX_INT64 = 2 ** 64 - 1
-MIN_INT64 = -1 * 2 ** 64 + 1
+MAX_INT32 = 2 ** 31 - 1
+MIN_INT32 = -1 * 2 ** 31
+MAX_INT64 = 2 ** 63 - 1
+MIN_INT64 = -1 * 2 ** 63
 
 
 #

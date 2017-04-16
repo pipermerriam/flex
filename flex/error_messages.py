@@ -28,7 +28,9 @@ FORMAT_MESSAGES = {
     'invalid_uuid': "{0} is not a valid uuid",
     'invalid_date': "{0} is not a valid RFC3339/ISO8601 full-date",
     'invalid_datetime': "{0} is not a valid RFC3339/ISO8601 date-time",
-    'too_many_bits': "Integer {0} has {1} bits. Must be no more than {2} bits",
+    'invalid_int': (
+        "Integer {0} does not conform to the format int{1}. Must be no more than {1} bits"
+    ),
     'invalid_uri': "The value `{0}` is not valid according to RFC3987.",
     'invalid_email': "The email address `{0}` is invalid according to RFC5322.",
 }

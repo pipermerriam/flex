@@ -85,29 +85,16 @@ def uri_validator(value, **kwargs):
         raise ValidationError(MESSAGES['format']['invalid_uri'].format(value))
 
 
-def number_of_bits(n):
-    try:
-        return n.bit_length()
-    except AttributeError:
-        return len(bin(n)) - 1
-
-
 @register(INT32, INTEGER)
 def int32_validator(value, **kwargs):
-    num_bits = number_of_bits(value)
-    if num_bits > 32:
-        raise ValidationError(MESSAGES['format']['too_many_bits'].format(
-            value, num_bits, 32
-        ))
+    if value < -2147483648 or value > 2147483647:
+        raise ValidationError(MESSAGES['format']['invalid_int'].format(value, 32))
 
 
 @register(INT64, INTEGER)
 def int64_validator(value, **kwargs):
-    num_bits = number_of_bits(value)
-    if num_bits > 64:
-        raise ValidationError(MESSAGES['format']['too_many_bits'].format(
-            value, num_bits, 64
-        ))
+    if value < -9223372036854775808 or value > 9223372036854775807:
+        raise ValidationError(MESSAGES['format']['invalid_int'].format(value, 64))
 
 
 @register(EMAIL, STRING)
