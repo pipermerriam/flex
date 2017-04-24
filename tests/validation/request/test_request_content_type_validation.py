@@ -54,16 +54,10 @@ def test_request_content_type_validation_when_no_content_type_specified():
         content_type=None,
     )
 
-    with pytest.raises(ValidationError) as err:
-        validate_request(
-            request=request,
-            schema=schema,
-        )
-
-    assert_message_in_errors(
-        MESSAGES['content_type']['not_specified'],
-        err.value.detail,
-        'method.consumes',
+    # this is considered valid currently, but may change
+    validate_request(
+        request=request,
+        schema=schema,
     )
 
 

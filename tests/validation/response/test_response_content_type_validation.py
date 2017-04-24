@@ -54,17 +54,12 @@ def test_response_content_type_validation_when_no_content_type_specified():
         url='http://www.example.com/get',
         content_type=None,
     )
-    with pytest.raises(ValidationError) as err:
-        validate_response(
-            response=response,
-            request_method='get',
-            schema=schema,
-        )
 
-    assert_message_in_errors(
-        MESSAGES['content_type']['not_specified'],
-        err.value.detail,
-        'body.produces',
+    # this is considered valid currently, but may change
+    validate_response(
+        response=response,
+        request_method='get',
+        schema=schema,
     )
 
 
