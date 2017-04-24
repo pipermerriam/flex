@@ -525,3 +525,22 @@ def validate_path_to_api_path(path, paths, basePath='', context=None, **kwargs):
         raise ValidationError(str(err))
 
     return api_path
+
+
+def validate_content_type(content_type, content_types, **kwargs):
+    if content_type:
+        # only check MIME type, ignore parameters
+        content_type, _, _ = content_type.partition(';')
+        if content_type not in content_types:
+            raise ValidationError(
+                MESSAGES['content_type']['invalid'].format(
+                    content_type, content_types,
+                ),
+            )
+    else:
+        # according to RFC 2616 if Content-Type is missing it should be treated
+        # as application/octet-stream
+        if 'application/octet-stream' not in content_types:
+            raise ValidationError(
+                MESSAGES['content_type']['not_specified'].format(content_types)
+            )

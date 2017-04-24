@@ -173,6 +173,7 @@ PATH_MESSAGES = {
 
 CONTENT_TYPE_MESSAGES = {
     'invalid': 'Invalid content type `{0}`. Must be one of `{1}`.',
+    'not_specified': 'Content type not specified. Must be be one of `{0}`',
 }
 
 
