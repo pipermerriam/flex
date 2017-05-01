@@ -39,6 +39,13 @@ except ImportError:
 else:
     _webob_available = True
 
+try:
+    import werkzeug
+except ImportError:
+    _werkzeug_available = False
+else:
+    _werkzeug_available = True
+
 
 class URLMixin(object):
     @property
@@ -225,6 +232,22 @@ def _normalize_webob_request(request):
     )
 
 
+def _normalize_werkzeug_request(request):
+    if not _werkzeug_available:
+        raise TypeError("werkzeug is not installed")
+
+    if not isinstance(request, (werkzeug.wrappers.BaseRequest, werkzeug.local.LocalProxy)):
+        raise TypeError("Cannot normalize this request object")
+
+    return Request(
+        url=request.url,
+        body=request.data,
+        method=request.method.lower(),
+        content_type=request.content_type,
+        request=request,
+    )
+
+
 REQUEST_NORMALIZERS = (
     _normalize_django_request,
     _normalize_python2_urllib_request,
@@ -233,6 +256,7 @@ REQUEST_NORMALIZERS = (
     _normalize_webob_request,
     _normalize_tornado_request,
     _normalize_falcon_request,
+    _normalize_werkzeug_request,
 )
 
 
@@ -395,12 +419,33 @@ def _normalize_webob_response(response, request=None):
     )
 
 
+def _normalize_werkzeug_response(response, request=None):
+    if not _werkzeug_available:
+        raise TypeError("werkzeug is not installed")
+
+    if not isinstance(response, werkzeug.wrappers.BaseResponse):
+        raise TypeError("Cannot normalize this response object")
+
+    if request is None:
+        raise TypeError("Cannot normalize this response object")
+
+    return Response(
+        url=request.url,
+        request=request,
+        content=response.data,
+        status_code=response.status_code,
+        content_type=response.headers.get('Content-Type'),
+        response=response,
+    )
+
+
 RESPONSE_NORMALIZERS = (
     _normalize_django_response,
     _normalize_urllib_response,
     _normalize_requests_response,
     _normalize_webob_response,
     _normalize_tornado_response,
+    _normalize_werkzeug_response,
 )
 
 

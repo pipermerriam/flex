@@ -8,7 +8,7 @@ import requests
 
 from flex.http import (
     normalize_request, _tornado_available, _falcon_available, _webob_available,
-    _django_available
+    _django_available, _werkzeug_available
 )
 
 
@@ -178,3 +178,26 @@ def test_django_request_normalization(httpbin):
     assert request.content_type == 'application/json'
     assert request.url == httpbin.url + '/get?key=val'
     assert request.method == 'get'
+
+
+@pytest.mark.skipif(not _werkzeug_available, reason="werkzeug not installed")
+def test_werkzeug_request_normalization(httpbin):
+    from werkzeug.test import create_environ
+    from werkzeug.wrappers import Request
+
+    env = create_environ(
+        path='/put',
+        base_url=httpbin.url,
+        query_string='key=val',
+        headers={'Content-Type': 'application/json'},
+        data=b'{"key2": "val2"}',
+        method='PUT',
+    )
+    raw_request = Request(env)
+    request = normalize_request(raw_request)
+
+    assert request.path == '/put'
+    assert request.content_type == 'application/json'
+    assert request.url == httpbin.url + '/put?key=val'
+    assert request.method == 'put'
+    assert request.data == {'key2': 'val2'}
