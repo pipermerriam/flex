@@ -151,9 +151,11 @@ def validate_api_call(schema, raw_request, raw_response):
             errors['request'].add_error(err.messages or getattr(err, 'detail'))
             return
 
+        response = normalize_response(raw_response, raw_request)
+
         try:
-            validate_api_response(
-                raw_response=raw_response,
+            validate_response(
+                response=response,
                 request_method=request.method,
                 schema=schema
             )
