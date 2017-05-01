@@ -101,7 +101,7 @@ specification.
    ...: }
    >>>  validate(schema)
    ValueError: JSON Schema did not validate:
-   
+
    u'properties':
        - 'friends':
            - 'minimum':
@@ -147,14 +147,16 @@ Request validation supports the following request objects.
 * ``requests.Request`` and ``requests.PreparedRequest`` from Kenneth Reitz'
   ``requests`` library.
 * ``urllib2.Request`` from the ``urllib2`` module of the standard library.
-* ``django.http.request.HttpRequest`` from ``django``
+* ``django.http.request.HttpRequest`` from ``django``.
+* ``werkzeug.wrappers.Request`` from ``werkzeug`` (on which ``flask`` is based).
 
 Response valdation supports the following respone objects.
 
 * ``requests.Response`` from Kenneth Reitz' ``requests`` library.
 * The return value of ``urllib.urlopen`` and ``urllib2.urlopen`` from the
   standard library urllib modules.
-* ``django.http.response.HttpResponse`` from ``django``
+* ``django.http.response.HttpResponse`` from ``django``.
+* ``werkzeug.wrappers.Response`` from ``werkzeug`` (on which ``flask`` is based).
 
 
 Formats
@@ -210,7 +212,7 @@ As well as a python API, ``flex`` also provides a commandline validation tool vi
     $ ./swagger-flex -s http://spec.example.com/swagger.yaml
 
 
-In the event of a validation error, the commandline program will return 1 and 
+In the event of a validation error, the commandline program will return 1 and
 print to stderr a list of the validation errors detected.
 
 If the file passes validation it will return to stdout "Validation passed" and return
