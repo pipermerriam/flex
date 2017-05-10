@@ -1,3 +1,9 @@
+6.9.0
+-----
+
+- Support for validation of Werkzug request and response object.
+- Allow passing in `raw_request` into `validate_api_response` function.
+
 6.8.1
 -----
 
