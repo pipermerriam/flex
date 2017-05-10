@@ -117,13 +117,17 @@ def validate_api_request(schema, raw_request):
         validate_request(request=request, schema=schema)
 
 
-def validate_api_response(schema, raw_response, request_method='get'):
+def validate_api_response(schema, raw_response, request_method='get', raw_request=None):
     """
     Validate the response of an api call against a swagger schema.
     """
+    request = None
+    if raw_request is not None:
+        request = normalize_request(raw_request)
+
     response = None
     if raw_response is not None:
-        response = normalize_response(raw_response)
+        response = normalize_response(raw_response, request=request)
 
     if response is not None:
         validate_response(
