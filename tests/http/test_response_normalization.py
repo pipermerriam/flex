@@ -8,7 +8,8 @@ import urllib
 import requests
 
 from flex.http import (
-    normalize_response, _tornado_available, _webob_available, _django_available
+    normalize_response, _tornado_available, _webob_available, _django_available,
+    _werkzeug_available,
 )
 
 
@@ -136,3 +137,28 @@ def test_django_response_normalization(httpbin):
     response = normalize_response(raw_response)
 
     assert response.url == redirect_url
+
+
+@pytest.mark.skipif(not _werkzeug_available, reason="django not installed")
+def test_werkzeug_response_normalization(httpbin):
+    from werkzeug.wrappers import Request, Response
+    from werkzeug.test import create_environ
+
+    raw_request = Request(create_environ(
+        path='/get',
+        base_url=httpbin.url,
+        query_string='key=val',
+        method='GET',
+    ))
+
+    raw_response = Response(
+        response=b'{"key2": "val2"}',
+        content_type='application/json',
+    )
+
+    response = normalize_response(raw_response, raw_request)
+
+    assert response.path == '/get'
+    assert response.content_type == 'application/json'
+    assert response.url == httpbin.url + '/get?key=val'
+    assert response.status_code == '200'

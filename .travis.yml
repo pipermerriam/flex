@@ -9,14 +9,17 @@ env:
     - TOX_ENV=py27-with-django19
     - TOX_ENV=py27-with-django110
     - TOX_ENV=py27-with-tornado-falcon
+    - TOX_ENV=py27-with-werkzeug
     - TOX_ENV=py34
     - TOX_ENV=py34-with-django19
     - TOX_ENV=py34-with-django110
     - TOX_ENV=py34-with-tornado-falcon
+    - TOX_ENV=py34-with-werkzeug
     - TOX_ENV=py35
     - TOX_ENV=py35-with-django19
     - TOX_ENV=py35-with-django110
     - TOX_ENV=py35-with-tornado-falcon
+    - TOX_ENV=py35-with-werkzeug
     - TOX_ENV=flake8
 cache:
   directories:
