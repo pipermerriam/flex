@@ -92,7 +92,7 @@ class Request(URLMixin):
             return EMPTY
         elif self.content_type.startswith('application/json'):
             try:
-                if type(self.body) == bytes:
+                if isinstance(self.body, six.binary_type):
                     return json.loads(self.body.decode('utf-8'))
                 else:
                     return json.loads(self.body)
