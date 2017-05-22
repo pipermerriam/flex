@@ -4,6 +4,14 @@ import io
 import http
 import urllib
 
+try:
+    # python3
+    from json import JSONDecodeError
+except ImportError:
+    # backfill python2
+    class JSONDecodeError(ValueError):
+        pass
+
 from six.moves import urllib_parse as urlparse
 import json
 
@@ -90,10 +98,16 @@ class Request(URLMixin):
         elif self.body is EMPTY:
             return EMPTY
         elif self.content_type.startswith('application/json'):
-            if type(self.body) == bytes:
-                return json.loads(self.body.decode('utf-8'))
-            else:
-                return json.loads(self.body)
+            try:
+                if isinstance(self.body, six.binary_type):
+                    return json.loads(self.body.decode('utf-8'))
+                else:
+                    return json.loads(self.body)
+            except ValueError as e:
+                if isinstance(e, JSONDecodeError):
+                    # this will only be True for Python3+
+                    raise e
+                raise JSONDecodeError(str(e))
         elif self.content_type == 'application/x-www-form-urlencoded':
             return dict(urlparse.parse_qsl(self.body))
         else:
@@ -303,10 +317,16 @@ class Response(URLMixin):
         if self.content is EMPTY:
             return self.content
         elif self.content_type.startswith('application/json'):
-            if isinstance(self.content, six.binary_type):
-                return json.loads(six.text_type(self.content, encoding='utf-8'))
-            else:
-                return json.loads(self.content)
+            try:
+                if isinstance(self.content, six.binary_type):
+                    return json.loads(six.text_type(self.content, encoding='utf-8'))
+                else:
+                    return json.loads(self.content)
+            except ValueError as e:
+                if isinstance(e, JSONDecodeError):
+                    # this will only be True for Python3+
+                    raise e
+                raise JSONDecodeError(str(e))
         raise NotImplementedError("No content negotiation for this content type")
 
 
