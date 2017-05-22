@@ -1,3 +1,8 @@
+6.10.0
+-----
+
+- Raise `JSONDecodeError` instead of plain `ValueError` when schema is not valid json.
+
 6.9.0
 -----
 
