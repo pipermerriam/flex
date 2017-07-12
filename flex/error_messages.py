@@ -26,8 +26,8 @@ TYPE_MESSAGES = {
 FORMAT_MESSAGES = {
     'invalid': "Value {0} does not conform to the format {1}",
     'invalid_uuid': "{0} is not a valid uuid",
-    'invalid_date': "{0} is not a valid RFC3339/ISO8601 full-date",
-    'invalid_datetime': "{0} is not a valid RFC3339/ISO8601 date-time",
+    'invalid_date': "{0} is not a valid RFC3339 full-date",
+    'invalid_datetime': "{0} is not a valid RFC3339 date-time",
     'invalid_int': (
         "Integer {0} does not conform to the format int{1}. Must be no more than {1} bits"
     ),
