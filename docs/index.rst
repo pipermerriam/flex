@@ -165,7 +165,7 @@ Flex implements format validation for the following formats
 * ``uuid``:
   Version 1, 3, 4, and 5
 * ``datetime``:
-  iso8601 formatted datetimes via https://pypi.python.org/pypi/iso8601.
+  RFC3339 formatted datetimes via https://pypi.python.org/pypi/strict-rfc3339.
 * ``int32``:
   Integers up to 32 bits.
 * ``int64``:

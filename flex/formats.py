@@ -3,8 +3,8 @@ import re
 
 import six
 
-import iso8601
 import rfc3987
+import strict_rfc3339
 
 from flex.utils import is_value_of_any_type
 from flex.exceptions import ValidationError
@@ -105,9 +105,7 @@ def email_validator(value, **kwargs):
 
 @register(DATETIME, STRING)
 def date_time_format_validator(value, **kwargs):
-    try:
-        iso8601.parse_date(value)
-    except iso8601.ParseError:
+    if not strict_rfc3339.validate_rfc3339(value):
         raise ValidationError(MESSAGES['format']['invalid_datetime'].format(value))
 
 

@@ -17,7 +17,7 @@ from tests.utils import (
     'when',
     (
         '2011-08-18T10:29:47+03:00',
-        '2011-08-18',
+        '2017-01-02T12:34:56Z',
     ),
 )
 def test_date_time_format_validation(when):
