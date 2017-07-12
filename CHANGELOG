@@ -1,3 +1,10 @@
+6.11.0
+-----
+
+- Improve handling of content-type negotiation with requests.
+- Enforce strict RFC3339 date/time formats.
+- Bugfix for response schemas not being properly de-referenced.
+
 6.10.0
 -----
 
