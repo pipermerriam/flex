@@ -14,7 +14,7 @@ from flex.http import (
 
 
 #
-#  Test normalizatin of the response object from the requests library
+#  Test normalization of the response object from the requests library
 #
 def test_response_normalization(httpbin):
     raw_response = requests.get(httpbin.url + '/get')
