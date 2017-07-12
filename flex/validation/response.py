@@ -31,6 +31,7 @@ from flex.validation.common import (
     validate_content_type,
 )
 from flex.http import Response
+from flex.utils import dereference_reference
 
 
 def validate_status_code_to_response_definition(response, operation_definition):
@@ -158,6 +159,8 @@ def generate_response_validator(api_path, operation_definition, response_definit
         parameters=operation_definition.get('parameters', []),
         context=context,
     ))
+    if '$ref' in response_definition:
+        response_definition = dereference_reference(response_definition['$ref'], context)
 
     for key in validator_mapping:
         if key in response_definition:
