@@ -95,3 +95,9 @@ def test_py3_invalid_json():
     with pytest.raises(JSONDecodeError) as e:
         request.data
     assert e.value.msg == expected_exception.msg
+
+
+def test_content_type_is_none():
+    request = RequestFactory(body='some content', content_type=None)
+    with pytest.raises(NotImplementedError):
+        request.data

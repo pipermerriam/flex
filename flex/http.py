@@ -97,7 +97,7 @@ class Request(URLMixin):
             return self.body
         elif self.body is EMPTY:
             return EMPTY
-        elif self.content_type.startswith('application/json'):
+        elif self.content_type and self.content_type.startswith('application/json'):
             try:
                 if isinstance(self.body, six.binary_type):
                     return json.loads(self.body.decode('utf-8'))
@@ -316,7 +316,7 @@ class Response(URLMixin):
     def data(self):
         if self.content is EMPTY:
             return self.content
-        elif self.content_type.startswith('application/json'):
+        elif self.content_type and self.content_type.startswith('application/json'):
             try:
                 if isinstance(self.content, six.binary_type):
                     return json.loads(six.text_type(self.content, encoding='utf-8'))
