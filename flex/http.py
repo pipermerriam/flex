@@ -328,7 +328,10 @@ class Response(URLMixin):
                     raise e
                 raise JSONDecodeError(str(e))
         elif self.content_type and self.content_type.startswith('text/html'):
-            return self.content
+            if isinstance(self.content, six.binary_type):
+                return six.text_type(self.content, encoding='utf-8')
+            else:
+                return self.content
         raise NotImplementedError("No content negotiation for this content type")
 
 
