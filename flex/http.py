@@ -327,6 +327,8 @@ class Response(URLMixin):
                     # this will only be True for Python3+
                     raise e
                 raise JSONDecodeError(str(e))
+        elif self.content_type and self.content_type.startswith('text/html'):
+            return self.content
         raise NotImplementedError("No content negotiation for this content type")
 
 
