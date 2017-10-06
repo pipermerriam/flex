@@ -15,7 +15,7 @@ from flex.decorators import (
     skip_if_empty,
     skip_if_not_of_type,
 )
-from flex.context_managers import ErrorCollection
+from flex.context_managers import ErrorDict
 
 
 string_type_validator = generate_type_validator(STRING)
@@ -49,7 +49,7 @@ def host_validator(value, **kwargs):
         hostname = hostname[:-1]  # strip exactly one dot from the right, if present
     allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
 
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         if not all(allowed.match(x) for x in hostname.split(".")):
             errors.add_error(
                 'invalid',

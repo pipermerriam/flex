@@ -2,9 +2,9 @@ import functools
 
 from flex.datastructures import ValidationDict
 from flex.exceptions import ValidationError
-from flex.utils import chain_reduce_partial
+from flex.functional import chain_reduce_partial
 from flex.functional import attrgetter
-from flex.context_managers import ErrorCollection
+from flex.context_managers import ErrorDict
 from flex.http import (
     Request,
 )
@@ -38,7 +38,7 @@ from flex.validation.common import (
 
 
 def validate_operation(request, validators, **kwargs):
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         for key, validator in validators.items():
             try:
                 validator(request, **kwargs)

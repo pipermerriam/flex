@@ -25,10 +25,10 @@ from flex.utils import (
     is_value_of_any_type,
     is_non_string_iterable,
     get_type_for_value,
-    chain_reduce_partial,
     cast_value_to_type,
     deep_equal,
 )
+from flex.functional import chain_reduce_partial
 from flex.paths import (
     match_path_to_api_path,
 )

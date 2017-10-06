@@ -14,7 +14,7 @@ from flex.validation.common import (
     generate_object_validator,
 )
 from flex.context_managers import (
-    ErrorCollection,
+    ErrorDict,
 )
 from .path_item import (
     path_item_validator,
@@ -24,7 +24,7 @@ from .path_item import (
 @skip_if_empty
 @skip_if_not_of_type(OBJECT)
 def validate_path_items(paths, **kwargs):
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         for path, path_definition in paths.items():
             # TODO: move this to its own validation function that validates the keys.
             if not path.startswith('/'):

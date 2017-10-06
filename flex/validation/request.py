@@ -1,5 +1,5 @@
 from flex.exceptions import ValidationError
-from flex.context_managers import ErrorCollection
+from flex.context_managers import ErrorDict
 from flex.validation.operation import (
     construct_operation_validators,
     validate_operation,
@@ -19,7 +19,7 @@ def validate_request(request, schema):
        3. validate that the request parameters conform to the parameter
           definitions for the operation definition.
     """
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         # 1
         try:
             api_path = validate_path_to_api_path(
