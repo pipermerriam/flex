@@ -1,6 +1,7 @@
 language: python
 python:
   - "2.7"
+  - "3.5"
 env:
   global:
     - PIP_DOWNLOAD_CACHE=$HOME/.pip_cache
