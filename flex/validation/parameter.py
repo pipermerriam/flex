@@ -9,7 +9,7 @@ from flex.exceptions import (
     NoParameterFound,
 )
 from flex.error_messages import MESSAGES
-from flex.context_managers import ErrorCollection
+from flex.context_managers import ErrorDict
 from flex.validation.reference import (
     LazyReferenceValidator,
 )
@@ -98,7 +98,7 @@ def validate_query_parameters(raw_query_data, query_parameters, context):
 def validate_parameters(parameter_values, parameters, context):
     validators = construct_multi_parameter_validators(parameters, context=context)
 
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         for key, validator in validators.items():
             try:
                 validator(parameter_values.get(key, EMPTY))

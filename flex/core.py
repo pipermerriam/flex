@@ -9,7 +9,7 @@ import six
 import json
 import yaml
 
-from flex.context_managers import ErrorCollection
+from flex.context_managers import ErrorDict
 from flex.exceptions import ValidationError
 from flex.loading.definitions import (
     definitions_validator,
@@ -113,7 +113,7 @@ def validate(raw_schema, target=None, **kwargs):
 def validate_api_request(schema, raw_request):
     request = normalize_request(raw_request)
 
-    with ErrorCollection():
+    with ErrorDict():
         validate_request(request=request, schema=schema)
 
 
@@ -145,7 +145,7 @@ def validate_api_call(schema, raw_request, raw_response):
     """
     request = normalize_request(raw_request)
 
-    with ErrorCollection() as errors:
+    with ErrorDict() as errors:
         try:
             validate_request(
                 request=request,

@@ -12,10 +12,10 @@ from flex.utils import (
     format_errors,
     get_type_for_value,
     cast_value_to_type,
-    chain_reduce_partial,
     is_any_string_type,
     deep_equal,
 )
+from flex.functional import chain_reduce_partial
 from flex.constants import (
     NULL,
     BOOLEAN,
