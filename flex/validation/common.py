@@ -423,6 +423,12 @@ def apply_validator_to_array(values, validator, **kwargs):
                 errors.add_error(err.detail)
 
 
+def add_string_into_list(raw_query_data):
+    if isinstance(raw_query_data, six.string_types):
+        return [raw_query_data]
+    return raw_query_data
+
+
 @suffix_reserved_words
 def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs):
     """
@@ -445,6 +451,7 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
             else:
                 if collectionFormat != MULTI:
                     raise TypeError("collectionFormat not implemented")
+                processors.append(add_string_into_list)
             # remove any Falsy values like empty strings.
             processors.append(functools.partial(filter, bool))
             # strip off any whitespace
