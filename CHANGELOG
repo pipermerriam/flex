@@ -1,3 +1,8 @@
+6.11.1
+-----
+
+- Bugfix for handling of `MULTI` parameters when there is only a single value.
+
 6.11.0
 -----
 
