@@ -102,3 +102,48 @@ def test_allof_simple_multiple_failures():
     )
 
     assert len(err.value.detail['allOf']) == 2
+
+
+def test_allof_ref_duplicate_failure():
+    # example taken from https://github.com/pipermerriam/flex/issues/146
+    schema_with_allof = {
+        'type': 'object',
+        'allOf': [
+            {
+                '$ref': '#/definitions/UserBase'
+            },
+            {
+                'properties': {
+                    'user_id': {
+                        'type': 'string',
+                        'maxLength': 128
+                    }
+                },
+                'required': ['user_id']
+            }
+        ]
+    }
+    context = {
+        'definitions': {
+            'UserBase': {
+                'type': 'object',
+                'properties': {
+                    'name': {
+                        'type': 'string',
+                        'maxLength': 100
+                    }
+                },
+                'required': ['name']
+            }
+        }
+    }
+
+    data = {'user_id': 'asdf'}
+
+    validator = generate_validator_from_schema(schema_with_allof, context=context)
+
+    with pytest.raises(ValidationError):
+        validator(data)
+
+    with pytest.raises(ValidationError):
+        validator(data)
