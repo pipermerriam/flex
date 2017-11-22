@@ -121,19 +121,19 @@ def test_request_body_parameter_validation_invalid_without_ref():
     schema = SchemaFactory(
         paths={
             '/post/': {
-                'post': {
+                POST: {
                     'consumes': ['application/json'],
                     'parameters': [
                         {
-                            'in': 'body',
-                            'name': 'body',
+                            'in': BODY,
+                            'name': BODY,
                             'required': True,
                             'schema': {
-                                'type': 'object',
+                                'type': OBJECT,
                                 'required': ['name'],
                                 'properties': {
                                     'name': {
-                                        'type': 'string'
+                                        'type': STRING
                                     }
                                 }
                             }
