@@ -337,7 +337,7 @@ def generate_allof_validator(allOf, context, **kwargs):
         else:
             unresolved_refs.append(ref)
 
-    return functools.partial(validate_allof_anyof_oneof, sub_schemas=unresolved_refs,
+    return functools.partial(validate_composition, sub_schemas=unresolved_refs,
                              context=context, method=all)
 
 
