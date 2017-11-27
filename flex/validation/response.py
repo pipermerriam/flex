@@ -222,7 +222,7 @@ def validate_response(response, request_method, schema):
                 path_definition=path_definition,
             )
         except ValidationError as err:
-            errors['method'].append(err.message)
+            errors['method'].add_error(err.detail)
             return
 
         # 4
