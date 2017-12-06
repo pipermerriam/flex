@@ -125,6 +125,7 @@ def construct_parameter_validators(parameter, context):
     if 'schema' in parameter:
         schema_validators = construct_schema_validators(parameter['schema'], context=context)
         for key, value in schema_validators.items():
+            # merge validators for those sharing the same key (like 'required') to not omit some
             if key in validators:
                 validators[key] += value
             else:
