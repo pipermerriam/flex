@@ -16,6 +16,7 @@ def test_native_mapping_is_passthrough():
     result = load_source(source)
 
     assert result == source
+    assert result is not source
 
 
 def test_json_string():
