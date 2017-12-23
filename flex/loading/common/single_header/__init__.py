@@ -47,16 +47,16 @@ from flex.loading.definitions.schema import (
 
 
 single_header_schema = {
-    'anyOf' :[
+    'anyOf': [
         {'type': OBJECT,
          'required': [
              'type',
          ]
-        },
+         },
         {'type': OBJECT,
          'required': [
              'schema',
-          ]
+         ]
          }
     ]
 }
