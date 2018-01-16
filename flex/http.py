@@ -147,6 +147,7 @@ def _normalize_requests_request(request):
         method=method,
         content_type=content_type,
         request=request,
+        headers=request.headers,
     )
 
 
