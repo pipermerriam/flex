@@ -27,14 +27,17 @@ from tests.utils import assert_message_in_errors
         ([True, False], 0),
         ([True, False], 1),
         ([True, False], ''),
+        ([True, False], None),
         ([0, 1, 2, 3], True),
         ([0, 1, 2, 3], False),
         ([0, 1, 2, 3], '1'),
         ([0, 1, 2, 3], 4),
         ([0, 1, 2, 3], 1.0),
+        ([0, 1, 2, 3], None),
         (['1', '2', 'a', 'b'], 'A'),
         (['1', '2', 'a', 'b'], 1),
         (['1', '2', 'a', 'b'], 2),
+        (['1', '2', 'a', 'b'], None),
     ),
 )
 def test_enum_validation_with_invalid_values(enum, value):
@@ -82,6 +85,36 @@ def test_enum_validation_with_allowed_values(enum, value):
             'type': [STRING, NUMBER, BOOLEAN],
             'required': True,
             'enum': enum,
+        },
+    ])
+    parameter_values = {
+        'id': value,
+    }
+
+    validate_parameters(parameter_values, parameters, {})
+
+
+@pytest.mark.parametrize(
+    'enum,value',
+    (
+        ([True, False], True),
+        ([True, False], None),
+        ([0, 1, 2, 3], 1),
+        ([0, 1, 2, 3], None),
+        (['1', '2', 'a', 'b'], 'a'),
+        (['1', '2', 'a', 'b'], None),
+    ),
+)
+def test_nullable_enum_validation_with_allowed_values(enum, value):
+    parameters = parameters_validator([
+        {
+            'name': 'id',
+            'in': PATH,
+            'description': 'id',
+            'type': [STRING, NUMBER, BOOLEAN],
+            'required': True,
+            'enum': enum,
+            'x-nullable': True
         },
     ])
     parameter_values = {
