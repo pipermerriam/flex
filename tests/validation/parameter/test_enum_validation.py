@@ -42,7 +42,7 @@ def test_enum_validation_with_invalid_values(enum, value):
         {
             'name': 'id',
             'in': PATH,
-            'description':'id',
+            'description': 'id',
             'type': [STRING, NUMBER, BOOLEAN],
             'required': True,
             'enum': enum,
@@ -62,7 +62,6 @@ def test_enum_validation_with_invalid_values(enum, value):
     )
 
 
-
 @pytest.mark.parametrize(
     'enum,value',
     (
@@ -79,7 +78,7 @@ def test_enum_validation_with_allowed_values(enum, value):
         {
             'name': 'id',
             'in': PATH,
-            'description':'id',
+            'description': 'id',
             'type': [STRING, NUMBER, BOOLEAN],
             'required': True,
             'enum': enum,
