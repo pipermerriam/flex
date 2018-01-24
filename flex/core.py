@@ -66,7 +66,7 @@ def load_source(source):
             pass
 
         try:
-            return yaml.load(raw_source)
+            return yaml.safe_load(raw_source)
         except (yaml.scanner.ScannerError, yaml.parser.ParserError):
             pass
     except NameError:

@@ -27,7 +27,7 @@ def test_json_string():
 
 
 def test_yaml_string():
-    native = {'foo': 'bar'}
+    native = {b'foo': b'bar'}
     source = yaml.dump(native)
     result = load_source(source)
 
@@ -62,7 +62,7 @@ def test_json_file_path():
 
 
 def test_yaml_file_object():
-    native = {'foo': 'bar'}
+    native = {b'foo': b'bar'}
     source = yaml.dump(native)
 
     tmp_file = tempfile.NamedTemporaryFile(mode='w')
@@ -76,7 +76,7 @@ def test_yaml_file_object():
 
 
 def test_yaml_file_path():
-    native = {'foo': 'bar'}
+    native = {b'foo': b'bar'}
     source = yaml.dump(native)
 
     tmp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.yaml')

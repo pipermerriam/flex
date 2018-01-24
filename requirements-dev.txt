@@ -4,6 +4,6 @@ tox==1.8.0
 pytest-httpbin==0.0.3
 factory-boy==2.4.1
 responses==0.5.1
-flake8==3.3.0
+flake8==3.5.0
 coverage==4.3.4
 sphinx==1.5.3

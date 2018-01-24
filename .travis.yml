@@ -1,29 +1,46 @@
 language: python
 python:
   - "3.5"
-env:
-  global:
-    - PIP_DOWNLOAD_CACHE=$HOME/.pip_cache
-  matrix:
-    - TOX_ENV=py27
-    - TOX_ENV=py27-with-django19
-    - TOX_ENV=py27-with-django110
-    - TOX_ENV=py27-with-tornado-falcon
-    - TOX_ENV=py27-with-werkzeug
-    - TOX_ENV=py34
-    - TOX_ENV=py34-with-django19
-    - TOX_ENV=py34-with-django110
-    - TOX_ENV=py34-with-tornado-falcon
-    - TOX_ENV=py34-with-werkzeug
-    - TOX_ENV=py35
-    - TOX_ENV=py35-with-django19
-    - TOX_ENV=py35-with-django110
-    - TOX_ENV=py35-with-tornado-falcon
-    - TOX_ENV=py35-with-werkzeug
-    - TOX_ENV=flake8
+matrix:
+  include:
+    # 2.7
+    - python: "2.7"
+      env: TOX_ENV=py27
+    - python: "2.7"
+      env: TOX_ENV=py27-with-django19
+    - python: "2.7"
+      env: TOX_ENV=py27-with-django110
+    - python: "2.7"
+      env: TOX_ENV=py27-with-tornado-falcon
+    - python: "2.7"
+      env: TOX_ENV=py27-with-werkzeug
+    # 3.4
+    - python: "3.4"
+      env: TOX_ENV=py34
+    - python: "3.4"
+      env: TOX_ENV=py34-with-django19
+    - python: "3.4"
+      env: TOX_ENV=py34-with-django110
+    - python: "3.4"
+      env: TOX_ENV=py34-with-tornado-falcon
+    - python: "3.4"
+      env: TOX_ENV=py34-with-werkzeug
+    # 3.5
+    - python: "3.5"
+      env: TOX_ENV=py35
+    - python: "3.5"
+      env: TOX_ENV=py35-with-django19
+    - python: "3.5"
+      env: TOX_ENV=py35-with-django110
+    - python: "3.5"
+      env: TOX_ENV=py35-with-tornado-falcon
+    - python: "3.5"
+      env: TOX_ENV=py35-with-werkzeug
+    # flake8
+    - python: "3.5"
+      env: TOX_ENV=flake8
 cache:
-  directories:
-    - $HOME/.pip-cache/
+  pip: true
 install:
   - "travis_retry pip install setuptools --upgrade"
   - "travis_retry pip install tox"
