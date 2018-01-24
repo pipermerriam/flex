@@ -41,7 +41,7 @@ definitions_schema = {
 def validate_deferred_references(schema, context, **kwargs):
     try:
         deferred_references = context['deferred_references']
-    except:
+    except KeyError:
         raise KeyError("`deferred_references` not found in context")
 
     with ErrorDict() as errors:
