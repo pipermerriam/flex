@@ -49,6 +49,7 @@ else:
 
 try:
     import werkzeug
+    from werkzeug import local  # make sure werkzeug.local exists
 except ImportError:
     _werkzeug_available = False
 else:
