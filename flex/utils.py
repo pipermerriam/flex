@@ -199,3 +199,14 @@ def dereference_reference(reference, context):
             MESSAGES['reference']['unsupported'].format(reference),
         )
     return jsonpointer.resolve_pointer(context, parts.fragment)
+
+
+def exactly_one(iterable):
+    """
+    Returns True if bool(x) is True for exactly one x in the iterable
+    If the iterable is empty, returns False
+    """
+    it = iter(iterable)
+    # check that one is True, then check that none is True in rest of the
+    # iterator
+    return any(it) and not any(it)
