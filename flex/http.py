@@ -352,7 +352,7 @@ def _normalize_django_response(response, request=None):
         content=response.content,
         url=url,
         status_code=response.status_code,
-        content_type=response['Content-Type'],
+        content_type=response.get('Content-Type'),
         response=response)
 
 

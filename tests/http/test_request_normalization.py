@@ -179,6 +179,10 @@ def test_django_request_normalization(httpbin):
     assert request.url == httpbin.url + '/get?key=val'
     assert request.method == 'get'
 
+    del raw_request.META['CONTENT_TYPE']
+    request = normalize_request(raw_request)
+    assert request.content_type is None
+
 
 @pytest.mark.skipif(not _werkzeug_available, reason="werkzeug not installed")
 def test_werkzeug_request_normalization(httpbin):
