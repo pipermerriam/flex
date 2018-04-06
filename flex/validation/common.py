@@ -325,19 +325,7 @@ def validate_allof_anyof(value, sub_schemas, context, method, **kwargs):
 
 
 def generate_allof_validator(allOf, context, **kwargs):
-    context.setdefault('resolved_refs', [])
-    unresolved_refs = []
-    for ref in allOf:
-        if isinstance(ref, dict) and '$ref' in ref:
-            schema = ref['$ref']
-            if schema not in context['resolved_refs']:
-                unresolved_refs.append(ref)
-                context['resolved_refs'].append(schema)
-        else:
-            unresolved_refs.append(ref)
-
-    return functools.partial(validate_allof_anyof, sub_schemas=unresolved_refs,
-                             context=context, method=all)
+    return functools.partial(validate_allof_anyof, sub_schemas=allOf, context=context, method=all)
 
 
 def generate_anyof_validator(anyOf, context, **kwargs):
@@ -390,6 +378,8 @@ def validate_object(obj, field_validators=None, non_field_validators=None,
 
     if 'discriminator' in schema:
         schema_validators = add_polymorphism_requirements(obj, schema, context, schema_validators)
+        # delete resolved discriminator to avoid infinite recursion
+        del schema['discriminator']
 
     schema_validators.update(field_validators)
     schema_validators.validate_object(obj, context=context)

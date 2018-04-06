@@ -4,6 +4,7 @@ from six.moves import urllib_parse as urlparse
 import os
 import collections
 import requests
+from copy import deepcopy
 
 import six
 import json
@@ -42,7 +43,7 @@ def load_source(source):
         - yaml string.
     """
     if isinstance(source, collections.Mapping):
-        return source
+        return deepcopy(source)
     elif hasattr(source, 'read') and callable(source.read):
         raw_source = source.read()
     elif os.path.exists(os.path.expanduser(str(source))):
