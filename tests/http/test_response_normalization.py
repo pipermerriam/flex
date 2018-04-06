@@ -131,6 +131,11 @@ def test_django_response_normalization(httpbin):
     assert response.url == httpbin.url + '/get?key=val'
     assert response.status_code == '200'
 
+    del raw_response._headers['content-type']
+
+    response = normalize_response(raw_response, raw_request)
+    assert response.content_type is None
+
     redirect_url = 'http://www.example.org'
     raw_response = django.http.response.HttpResponseRedirect(redirect_url)
 
