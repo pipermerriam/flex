@@ -1,29 +1,35 @@
+6.13.1
+------
+
+- Extend supported version range for `click`
+
 6.13.0
------
+------
 
 - Fix for `allOf` validation:
 - Bugfix for Werkreug requests.
 - Bugfix for django response normalization.
+- Pin dependencies within major version ranges.
 
 6.12.0
------
+------
 
 - SECURITY FIX: Change to use `yaml.safe_load` to prevent remote code execution vulnerability.
 
 6.11.1
------
+------
 
 - Bugfix for handling of `MULTI` parameters when there is only a single value.
 
 6.11.0
------
+------
 
 - Improve handling of content-type negotiation with requests.
 - Enforce strict RFC3339 date/time formats.
 - Bugfix for response schemas not being properly de-referenced.
 
 6.10.0
------
+------
 
 - Raise `JSONDecodeError` instead of plain `ValueError` when schema is not valid json.
 
