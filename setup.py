@@ -31,7 +31,7 @@ setup(
         "rfc3987>=1.3.4,<2",
         "requests>=2.4.3,<3",
         "strict-rfc3339>=0.7,<1",
-        "click>=3.3,<4",
+        "click>=3.3,<7",
         "jsonpointer>=1.7,<2",
     ],
     license="BSD",
