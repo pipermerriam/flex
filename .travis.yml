@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.5"
+  - "3.6"
 matrix:
   include:
     # 2.7
@@ -10,6 +10,8 @@ matrix:
       env: TOX_ENV=py27-with-django19
     - python: "2.7"
       env: TOX_ENV=py27-with-django110
+    - python: "2.7"
+      env: TOX_ENV=py27-with-django111
     - python: "2.7"
       env: TOX_ENV=py27-with-tornado-falcon
     - python: "2.7"
@@ -22,6 +24,8 @@ matrix:
     - python: "3.4"
       env: TOX_ENV=py34-with-django110
     - python: "3.4"
+      env: TOX_ENV=py34-with-django111
+    - python: "3.4"
       env: TOX_ENV=py34-with-tornado-falcon
     - python: "3.4"
       env: TOX_ENV=py34-with-werkzeug
@@ -33,9 +37,24 @@ matrix:
     - python: "3.5"
       env: TOX_ENV=py35-with-django110
     - python: "3.5"
+      env: TOX_ENV=py35-with-django111
+    - python: "3.5"
       env: TOX_ENV=py35-with-tornado-falcon
     - python: "3.5"
       env: TOX_ENV=py35-with-werkzeug
+    # 3.6
+    - python: "3.6"
+      env: TOX_ENV=py36
+    - python: "3.6"
+      env: TOX_ENV=py36-with-django19
+    - python: "3.6"
+      env: TOX_ENV=py36-with-django110
+    - python: "3.6"
+      env: TOX_ENV=py36-with-django111
+    - python: "3.6"
+      env: TOX_ENV=py36-with-tornado-falcon
+    - python: "3.6"
+      env: TOX_ENV=py36-with-werkzeug
     # flake8
     - python: "3.5"
       env: TOX_ENV=flake8
