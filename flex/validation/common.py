@@ -6,7 +6,7 @@ import functools
 import collections
 import itertools
 import json
-
+import os
 import six
 
 
@@ -41,6 +41,7 @@ from flex.constants import (
     OBJECT,
     DELIMETERS,
     REQUEST_METHODS,
+    FLEX_DISABLE_X_NULLABLE,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -297,7 +298,7 @@ def validate_enum(value, options, **kwargs):
 
 
 def generate_enum_validator(enum, **kwargs):
-    if kwargs.get('x-nullable') is True:
+    if not os.environ.get(FLEX_DISABLE_X_NULLABLE) and kwargs.get('x-nullable') is True:
         enum.append(None)
     return functools.partial(validate_enum, options=enum)
 

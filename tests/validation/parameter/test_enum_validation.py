@@ -12,10 +12,11 @@ from flex.constants import (
     STRING,
     NUMBER,
     BOOLEAN,
+    FLEX_DISABLE_X_NULLABLE
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_message_in_errors
+from tests.utils import assert_message_in_errors, set_env
 
 
 #
@@ -122,3 +123,82 @@ def test_nullable_enum_validation_with_allowed_values(enum, value):
     }
 
     validate_parameters(parameter_values, parameters, {})
+
+
+@pytest.mark.parametrize(
+    'enum,value',
+    (
+        ([True, False], None),
+        ([0, 1, 2, 3], None),
+        (['1', '2', 'a', 'b'], None),
+    ),
+)
+def test_nullable_enum_with_null_values_strict(enum, value):
+
+    parameters = parameters_validator([
+        {
+            'name': 'id',
+            'in': PATH,
+            'description': 'id',
+            'type': [STRING, NUMBER, BOOLEAN],
+            'required': True,
+            'enum': enum,
+            'x-nullable': True
+        },
+    ])
+    parameter_values = {
+        'id': value,
+    }
+
+    with set_env(**{FLEX_DISABLE_X_NULLABLE: '1'}):
+        with pytest.raises(ValidationError) as err:
+            validate_parameters(parameter_values, parameters, {})
+
+        assert_message_in_errors(
+            MESSAGES['enum']['invalid'],
+            err.value.detail,
+            'id.enum',
+        )
+
+
+@pytest.mark.parametrize(
+    'enum,value',
+    (
+        ([True, False], 0),
+        ([True, False], 1),
+        ([True, False], ''),
+        ([0, 1, 2, 3], True),
+        ([0, 1, 2, 3], False),
+        ([0, 1, 2, 3], '1'),
+        ([0, 1, 2, 3], 4),
+        ([0, 1, 2, 3], 1.0),
+        (['1', '2', 'a', 'b'], 'A'),
+        (['1', '2', 'a', 'b'], 1),
+        (['1', '2', 'a', 'b'], 2),
+    ),
+)
+def test_nullable_enum_with_invalid_values(enum, value):
+
+    parameters = parameters_validator([
+        {
+            'name': 'id',
+            'in': PATH,
+            'description': 'id',
+            'type': [STRING, NUMBER, BOOLEAN],
+            'required': True,
+            'enum': enum,
+            'x-nullable': True
+        },
+    ])
+    parameter_values = {
+        'id': value,
+    }
+
+    with pytest.raises(ValidationError) as err:
+        validate_parameters(parameter_values, parameters, {})
+
+    assert_message_in_errors(
+        MESSAGES['enum']['invalid'],
+        err.value.detail,
+        'id.enum',
+    )
