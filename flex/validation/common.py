@@ -6,6 +6,7 @@ import functools
 import collections
 import itertools
 import json
+
 import os
 import six
 
@@ -298,7 +299,7 @@ def validate_enum(value, options, **kwargs):
 
 
 def generate_enum_validator(enum, **kwargs):
-    if not os.environ.get(FLEX_DISABLE_X_NULLABLE) and kwargs.get('x-nullable') is True:
+    if FLEX_DISABLE_X_NULLABLE not in os.environ and kwargs.get('x-nullable') is True:
         enum.append(None)
     return functools.partial(validate_enum, options=enum)
 

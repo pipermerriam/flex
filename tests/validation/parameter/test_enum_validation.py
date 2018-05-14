@@ -1,4 +1,5 @@
 import pytest
+import os
 
 from flex.exceptions import ValidationError
 from flex.loading.schema.paths.path_item.operation.parameters import (
@@ -16,7 +17,7 @@ from flex.constants import (
 )
 from flex.error_messages import MESSAGES
 
-from tests.utils import assert_message_in_errors, set_env
+from tests.utils import assert_message_in_errors
 
 
 #
@@ -133,7 +134,7 @@ def test_nullable_enum_validation_with_allowed_values(enum, value):
         (['1', '2', 'a', 'b'], None),
     ),
 )
-def test_nullable_enum_with_null_values_strict(enum, value):
+def test_nullable_enum_with_null_values_strict(enum, value, monkeypatch):
 
     parameters = parameters_validator([
         {
@@ -150,15 +151,15 @@ def test_nullable_enum_with_null_values_strict(enum, value):
         'id': value,
     }
 
-    with set_env(**{FLEX_DISABLE_X_NULLABLE: '1'}):
-        with pytest.raises(ValidationError) as err:
-            validate_parameters(parameter_values, parameters, {})
+    monkeypatch.setattr(os, 'environ', {FLEX_DISABLE_X_NULLABLE: '1'})
+    with pytest.raises(ValidationError) as err:
+        validate_parameters(parameter_values, parameters, {})
 
-        assert_message_in_errors(
-            MESSAGES['enum']['invalid'],
-            err.value.detail,
-            'id.enum',
-        )
+    assert_message_in_errors(
+        MESSAGES['enum']['invalid'],
+        err.value.detail,
+        'id.enum',
+    )
 
 
 @pytest.mark.parametrize(
