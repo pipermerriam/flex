@@ -2,7 +2,6 @@ import functools
 import collections
 import re
 import six
-
 from flex.validation.common import validate_object
 from flex.loading.schema.paths.path_item.operation.responses.single.schema import (
     schema_validator,

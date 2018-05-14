@@ -7,6 +7,7 @@ import collections
 import itertools
 import json
 
+import os
 import six
 
 
@@ -41,6 +42,7 @@ from flex.constants import (
     OBJECT,
     DELIMETERS,
     REQUEST_METHODS,
+    FLEX_DISABLE_X_NULLABLE,
 )
 from flex.decorators import (
     skip_if_not_of_type,
@@ -67,7 +69,7 @@ def generate_type_validator(type_, **kwargs):
     Generates a callable validator for the given type or iterable of types.
     """
     if is_non_string_iterable(type_):
-        types = type_
+        types = tuple(type_)
     else:
         types = (type_,)
     # support x-nullable since Swagger 2.0 doesn't support null type
@@ -297,6 +299,8 @@ def validate_enum(value, options, **kwargs):
 
 
 def generate_enum_validator(enum, **kwargs):
+    if FLEX_DISABLE_X_NULLABLE not in os.environ and kwargs.get('x-nullable') is True:
+        enum.append(None)
     return functools.partial(validate_enum, options=enum)
 
 

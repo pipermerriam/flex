@@ -115,6 +115,7 @@ SECURITY_FLOWS = (
 
 
 class Empty(object):
+
     def __cmp__(self, other):
         raise TypeError('Empty cannot be compared to other values')
 
@@ -157,3 +158,6 @@ HEAD = 'head'
 PATCH = 'patch'
 
 REQUEST_METHODS = (GET, PUT, POST, DELETE, OPTIONS, HEAD, PATCH)
+
+# Environment variables
+FLEX_DISABLE_X_NULLABLE = 'FLEX_DISABLE_X_NULLABLE'
