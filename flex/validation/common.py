@@ -299,9 +299,16 @@ def validate_enum(value, options, **kwargs):
 
 
 def generate_enum_validator(enum, **kwargs):
-    if FLEX_DISABLE_X_NULLABLE not in os.environ and kwargs.get('x-nullable') is True:
-        enum.append(None)
-    return functools.partial(validate_enum, options=enum)
+    x_nullable_enabled = all((
+        FLEX_DISABLE_X_NULLABLE not in os.environ,
+        kwargs.get('x-nullable') is True,
+        None not in enum
+    ))
+    if x_nullable_enabled:
+        enum_values = tuple(itertools.chain(enum, [None]))
+    else:
+        enum_values = enum
+    return functools.partial(validate_enum, options=enum_values)
 
 
 @skip_if_empty
