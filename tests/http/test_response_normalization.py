@@ -9,7 +9,7 @@ import requests
 
 from flex.http import (
     normalize_response, _tornado_available, _webob_available, _django_available,
-    _werkzeug_available,
+    _werkzeug_available, _aiohttp_available
 )
 
 
@@ -167,3 +167,24 @@ def test_werkzeug_response_normalization(httpbin):
     assert response.content_type == 'application/json'
     assert response.url == httpbin.url + '/get?key=val'
     assert response.status_code == '200'
+
+
+@pytest.mark.skipif(not _aiohttp_available, reason="aiohttp not installed")
+def test_aiohttp_response_normalization():
+    from aiohttp.test_utils import make_mocked_request
+    from aiohttp.web import Response
+
+    raw_request = make_mocked_request('GET', '/get?key=val')
+
+    raw_response = Response(
+        body=b'{"key2": "val2"}',
+        content_type='application/json',
+        headers={'Cache-Control': 'no-cache'}
+    )
+
+    response = normalize_response(raw_response, raw_request)
+
+    assert response.path == '/get'
+    assert response.data == {'key2': 'val2'}
+    assert response.status_code == '200'
+    assert response.headers.get('Cache-Control') == 'no-cache'

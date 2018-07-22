@@ -8,7 +8,7 @@ import requests
 
 from flex.http import (
     normalize_request, _tornado_available, _falcon_available, _webob_available,
-    _django_available, _werkzeug_available
+    _django_available, _werkzeug_available, _aiohttp_available
 )
 
 
@@ -205,3 +205,19 @@ def test_werkzeug_request_normalization(httpbin):
     assert request.url == httpbin.url + '/put?key=val'
     assert request.method == 'put'
     assert request.data == {'key2': 'val2'}
+
+
+@pytest.mark.skipif(not _aiohttp_available, reason="aiohttp not installed")
+def test_aiohttp_request_normalization():
+    from aiohttp.test_utils import make_mocked_request
+
+    raw_request = make_mocked_request(
+        'PUT', '/put', headers={'Content-Type': 'application/json'}, payload=b'{"key2": "val2"}'
+    )
+    request = normalize_request(raw_request)
+
+    assert request.path == '/put'
+    assert request.method == 'PUT'
+    assert request.content_type == 'application/json'
+    assert request.data == {'key2': 'val2'}
+    assert request.headers.get('Content-Type') == 'application/json'
