@@ -47,9 +47,9 @@ def test_date_time_format_validator_detects_invalid_values(value):
         '1985-04-12T23:20:50.52Z',
         '1996-12-19T16:39:57-08:00',
         # Leap second should be valid but strict_rfc339 doesn't correctly parse.
-        pytest.mark.xfail('1990-12-31T23:59:60Z'),
+        pytest.param('1990-12-31T23:59:60Z', marks=pytest.mark.xfail),
         # Leap second should be valid but strict_rfc339 doesn't correctly parse.
-        pytest.mark.xfail('1990-12-31T15:59:60-08:00'),
+        pytest.param('1990-12-31T15:59:60-08:00', marks=pytest.mark.xfail),
         # Weird netherlands time from strange 1909 law.
         '1937-01-01T12:00:27.87+00:20',
     )
