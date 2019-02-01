@@ -32,7 +32,7 @@ setup(
         "requests>=2.4.3",
         "strict-rfc3339>=0.7",
         "click>=3.3",
-        "jsonpointer==1.7",
+        "jsonpointer>=1.7",
     ],
     license="BSD",
     zip_safe=False,
