@@ -38,6 +38,7 @@ def test_mimetype_invalid_for_non_array_value(value):
         ['image/svg+xml'],
         ['application/vnd.oasis.opendocument.text'],
         ['text/plain; charset=utf-8'],
+        ['text/plain;charset=utf-8'],
         ['video/mp4'],
         ['video/mp4; codecs="avc1.640028"'],
         ["video/mp4; codecs='avc1.640028'"],
