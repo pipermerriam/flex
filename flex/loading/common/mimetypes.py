@@ -25,7 +25,7 @@ MIMETYPE_PATTERN = (
     '(vnd(\.[-a-zA-Z0-9]+)*\.)?'  # vendor tree
     '([-a-zA-Z0-9]+)'  # media type
     '(\+(xml|json|ber|der|fastinfoset|wbxml|zip))?'
-    '((; [-a-zA-Z0-9]+=(([-\.a-zA-Z0-9]+)|(("|\')[-\.a-zA-Z0-9]+("|\'))))+)?'  # parameters
+    '((; ?[-a-zA-Z0-9]+=(([-\.a-zA-Z0-9]+)|(("|\')[-\.a-zA-Z0-9]+("|\'))))+)?'  # parameters
     '$'
 )
 
