@@ -20,11 +20,13 @@ from flex.decorators import (
 # top-level type name / [ tree. ] subtype name [ +suffix ] [ ; parameters ]
 MIMETYPE_PATTERN = (
     '^'
-    '(application|audio|example|image|message|model|multipart|text|video)'  # top-level type name
+    # https://www.iana.org/assignments/media-types/media-types.xhtml
+    '(application|audio|example|font|image|message|model|multipart|text|video)'  # media type
     '/'
     '(vnd(\.[-a-zA-Z0-9]+)*\.)?'  # vendor tree
-    '([-a-zA-Z0-9]+)'  # media type
-    '(\+(xml|json|ber|der|fastinfoset|wbxml|zip))?'
+    '([-a-zA-Z0-9]+)'  # media subtype
+    # https://www.iana.org/assignments/media-type-structured-suffix/media-type-structured-suffix.xml
+    '(\+(xml|json|ber|cbor|der|fastinfoset|wbxml|zip|tlv|json-seq|sqlite3|jwt|gzip))?'
     '((; ?[-a-zA-Z0-9]+=(([-\.a-zA-Z0-9]+)|(("|\')[-\.a-zA-Z0-9]+("|\'))))+)?'  # parameters
     '$'
 )
