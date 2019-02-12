@@ -19,6 +19,7 @@ setup(
     version=version,
     description="""Swagger Schema validation.""",
     long_description=readme,
+    long_description_content_type='text/markdown',
     author='Piper Merriam',
     author_email='pipermerriam@gmail.com',
     url='https://github.com/pipermerriam/flex',
