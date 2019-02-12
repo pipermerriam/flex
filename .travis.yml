@@ -3,6 +3,9 @@ python:
   - "3.6"
 matrix:
   include:
+    # flake8
+    - python: "3.5"
+      env: TOX_ENV=flake8
     # 2.7
     - python: "2.7"
       env: TOX_ENV=py27
@@ -55,9 +58,6 @@ matrix:
       env: TOX_ENV=py36-with-tornado-falcon
     - python: "3.6"
       env: TOX_ENV=py36-with-werkzeug
-    # flake8
-    - python: "3.5"
-      env: TOX_ENV=flake8
 cache:
   pip: true
 install:
