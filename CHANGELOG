@@ -1,3 +1,17 @@
+6.14.0
+------
+
+- Allow space in mimetype before parameters (thanks to miki725)
+  https://github.com/pipermerriam/flex/pull/206
+- Open up dependency requirements (thanks to blueyed, javabrett)
+  https://github.com/pipermerriam/flex/pull/207
+  https://github.com/pipermerriam/flex/pull/211
+- Increased test coverage with additional vectors, rearranged tests
+  https://github.com/pipermerriam/flex/pull/214
+  https://github.com/pipermerriam/flex/pull/216
+- Fixed warning about importing from collections on Python 3 (thanks to sloria)
+  https://github.com/pipermerriam/flex/pull/215
+
 6.13.2
 ------
 
