@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
 
 import numbers
-import collections
+try:
+    from collections.abc import Sequence, Mapping
+except ImportError:  # Python 2
+    from collections import Sequence, Mapping
 import six
 
 
@@ -32,8 +35,8 @@ PRIMATIVE_TYPES = {
     INTEGER: six.integer_types,
     NUMBER: (numbers.Number,),
     STRING: (six.binary_type, six.text_type),
-    ARRAY: (collections.Sequence,),
-    OBJECT: (collections.Mapping,),
+    ARRAY: (Sequence,),
+    OBJECT: (Mapping,),
 }
 
 TRUE_VALUES = set(('true', 'True', '1'))
