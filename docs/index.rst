@@ -149,14 +149,16 @@ Request validation supports the following request objects.
 * ``urllib2.Request`` from the ``urllib2`` module of the standard library.
 * ``django.http.request.HttpRequest`` from ``django``.
 * ``werkzeug.wrappers.Request`` from ``werkzeug`` (on which ``flask`` is based).
+* ``aiohttp.web.Request`` from the ``aiohttp`` library
 
-Response valdation supports the following respone objects.
+Response validation supports the following response objects.
 
 * ``requests.Response`` from Kenneth Reitz' ``requests`` library.
 * The return value of ``urllib.urlopen`` and ``urllib2.urlopen`` from the
   standard library urllib modules.
 * ``django.http.response.HttpResponse`` from ``django``.
 * ``werkzeug.wrappers.Response`` from ``werkzeug`` (on which ``flask`` is based).
+* ``aiohttp.web.Response`` from the ``aiohttp`` library
 
 
 Formats

@@ -55,6 +55,13 @@ except ImportError:
 else:
     _werkzeug_available = True
 
+try:
+    import aiohttp.web
+except ImportError:
+    _aiohttp_available = False
+else:
+    _aiohttp_available = True
+
 
 class URLMixin(object):
     @property
@@ -264,6 +271,23 @@ def _normalize_werkzeug_request(request):
     )
 
 
+def _normalize_aiohttp_request(request):
+    if not _aiohttp_available:
+        raise TypeError("aiohttp is not installed")
+
+    if not isinstance(request, aiohttp.web.Request):
+        raise TypeError("Cannot normalize this request object")
+
+    return Request(
+        url=str(request.url),
+        method=request.method,
+        content_type=request.content_type,
+        body=request.content,
+        request=request,
+        headers=request.headers,
+    )
+
+
 REQUEST_NORMALIZERS = (
     _normalize_django_request,
     _normalize_python2_urllib_request,
@@ -273,6 +297,7 @@ REQUEST_NORMALIZERS = (
     _normalize_tornado_request,
     _normalize_falcon_request,
     _normalize_werkzeug_request,
+    _normalize_aiohttp_request,
 )
 
 
@@ -461,6 +486,27 @@ def _normalize_werkzeug_response(response, request=None):
     )
 
 
+def _normalize_aiohttp_response(response, request=None):
+    if not _aiohttp_available:
+        raise TypeError("aiohttp is not installed")
+
+    if not isinstance(response, aiohttp.web.Response):
+        raise TypeError("Cannot normalize this request object")
+
+    if not isinstance(request, Request):
+        raise TypeError("Cannot normalize this response object")
+
+    return Response(
+        request=request,
+        content=response.text,
+        url=str(request.url),
+        status_code=response.status,
+        content_type=response.content_type,
+        headers=response.headers,
+        response=response,
+    )
+
+
 RESPONSE_NORMALIZERS = (
     _normalize_django_response,
     _normalize_urllib_response,
@@ -468,6 +514,7 @@ RESPONSE_NORMALIZERS = (
     _normalize_webob_response,
     _normalize_tornado_response,
     _normalize_werkzeug_response,
+    _normalize_aiohttp_response,
 )
 
 
