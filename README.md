@@ -1,8 +1,8 @@
 # FLEX
 
-[![Build Status](https://travis-ci.org/pipermerriam/flex.png)](https://travis-ci.org/pipermerriam/flex)
+[![Build Status](https://badgen.net/travis/pipermerriam/flex)](https://travis-ci.org/pipermerriam/flex)
 [![Documentation Status](https://readthedocs.org/projects/flex-swagger/badge/?version=latest)](https://readthedocs.org/projects/flex-swagger/?badge=latest)
-[![PyPi version](https://img.shields.io/pypi/v/flex.svg)](https://pypi.python.org/pypi/flex)
+[![PyPi version](https://badgen.net/pypi/v/flex)](https://pypi.org/project/flex/)
 [![PyPi downloads](https://img.shields.io/pypi/dm/flex.svg)](https://pypi.python.org/pypi/flex)
    
 
