@@ -8,7 +8,7 @@ import six
 import jsonpointer
 
 from flex.constants import (
-    PRIMATIVE_TYPES,
+    PRIMITIVE_TYPES,
     NULL,
     BOOLEAN,
     INTEGER,
@@ -49,7 +49,7 @@ def pluralize(value):
 
 
 def is_value_of_type(value, type_):
-    if type_ not in PRIMATIVE_TYPES:
+    if type_ not in PRIMITIVE_TYPES:
         raise ValueError("Unknown type: {0}".format(type_))
 
     if type_ == ARRAY and is_value_of_type(value, STRING):
@@ -58,7 +58,7 @@ def is_value_of_type(value, type_):
     if type_ in (INTEGER, NUMBER) and is_value_of_type(value, BOOLEAN):
         return False
 
-    return isinstance(value, PRIMATIVE_TYPES[type_])
+    return isinstance(value, PRIMITIVE_TYPES[type_])
 
 
 def is_value_of_any_type(value, types):
@@ -103,23 +103,23 @@ def cast_value_to_type(value, type_):
         else:
             raise TypeError("Invalid value for boolean: `{0}`".format(repr(value)))
     # TODO: the only thing left is null type.
-    return PRIMATIVE_TYPES[type_][0](value)
+    return PRIMITIVE_TYPES[type_][0](value)
 
 
 def get_type_for_value(value):
     if value is None:
         return NULL
-    if isinstance(value, PRIMATIVE_TYPES[BOOLEAN]):
+    if isinstance(value, PRIMITIVE_TYPES[BOOLEAN]):
         return BOOLEAN
-    elif isinstance(value, PRIMATIVE_TYPES[INTEGER]):
+    elif isinstance(value, PRIMITIVE_TYPES[INTEGER]):
         return INTEGER
-    elif isinstance(value, PRIMATIVE_TYPES[NUMBER]):
+    elif isinstance(value, PRIMITIVE_TYPES[NUMBER]):
         return NUMBER
-    elif isinstance(value, PRIMATIVE_TYPES[STRING]):
+    elif isinstance(value, PRIMITIVE_TYPES[STRING]):
         return STRING
-    elif isinstance(value, PRIMATIVE_TYPES[ARRAY]):
+    elif isinstance(value, PRIMITIVE_TYPES[ARRAY]):
         return ARRAY
-    elif isinstance(value, PRIMATIVE_TYPES[OBJECT]):
+    elif isinstance(value, PRIMITIVE_TYPES[OBJECT]):
         return OBJECT
     else:
         raise ValueError("Unable to identify type of {0}".format(repr(value)))

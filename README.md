@@ -22,4 +22,4 @@ Validation tooling for [Swagger 2.0](https://github.com/wordnik/swagger-spec/blo
 # CLI Name Change
 
 Starting in version 5.0.0 the CLI interface has been changed to `swagger-flex`
-due to a collission with the Apache Flex project.
+due to a collision with the Apache Flex project.

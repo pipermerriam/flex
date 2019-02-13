@@ -27,7 +27,7 @@ ARRAY = 'array'
 OBJECT = 'object'
 FILE = 'file'
 
-PRIMATIVE_TYPES = {
+PRIMITIVE_TYPES = {
     '': (type(None),),
     None: (type(None),),
     NULL: (type(None),),
