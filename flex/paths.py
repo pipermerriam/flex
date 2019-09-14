@@ -3,6 +3,7 @@ import collections
 import functools
 import re
 
+from flex._compat import Mapping
 from flex.exceptions import MultiplePathsFound
 from flex.error_messages import MESSAGES
 from flex.constants import (
@@ -146,7 +147,7 @@ def match_path_to_api_path(path_definitions, target_path, base_path='',
     """
     if context is None:
         context = {}
-    assert isinstance(context, collections.Mapping)
+    assert isinstance(context, Mapping)
     if target_path.startswith(base_path):
         # Convert all of the api paths into Path instances for easier regex
         # matching.

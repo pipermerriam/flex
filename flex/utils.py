@@ -1,5 +1,4 @@
 import math
-import collections
 import numbers
 
 from six.moves import urllib_parse as urlparse
@@ -7,6 +6,7 @@ import six
 
 import jsonpointer
 
+from flex._compat import Mapping, Sequence
 from flex.constants import (
     PRIMITIVE_TYPES,
     NULL,
@@ -43,7 +43,7 @@ def is_non_string_iterable(value):
 
 
 def pluralize(value):
-    if is_non_string_iterable(value) and not isinstance(value, collections.Mapping):
+    if is_non_string_iterable(value) and not isinstance(value, Mapping):
         return value
     return [value]
 
@@ -127,7 +127,7 @@ def get_type_for_value(value):
 
 def is_single_item_iterable(value):
     if is_non_string_iterable(value):
-        if isinstance(value, collections.Sequence):
+        if isinstance(value, Sequence):
             if len(value) == 1:
                 return True
     return False
@@ -161,7 +161,7 @@ def format_errors(errors, indent=0, prefix='', suffix=''):
     if isinstance(errors, SINGULAR_TYPES):
         yield indent_message(repr(errors), indent, prefix=prefix, suffix=suffix)
 
-    elif isinstance(errors, collections.Mapping):
+    elif isinstance(errors, Mapping):
         for key, value in errors.items():
             assert isinstance(key, SINGULAR_TYPES), type(key)
             if isinstance(value, SINGULAR_TYPES):

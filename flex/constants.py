@@ -1,11 +1,9 @@
 from __future__ import unicode_literals
 
 import numbers
-try:
-    from collections.abc import Sequence, Mapping
-except ImportError:  # Python 2
-    from collections import Sequence, Mapping
 import six
+
+from flex._compat import Sequence, Mapping
 
 
 SCHEMES = (

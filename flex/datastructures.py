@@ -1,5 +1,6 @@
 import collections
 
+from flex._compat import Mapping
 from flex.exceptions import (
     ValidationError,
     ErrorDict,
@@ -28,7 +29,7 @@ class ValidationList(list):
 
     def add_validator(self, validator):
         if is_non_string_iterable(validator)\
-           and not isinstance(validator, collections.Mapping):
+           and not isinstance(validator, Mapping):
             for value in validator:
                 self.add_validator(value)
         else:
@@ -50,7 +51,7 @@ class ValidationDict(collections.defaultdict):
     def __init__(self, validators=None):
         super(ValidationDict, self).__init__(ValidationList)
         if validators is not None:
-            if not isinstance(validators, collections.Mapping):
+            if not isinstance(validators, Mapping):
                 raise ValueError("ValidationDict may only be instantiated with a mapping")
             for key, validator in validators.items():
                 self.add_validator(key, validator)

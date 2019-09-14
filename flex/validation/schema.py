@@ -1,9 +1,9 @@
 import itertools
-import collections
 import functools
 
 import six
 
+from flex._compat import Mapping, Sequence
 from flex.exceptions import (
     ValidationError,
     ErrorList,
@@ -93,7 +93,7 @@ def generate_max_properties_validator(maxProperties, **kwargs):
 
 
 def construct_items_validators(items, context):
-    if isinstance(items, collections.Mapping):
+    if isinstance(items, Mapping):
         items_validators = construct_schema_validators(
             schema=items,
             context=context,
@@ -126,7 +126,7 @@ def validate_items(objs, field_validators, **kwargs):
 
 
 def generate_items_validator(items, context, **kwargs):
-    if isinstance(items, collections.Mapping):
+    if isinstance(items, Mapping):
         # If items is a reference or a schema, we pass it through as an
         # ever repeating list of the same validation dictionary, thus
         # validating all of the objects against the same schema.
@@ -134,7 +134,7 @@ def generate_items_validator(items, context, **kwargs):
             items,
             context,
         ))
-    elif isinstance(items, collections.Sequence):
+    elif isinstance(items, Sequence):
         # We generate a list of validator dictionaries and then chain it
         # with an empty schema that repeats forever.  This ensures that if
         # the array of objects to be validated is longer than the array of
