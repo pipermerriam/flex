@@ -1,7 +1,8 @@
 import functools
-import collections
 import re
 import six
+
+from flex._compat import Mapping
 from flex.validation.common import validate_object
 from flex.loading.schema.paths.path_item.operation.responses.single.schema import (
     schema_validator,
@@ -57,7 +58,7 @@ def _find_message_in_errors(message, errors, namespace=''):
     if isinstance(errors, six.string_types):
         if check_if_error_message_equal(errors, message):
             yield namespace
-    elif isinstance(errors, collections.Mapping):
+    elif isinstance(errors, Mapping):
         for key, error in errors.items():
             for match in _find_message_in_errors(
                 message,
@@ -124,7 +125,7 @@ def assert_message_not_in_errors(message, errors):
 def _enumerate_error_paths(errors, namespace=''):
     if isinstance(errors, six.string_types):
         yield namespace
-    elif isinstance(errors, collections.Mapping):
+    elif isinstance(errors, Mapping):
         for key, error in errors.items():
             for match in _enumerate_error_paths(
                 error,

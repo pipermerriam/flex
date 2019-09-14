@@ -11,6 +11,7 @@ import os
 import six
 
 
+from flex._compat import Mapping, Sequence
 from flex.exceptions import (
     ValidationError,
     ErrorDict,
@@ -458,11 +459,11 @@ def generate_value_processor(type_, collectionFormat=None, items=None, **kwargs)
             # strip off any whitespace
             processors.append(functools.partial(map, operator.methodcaller('strip')))
             if items is not None:
-                if isinstance(items, collections.Mapping):
+                if isinstance(items, Mapping):
                     items_processors = itertools.repeat(
                         generate_value_processor(**items)
                     )
-                elif isinstance(items, collections.Sequence):
+                elif isinstance(items, Sequence):
                     items_processors = itertools.chain(
                         (generate_value_processor(**item) for item in items),
                         itertools.repeat(lambda v: v),

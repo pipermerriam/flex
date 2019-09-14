@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import six
 import collections
 
+from flex._compat import Mapping
 from flex.utils import (
     is_non_string_iterable,
     prettify_errors,
@@ -37,7 +38,7 @@ class ErrorList(ErrorCollectionMixin, list):
 
         Otherwise, the value is appended.
         """
-        if is_non_string_iterable(error) and not isinstance(error, collections.Mapping):
+        if is_non_string_iterable(error) and not isinstance(error, Mapping):
             for value in error:
                 self.add_error(value)
         else:
@@ -56,13 +57,13 @@ class ErrorDict(ErrorCollectionMixin, collections.defaultdict):
 
 class ValidationError(ValueError):
     def __init__(self, error):
-        if not isinstance(error, collections.Mapping) and \
+        if not isinstance(error, Mapping) and \
            is_non_string_iterable(error) and \
            len(error) == 1:
             error = error[0]
         self._error = error
 
-        if isinstance(self._error, collections.Mapping):
+        if isinstance(self._error, Mapping):
             self.error_dict = self._error
         elif is_non_string_iterable(self._error):
             self.error_list = self._error
@@ -80,7 +81,7 @@ class ValidationError(ValueError):
     def detail(self):
         if isinstance(self._error, six.string_types):
             return [self._error]
-        elif isinstance(self._error, collections.Mapping):
+        elif isinstance(self._error, Mapping):
             return self._error
         return self._error
 
@@ -88,7 +89,7 @@ class ValidationError(ValueError):
     def messages(self):
         if isinstance(self._error, six.string_types):
             return [self._error]
-        elif isinstance(self._error, collections.Mapping):
+        elif isinstance(self._error, Mapping):
             return [self._error]
         return self._error
 

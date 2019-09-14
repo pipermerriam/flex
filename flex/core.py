@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from six.moves import urllib_parse as urlparse
 import os
-import collections
 import requests
 from copy import deepcopy
 
@@ -10,6 +9,7 @@ import six
 import json
 import yaml
 
+from flex._compat import Mapping
 from flex.context_managers import ErrorDict
 from flex.exceptions import ValidationError
 from flex.loading.definitions import (
@@ -42,7 +42,7 @@ def load_source(source):
         - json string.
         - yaml string.
     """
-    if isinstance(source, collections.Mapping):
+    if isinstance(source, Mapping):
         return deepcopy(source)
     elif hasattr(source, 'read') and callable(source.read):
         raw_source = source.read()

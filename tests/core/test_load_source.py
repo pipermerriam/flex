@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
 import tempfile
-import collections
 
 import six
 
 import json
 import yaml
 
+from flex._compat import Mapping
 from flex.core import load_source
 
 
@@ -105,7 +105,7 @@ def test_url(httpbin):
     }
     source = httpbin.url + '/get'
     result = load_source(source)
-    assert isinstance(result, collections.Mapping)
+    assert isinstance(result, Mapping)
     result.pop('headers')
     result.pop('url')
     assert result == native
