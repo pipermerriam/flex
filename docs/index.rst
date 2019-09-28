@@ -75,7 +75,7 @@ A subset of the ``flex`` tooling implements JSON schema validation.
    ValueError: Invalid:
    'age':
        - 'minimum':
-           - u'-5 must be greater than than 0.0'
+           - u'-5 must be greater than 0.0'
    'name':
        - 'minLength':
            - u'Ensure this value has at least 3 characters (it has 2).'
