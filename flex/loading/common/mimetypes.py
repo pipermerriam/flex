@@ -23,11 +23,11 @@ MIMETYPE_PATTERN = (
     # https://www.iana.org/assignments/media-types/media-types.xhtml
     '(application|audio|example|font|image|message|model|multipart|text|video)'  # media type
     '/'
-    '(vnd(\.[-a-zA-Z0-9]+)*\.)?'  # vendor tree
+    r'(vnd(\.[-a-zA-Z0-9]+)*\.)?'  # vendor tree
     '([-a-zA-Z0-9]+)'  # media subtype
     # https://www.iana.org/assignments/media-type-structured-suffix/media-type-structured-suffix.xml
-    '(\+(xml|json|ber|cbor|der|fastinfoset|wbxml|zip|tlv|json-seq|sqlite3|jwt|gzip))?'
-    '((; ?[-a-zA-Z0-9]+=(([-\.a-zA-Z0-9]+)|(("|\')[-\.a-zA-Z0-9]+("|\'))))+)?'  # parameters
+    r'(\+(xml|json|ber|cbor|der|fastinfoset|wbxml|zip|tlv|json-seq|sqlite3|jwt|gzip))?'
+    r'((; ?[-a-zA-Z0-9]+=(([-\.a-zA-Z0-9]+)|(("|\')[-\.a-zA-Z0-9]+("|\'))))+)?'  # parameters
     '$'
 )
 
