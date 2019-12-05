@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.6"
+  - "3.7"
 matrix:
   include:
     # flake8
@@ -58,6 +58,19 @@ matrix:
       env: TOX_ENV=py36-with-tornado-falcon
     - python: "3.6"
       env: TOX_ENV=py36-with-werkzeug
+    # 3.7
+    - python: "3.7"
+      env: TOX_ENV=py37
+    - python: "3.7"
+      env: TOX_ENV=py37-with-django19
+    - python: "3.7"
+      env: TOX_ENV=py37-with-django110
+    - python: "3.7"
+      env: TOX_ENV=py37-with-django111
+    - python: "3.7"
+      env: TOX_ENV=py37-with-tornado-falcon
+    - python: "3.7"
+      env: TOX_ENV=py37-with-werkzeug
 cache:
   pip: true
 install:
