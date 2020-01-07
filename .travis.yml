@@ -134,6 +134,22 @@ matrix:
       env: TOX_ENV=py37-with-tornado-falcon
     - python: "3.7"
       env: TOX_ENV=py37-with-werkzeug
+    # 3.8
+    - python: "3.8"
+      arch: arm64
+      env: TOX_ENV=py38
+    - python: "3.8"
+      arch: arm64
+      env: TOX_ENV=py38-with-tornado-falcon
+    - python: "3.8"
+      arch: arm64
+      env: TOX_ENV=py38-with-werkzeug
+    - python: "3.8"
+      env: TOX_ENV=py38
+    - python: "3.8"
+      env: TOX_ENV=py38-with-tornado-falcon
+    - python: "3.8"
+      env: TOX_ENV=py38-with-werkzeug
 cache:
   pip: true
 install:
