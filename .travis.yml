@@ -4,9 +4,31 @@ python:
 matrix:
   include:
     # flake8
+
+    - python: "3.5"
+      arch: arm64
+      env: TOX_ENV=flake8
     - python: "3.5"
       env: TOX_ENV=flake8
     # 2.7
+    - python: "2.7"
+      arch: arm64
+      env: TOX_ENV=py27
+    - python: "2.7"
+      arch: arm64
+      env: TOX_ENV=py27-with-django19
+    - python: "2.7"
+      arch: arm64
+      env: TOX_ENV=py27-with-django110
+    - python: "2.7"
+      arch: arm64
+      env: TOX_ENV=py27-with-django111
+    - python: "2.7"
+      arch: arm64
+      env: TOX_ENV=py27-with-tornado-falcon
+    - python: "2.7"
+      arch: arm64
+      env: TOX_ENV=py27-with-werkzeug
     - python: "2.7"
       env: TOX_ENV=py27
     - python: "2.7"
@@ -21,6 +43,24 @@ matrix:
       env: TOX_ENV=py27-with-werkzeug
     # 3.4
     - python: "3.4"
+      arch: arm64
+      env: TOX_ENV=py34
+    - python: "3.4"
+      arch: arm64
+      env: TOX_ENV=py34-with-django19
+    - python: "3.4"
+      arch: arm64
+      env: TOX_ENV=py34-with-django110
+    - python: "3.4"
+      arch: arm64
+      env: TOX_ENV=py34-with-django111
+    - python: "3.4"
+      arch: arm64
+      env: TOX_ENV=py34-with-tornado-falcon
+    - python: "3.4"
+      arch: arm64
+      env: TOX_ENV=py34-with-werkzeug
+    - python: "3.4"
       env: TOX_ENV=py34
     - python: "3.4"
       env: TOX_ENV=py34-with-django19
@@ -33,6 +73,24 @@ matrix:
     - python: "3.4"
       env: TOX_ENV=py34-with-werkzeug
     # 3.5
+    - python: "3.5"
+      arch: arm64
+      env: TOX_ENV=py35
+    - python: "3.5"
+      arch: arm64
+      env: TOX_ENV=py35-with-django19
+    - python: "3.5"
+      arch: arm64
+      env: TOX_ENV=py35-with-django110
+    - python: "3.5"
+      arch: arm64
+      env: TOX_ENV=py35-with-django111
+    - python: "3.5"
+      arch: arm64
+      env: TOX_ENV=py35-with-tornado-falcon
+    - python: "3.5"
+      arch: arm64
+      env: TOX_ENV=py35-with-werkzeug
     - python: "3.5"
       env: TOX_ENV=py35
     - python: "3.5"
@@ -47,6 +105,24 @@ matrix:
       env: TOX_ENV=py35-with-werkzeug
     # 3.6
     - python: "3.6"
+      arch: arm64
+      env: TOX_ENV=py36
+    - python: "3.6"
+      arch: arm64
+      env: TOX_ENV=py36-with-django19
+    - python: "3.6"
+      arch: arm64
+      env: TOX_ENV=py36-with-django110
+    - python: "3.6"
+      arch: arm64
+      env: TOX_ENV=py36-with-django111
+    - python: "3.6"
+      arch: arm64
+      env: TOX_ENV=py36-with-tornado-falcon
+    - python: "3.6"
+      arch: arm64
+      env: TOX_ENV=py36-with-werkzeug
+    - python: "3.6"
       env: TOX_ENV=py36
     - python: "3.6"
       env: TOX_ENV=py36-with-django19
@@ -59,6 +135,24 @@ matrix:
     - python: "3.6"
       env: TOX_ENV=py36-with-werkzeug
     # 3.7
+    - python: "3.7"
+      arch: arm64
+      env: TOX_ENV=py37
+    - python: "3.7"
+      arch: arm64
+      env: TOX_ENV=py37-with-django19
+    - python: "3.7"
+      arch: arm64
+      env: TOX_ENV=py37-with-django110
+    - python: "3.7"
+      arch: arm64
+      env: TOX_ENV=py37-with-django111
+    - python: "3.7"
+      arch: arm64
+      env: TOX_ENV=py37-with-tornado-falcon
+    - python: "3.7"
+      arch: arm64
+      env: TOX_ENV=py37-with-werkzeug
     - python: "3.7"
       env: TOX_ENV=py37
     - python: "3.7"
