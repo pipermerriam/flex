@@ -6,9 +6,10 @@
 Flex
 ====
 
-Flex is a Swagger 2.0 validator.  It is currently at a very early stage in
-development and thus is likely to have plenty of bugs.
-
+Flex is a Swagger 2.0 validator.  It is stable but at this point its
+development is in maintenance mode. However, we do accept all types of pull
+requests, so please get involved at
+`GitHub <https://github.com/pipermerriam/flex>`_!
 
 General Use
 -----------
