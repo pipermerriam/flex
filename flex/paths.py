@@ -18,9 +18,9 @@ from flex.parameters import (
 
 
 REGEX_REPLACEMENTS = (
-    ('\.', '\.'),
-    ('\{', '\{'),
-    ('\}', '\}'),
+    (r'\.', r'\.'),
+    (r'\{', r'\{'),
+    (r'\}', r'\}'),
 )
 
 
@@ -39,7 +39,7 @@ def escape_regex_special_chars(api_path):
 
 # matches the parametrized parts of a path.
 # eg. /{id}/ matches the `{id}` part of it.
-PARAMETER_REGEX = re.compile('(\{[^\}]+})')
+PARAMETER_REGEX = re.compile(r'(\{[^\}]+})')
 
 
 def construct_parameter_pattern(parameter):
@@ -53,7 +53,7 @@ def construct_parameter_pattern(parameter):
     repeated = '[^/]'
 
     if type == 'integer':
-        repeated = '\d'
+        repeated = r'\d'
 
     return "(?P<{name}>{repeated}+)".format(name=name, repeated=repeated)
 
