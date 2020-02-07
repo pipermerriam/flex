@@ -41,11 +41,23 @@ from .collection_format import (
     collection_format_validator,
 )
 
+from flex.loading.definitions.schema import (
+    schema_validator
+)
+
 
 single_header_schema = {
-    'type': OBJECT,
-    'required': [
-        'type',
+    'anyOf': [
+        {'type': OBJECT,
+         'required': [
+             'type',
+         ]
+         },
+        {'type': OBJECT,
+         'required': [
+             'schema',
+         ]
+         }
     ]
 }
 
@@ -53,6 +65,7 @@ single_header_field_validators = ValidationDict()
 single_header_field_validators.update(common_field_validators)
 single_header_field_validators.add_property_validator('description', description_validator)
 single_header_field_validators.add_property_validator('type', type_validator)
+single_header_field_validators.add_property_validator('schema', schema_validator)
 single_header_field_validators.add_property_validator('format', format_validator)
 single_header_field_validators.add_property_validator(
     'collectionFormat', collection_format_validator,
@@ -63,7 +76,7 @@ single_header_field_validators.add_property_validator(
 @suffix_reserved_words
 def validate_items_required_if_type_arraw(type_, items, **kwargs):
     types = pluralize(type_)
-    if ARRAY in types and items is EMPTY:
+    if type_ is not EMPTY and ARRAY in types and items is EMPTY:
         raise ValidationError(MESSAGES['required']['required'])
 
 

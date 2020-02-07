@@ -12,6 +12,7 @@ from flex.loading.common.mimetypes import (
 )
 from .info import info_validator
 from .swagger import swagger_version_validator
+from .openapi import openapi_version_validator
 from .host import host_validator
 from .base_path import base_path_validator
 from .schemes import schemes_validator
@@ -29,17 +30,30 @@ __ALL__ = [
 ]
 
 swagger_schema = {
-    'type': OBJECT,
-    'required': [
-        'info',
-        'paths',
-        'swagger',
-    ],
+    'anyOf': [
+        {
+            'type': OBJECT,
+            'required': [
+                'info',
+                'paths',
+                'swagger',
+            ]
+        },
+        {
+            'type': OBJECT,
+            'required': [
+                'info',
+                'paths',
+                'openapi',
+            ]
+        }
+    ]
 }
 
 non_field_validators = ValidationDict()
 non_field_validators.add_property_validator('info', info_validator)
 non_field_validators.add_property_validator('swagger', swagger_version_validator)
+non_field_validators.add_property_validator('openapi', openapi_version_validator)
 non_field_validators.add_property_validator('host', host_validator)
 non_field_validators.add_property_validator('basePath', base_path_validator)
 non_field_validators.add_property_validator('schemes', schemes_validator)

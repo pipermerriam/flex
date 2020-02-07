@@ -41,10 +41,12 @@ def validate_body_parameters_must_include_a_schema(in_, schema, **kwargs):
             raise ValidationError(MESSAGES['schema']['body_parameters_must_include_a_schema'])
 
 
-@pull_keys_from_obj('in', 'type')
+@pull_keys_from_obj('in', 'type', 'schema')
 @skip_if_any_kwargs_empty('in')
 @suffix_reserved_words
 def validate_type_declared_for_non_body_parameters(in_, type_, **kwargs):
+    if 'openapi' in kwargs['context'] and 'schema' in kwargs:
+        return
     if in_ != BODY:
         if type_ is EMPTY:
             raise ValidationError(MESSAGES['type']['non_body_parameters_must_declare_a_type'])
