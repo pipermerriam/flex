@@ -112,3 +112,53 @@ def test_request_body_parameter_validation_with_invalid_value(user_post_schema):
         MESSAGES['format']['invalid_email'],
         err.value.detail,
     )
+
+
+def test_request_body_parameter_validation_invalid_without_ref():
+    """
+    Test validating the request body with a invalid post.
+    """
+    schema = SchemaFactory(
+        paths={
+            '/post/': {
+                POST: {
+                    'consumes': ['application/json'],
+                    'parameters': [
+                        {
+                            'in': BODY,
+                            'name': BODY,
+                            'required': True,
+                            'schema': {
+                                'type': OBJECT,
+                                'required': ['name'],
+                                'properties': {
+                                    'name': {
+                                        'type': STRING
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    'responses': {200: {'description': "Success"}},
+                }
+            }
+        }
+    )
+
+    request = RequestFactory(
+        url='http://www.example.com/post/',
+        content_type='application/json',
+        body=json.dumps({}),
+        method=POST,
+    )
+
+    with pytest.raises(ValidationError) as err:
+        validate_request(
+            request=request,
+            schema=schema,
+        )
+
+    assert_message_in_errors(
+        MESSAGES['required']['required'],
+        err.value.detail,
+    )
