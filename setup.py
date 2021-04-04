@@ -35,7 +35,7 @@ setup(
         "click>=3.3",
         "jsonpointer>=1.7",
     ],
-    license="BSD",
+    license="MIT",
     zip_safe=False,
     entry_points={
         'console_scripts': ["swagger-flex=flex.cli:main"],
@@ -44,7 +44,7 @@ setup(
     packages=find_packages(exclude=["tests", "tests.*"]),
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
