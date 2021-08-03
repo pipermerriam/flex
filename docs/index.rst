@@ -174,7 +174,7 @@ Flex implements format validation for the following formats
 * ``int64``:
   Integers up to 64 bits.
 * ``email``:
-  via https://pypi.python.org/pypi/validate_email
+  via https://pypi.python.org/pypi/email-validator
 * ``uri``:
   via https://pypi.python.org/pypi/rfc3987
 

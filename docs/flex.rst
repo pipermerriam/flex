@@ -6,7 +6,6 @@ Subpackages
 
 .. toctree::
 
-    flex.compat
     flex.loading
     flex.validation
 

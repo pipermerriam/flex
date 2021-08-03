@@ -28,7 +28,7 @@ setup(
     install_requires=[
         "six>=1.7.3",
         "PyYAML>=3.11",
-        "validate-email>=1.2",
+        "email-validator>=1.0",
         "rfc3987>=1.3.4",
         "requests>=2.4.3",
         "strict-rfc3339>=0.7",
