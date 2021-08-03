@@ -1,8 +1,7 @@
 import datetime
 import re
 
-import six
-
+from email_validator import validate_email, EmailNotValidError
 import rfc3987
 import strict_rfc3339
 
@@ -21,12 +20,6 @@ from flex.constants import (
     URI,
 )
 from flex.error_messages import MESSAGES
-
-if six.PY2:
-    import validate_email
-else:
-    # TODO: when a new version is released, this can be removed.
-    from flex.compat import validate_email
 
 
 class FormatRegistry(object):
@@ -99,7 +92,9 @@ def int64_validator(value, **kwargs):
 
 @register(EMAIL, STRING)
 def email_validator(value, **kwargs):
-    if not validate_email.validate_email(value):
+    try:
+        validate_email(value)
+    except EmailNotValidError:
         raise ValidationError(MESSAGES['format']['invalid_email'].format(value))
 
 
