@@ -252,7 +252,7 @@ def _normalize_werkzeug_request(request):
     if not _werkzeug_available:
         raise TypeError("werkzeug is not installed")
 
-    if not isinstance(request, (werkzeug.wrappers.BaseRequest, local.LocalProxy)):
+    if not isinstance(request, (werkzeug.wrappers.Request, local.LocalProxy)):
         raise TypeError("Cannot normalize this request object")
 
     return Request(
@@ -445,7 +445,7 @@ def _normalize_werkzeug_response(response, request=None):
     if not _werkzeug_available:
         raise TypeError("werkzeug is not installed")
 
-    if not isinstance(response, werkzeug.wrappers.BaseResponse):
+    if not isinstance(response, werkzeug.wrappers.Response):
         raise TypeError("Cannot normalize this response object")
 
     if request is None:
