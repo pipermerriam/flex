@@ -34,6 +34,7 @@ setup(
         "strict-rfc3339>=0.7",
         "click>=3.3",
         "jsonpointer>=1.7",
+        "setuptools>=44.0.0",
     ],
     license="BSD",
     zip_safe=False,
